@@ -6,9 +6,13 @@ API 文档：https://www.barchart.com/ondemand/api
 """
 
 import os
+import logging
 import requests
 from typing import Optional, Dict, List
 from datetime import datetime, date
+
+
+logger = logging.getLogger(__name__)
 
 
 class BarchartAPIClient:
@@ -51,7 +55,7 @@ class BarchartAPIClient:
             价格数据字典，失败返回 None
         """
         if not self.api_key:
-            print("⚠️ BARCHART_API_KEY 未配置")
+            logger.warning(" BARCHART_API_KEY 未配置")
             return None
         
         try:
@@ -147,9 +151,9 @@ if __name__ == "__main__":
     
     # 测试连接
     if client.test_connection():
-        print("✅ Barchart API 连接成功")
+        logger.info(" Barchart API 连接成功")
     else:
-        print("❌ Barchart API 连接失败")
+        logger.error(" Barchart API 连接失败")
     
     # 获取玉米价格
     corn_price = client.get_commodity_price("ZC")
