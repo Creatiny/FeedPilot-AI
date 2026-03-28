@@ -1,83 +1,133 @@
 """
-FeedSales AI - 配方成本计算技能
+FeedSales AI - Formula Cost Skill
 
-计算饲料配方成本
+Calculate feed formula cost
 """
 
 import logging
+import sqlite3
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class FormulaCostSkill:
-    """配方成本计算技能"""
+    """Formula cost calculation skill"""
     
-    def __init__(self, db_pool=None, formula_repo=None, price_repo=None):
+    def __init__(self, db_path: str = "data/feed_sales.db"):
         """
-        初始化技能
+        Initialize skill
         
         Args:
-            db_pool: 数据库连接池
-            formula_repo: 配方仓库
-            price_repo: 价格仓库
+            db_path: SQLite database path
         """
-        self.db_pool = db_pool
-        self.formula_repo = formula_repo
-        self.price_repo = price_repo
+        self.db_path = db_path
+    
+    def _get_db_connection(self):
+        """Get database connection"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """
-        执行技能
+        Execute skill
         
         Args:
-            user_id: 用户 ID
-            message: 用户消息
+            user_id: User ID
+            message: User message
             
         Returns:
-            Dict: 执行结果
+            Dict: Execution result
         """
         try:
-            logger.info(f"执行配方成本计算 (用户：{user_id})")
+            logger.info(f"Executing formula cost calculation (user: {user_id})")
             
-            # 从消息中提取配方名称
+            # Extract formula name from message
             formula_name = self._extract_formula_name(message)
             if not formula_name:
-                return self._error("未找到配方名称，请明确指定配方")
+                return self._error("Formula name not found, please specify the formula")
             
-            # 获取配方数据
-            formula = self.formula_repo.get_formula(user_id, formula_name)
+            # Get formula data from database
+            formula = self._get_formula(formula_name)
             if not formula:
-                return self._error(f"配方不存在：{formula_name}")
+                return self._error(f"Formula not found: {formula_name}")
             
-            # 计算成本
+            # Calculate cost
             cost_data = self._calculate_cost(formula)
             
-            logger.info(f"配方成本计算完成：{formula_name}")
+            logger.info(f"Formula cost calculation completed: {formula_name}")
             return self._success(cost_data)
             
         except Exception as e:
-            logger.error(f"配方成本计算失败：{e}")
-            return self._error(f"计算失败：{str(e)}")
+            logger.error(f"Formula cost calculation failed: {e}")
+            return self._error(f"Calculation failed: {str(e)}")
     
     def _extract_formula_name(self, message: str) -> Optional[str]:
-        """从消息中提取配方名称"""
+        """Extract formula name from message"""
         import re
         
-        # 简单匹配：计算 xxx 的成本
-        match = re.search(r'计算 (.*?) 的成本', message)
+        # Match: calculate cost of xxx
+        match = re.search(r'calculate (.*?) cost', message, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            # Remove "formula" suffix
+            name = name.replace('formula', '').strip()
+            return name
+        
+        # Match: xxx formula
+        match = re.search(r'(.*?) formula', message, re.IGNORECASE)
         if match:
             return match.group(1).strip()
         
-        # 匹配：xxx 配方
-        match = re.search(r'(.*?配方)', message)
+        # Match: xxx cost
+        match = re.search(r'(.*?) cost', message, re.IGNORECASE)
         if match:
-            return match.group(1).strip()
+            name = match.group(1).strip()
+            # Remove "how much" etc
+            if 'how much' in name.lower():
+                return None
+            return name
         
         return None
     
+    def _get_formula(self, formula_name: str) -> Optional[Dict]:
+        """Get formula from database"""
+        conn = self._get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get formula
+        cursor.execute('''
+            SELECT * FROM formulas 
+            WHERE name LIKE ?
+        ''', (f'%{formula_name}%',))
+        
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return None
+        
+        formula = dict(row)
+        
+        # Get ingredients
+        cursor.execute('''
+            SELECT ingredient_name, ratio FROM formula_ingredients
+            WHERE formula_id = ?
+        ''', (formula['id'],))
+        
+        formula['ingredients'] = [
+            {'name': row['ingredient_name'], 'ratio': row['ratio']}
+            for row in cursor.fetchall()
+        ]
+        
+        conn.close()
+        return formula
+    
     def _calculate_cost(self, formula: Dict) -> Dict[str, Any]:
-        """计算配方成本"""
+        """Calculate formula cost"""
+        conn = self._get_db_connection()
+        cursor = conn.cursor()
+        
         ingredients = formula.get('ingredients', [])
         total_cost = 0.0
         cost_details = []
@@ -86,10 +136,21 @@ class FormulaCostSkill:
             ingredient_name = ingredient.get('name')
             ratio = ingredient.get('ratio', 0)
             
-            # 获取价格（简化版，使用默认价格）
-            price = self._get_default_price(ingredient_name)
+            # Get price from database
+            cursor.execute('''
+                SELECT price, unit FROM ingredient_prices
+                WHERE ingredient_name = ?
+                ORDER BY date DESC LIMIT 1
+            ''', (ingredient_name,))
             
-            # 计算成本
+            price_row = cursor.fetchone()
+            if price_row:
+                price = price_row['price']
+            else:
+                # Use default price
+                price = self._get_default_price(ingredient_name)
+            
+            # Calculate cost
             cost = price * ratio / 100.0
             total_cost += cost
             
@@ -100,41 +161,48 @@ class FormulaCostSkill:
                 'cost': cost
             })
         
+        conn.close()
+        
         return {
             'formula_name': formula.get('name'),
+            'animal_type': formula.get('animal_category'),
+            'stage': formula.get('stage'),
             'cost_per_ton': round(total_cost, 2),
             'cost_per_kg': round(total_cost / 1000, 2),
-            'ingredients': cost_details
+            'ingredients': cost_details,
+            'currency': 'USD'
         }
     
     def _get_default_price(self, ingredient_name: str) -> float:
-        """获取默认价格"""
+        """Get default price"""
         default_prices = {
-            '玉米': 2800.00,
-            '豆粕': 4200.00,
-            '豆油': 6500.00,
-            '小麦': 2700.00,
-            '鱼粉': 9000.00,
-            '预混料': 3200.00,
+            'Corn, grain': 180.00,
+            'Soybean meal, 48%': 350.00,
+            'Fish meal, 65%': 1800.00,
+            'Premix, swine': 450.00,
+            'Dicalcium phosphate': 650.00,
+            'Limestone, ag': 120.00,
+            'Salt, white': 150.00,
+            'L-Lysine HCl': 1200.00,
         }
-        return default_prices.get(ingredient_name, 3000.00)
+        return default_prices.get(ingredient_name, 300.00)
     
     def _success(self, data: Dict) -> Dict[str, Any]:
-        """成功响应"""
+        """Success response"""
         return {
             'success': True,
             'data': data
         }
     
     def _error(self, message: str) -> Dict[str, Any]:
-        """错误响应"""
+        """Error response"""
         return {
             'success': False,
             'error': message
         }
 
 
-# 技能工厂函数
-def create_skill(db_pool, formula_repo, price_repo):
-    """创建技能实例"""
-    return FormulaCostSkill(db_pool, formula_repo, price_repo)
+# Skill factory function
+def create_skill(db_path: str = "data/feed_sales.db"):
+    """Create skill instance"""
+    return FormulaCostSkill(db_path)

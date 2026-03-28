@@ -1,611 +1,644 @@
-# FeedSales AI MVP - 部署手册
+# FeedSales AI - 生产环境部署指南
 
-## 文档信息
+## 📋 概述
 
-| 项目 | 内容 |
-|------|------|
-| **版本** | v1.6.0 |
-| **创建日期** | 2026-03-27 |
-| **状态** | 📋 草稿 |
-| **作者** | Kenny Chen |
+本文档总结从零开始部署 FeedSales AI 到生产环境的完整流程，包括所有已知问题和解决方案。
+
+**适用场景**：全新服务器部署，确保一次部署成功，避免开发过程中遇到的所有问题。
 
 ---
 
-## 1. 部署方式
+## 🚀 快速部署（推荐）
 
-### 1.1 部署架构
+### 前置要求
 
-```
-┌─────────────────────────────────────────┐
-│         用户设备                         │
-│  - Telegram App                         │
-│  - 飞书 App                              │
-└─────────────────┬───────────────────────┘
-                  │ Internet
-┌─────────────────▼───────────────────────┐
-│         OpenClaw Gateway                 │
-│  - 端口：18789                           │
-│  - 进程：openclaw gateway                │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│         FeedSales AI Skills              │
-│  - formula_cost_skill                    │
-│  - price_lookup_skill                    │
-│  - customer_record_skill                 │
-│  - nutrition_analysis_skill              │
-└─────────────────┬───────────────────────┘
-                  │
-┌─────────────────▼───────────────────────┐
-│         SQLite Database (WAL)            │
-│  - data/feed_sales.db                   │
-│  - data/feed_sales.db-wal               │
-│  - data/feed_sales.db-shm               │
-└─────────────────────────────────────────┘
-```
+- OpenClaw 已安装并运行
+- 服务器：Linux (Ubuntu 24.04+)
+- 用户权限：普通用户 + sudo
 
-### 1.2 部署选项
-
-| 选项 | 适用场景 | 复杂度 |
-|------|---------|--------|
-| **本地部署** | 开发/测试 | 低 |
-| **VPS 部署** | 生产环境 | 中 |
-| **Docker 部署** | 容器化环境 | 中 |
-
----
-
-## 2. 前置要求
-
-### 2.1 系统要求
-
-| 组件 | 版本 | 说明 |
-|------|------|------|
-| **操作系统** | Linux/macOS | Ubuntu 22.04+ 推荐 |
-| **Python** | 3.10+ | 必需 |
-| **Node.js** | 22+ | OpenClaw 依赖 |
-| **Git** | 任意 | 代码管理 |
-
-### 2.2 账号要求
-
-| 服务 | 用途 | 必需 |
-|------|------|------|
-| **阿里云 DashScope** | LLM API | ✅ |
-| **Barchart** | 价格数据 | ✅ |
-| **Telegram Bot** | 消息通道 | ✅ |
-| **飞书 Bot** | 消息通道 | 可选 |
-
----
-
-## 3. 本地部署（开发环境）
-
-### 3.1 安装 OpenClaw
+### 一键部署脚本
 
 ```bash
-# 使用 npm 全局安装
-npm install -g openclaw
+#!/bin/bash
+# FeedSales AI 生产环境部署脚本
 
-# 验证安装
-openclaw --version
-# 应显示：OpenClaw 2026.3.24
-```
+set -e
 
-### 3.2 克隆项目
+echo "🚀 开始部署 FeedSales AI..."
 
-```bash
-# 克隆代码
-git clone git@gitee.com:kenny-chenym/feed-sales-ai-mvp.git
-cd feed-sales-ai-mvp
+# 1. 复制技能文件
+echo "📦 复制技能文件..."
+mkdir -p ~/.openclaw/workspace-feedsales/skills
+cp -r ~/feed-sales-ai-mvp/skills/formula_cost_skill ~/.openclaw/workspace-feedsales/skills/
+cp -r ~/feed-sales-ai-mvp/skills/price_lookup_skill ~/.openclaw/workspace-feedsales/skills/
+cp -r ~/feed-sales-ai-mvp/skills/nutrition_analysis_skill ~/.openclaw/workspace-feedsales/skills/
+cp -r ~/feed-sales-ai-mvp/skills/customer_record_skill ~/.openclaw/workspace-feedsales/skills/
 
-# 确认目录结构
-ls -la
-# 应包含：skills/, src/, data/, docs/
-```
+# 2. 创建 FeedSales Agent
+echo "🤖 创建 FeedSales Agent..."
+openclaw agents add feedsales \
+  --workspace ~/.openclaw/workspace-feedsales \
+  --model modelstudio/qwen3.5-plus
 
-### 3.3 安装 Python 依赖
+# 3. 配置 Telegram Bot
+echo "📱 配置 Telegram Bot..."
+read -p "输入 Telegram Bot Token: " BOT_TOKEN
+read -p "输入用户 Telegram ID: " USER_ID
 
-```bash
-# 创建虚拟环境（可选）
-python3 -m venv .venv
-source .venv/bin/activate
+openclaw config set --json channels.telegram "{
+  \"enabled\": true,
+  \"botToken\": \"$BOT_TOKEN\",
+  \"allowFrom\": [$USER_ID],
+  \"groupPolicy\": \"allowlist\",
+  \"groupAllowFrom\": [$USER_ID],
+  \"groups\": {\"*\": {\"requireMention\": true}},
+  \"streaming\": \"partial\",
+  \"proxy\": \"http://127.0.0.1:7897\"
+}"
 
-# 安装依赖
-pip install -r requirements.txt
-```
+# 4. 绑定 Telegram 到 FeedSales Agent
+echo "🔗 绑定 Telegram 到 FeedSales Agent..."
+openclaw config set --json bindings "[{
+  \"agentId\": \"feedsales\",
+  \"match\": {
+    \"channel\": \"telegram\",
+    \"accountId\": \"default\"
+  }
+}]"
 
-### 3.4 配置环境变量
-
-```bash
-# 复制环境变量模板
-cp .env.example .env
-
-# 编辑 .env 文件
-nano .env
-```
-
-**.env 内容**：
-```bash
-# OpenClaw 配置
-OPENCLAW_WORKSPACE=/home/kenny/.openclaw/workspace
-
-# DashScope API Key（LLM）
-DASHSCOPE_API_KEY=sk-sp-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Barchart API Key（价格数据）
-BARCHART_API_KEY=your_barchart_api_key
-
-# 数据库配置
-DATABASE_URL=sqlite:///data/feed_sales.db
-
-# Telegram Bot Token（可选，OpenClaw 已提供）
-TELEGRAM_BOT_TOKEN=xxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# 日志配置
-LOG_LEVEL=INFO
-LOG_FILE=logs/feed_sales.log
-```
-
-### 3.5 初始化数据库
-
-```bash
-# 创建数据目录
-mkdir -p data
-
-# 初始化数据库
-python3 scripts/init_database.py
-
-# 验证数据库
-ls -la data/
-# 应包含：feed_sales.db, feed_sales.db-wal, feed_sales.db-shm
-```
-
-### 3.6 启动 OpenClaw Gateway
-
-```bash
-# 启动 Gateway
-openclaw gateway start
-
-# 检查状态
-openclaw gateway status
-
-# 查看日志
-openclaw logs --follow
-```
-
-### 3.7 验证部署
-
-```bash
-# 健康检查
-curl http://localhost:18789/health
-
-# 应返回：{"status":"healthy"}
-```
-
----
-
-## 4. VPS 部署（生产环境）
-
-### 4.1 服务器要求
-
-| 配置 | 要求 | 说明 |
-|------|------|------|
-| **CPU** | 1 核+ | 基础需求 |
-| **内存** | 2GB+ | 推荐 4GB |
-| **存储** | 20GB+ | SSD 推荐 |
-| **带宽** | 1Mbps+ | 根据用户量调整 |
-
-### 4.2 安装步骤
-
-```bash
-# 1. 更新系统
-sudo apt update && sudo apt upgrade -y
-
-# 2. 安装 Node.js
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# 3. 安装 Python
-sudo apt install -y python3 python3-pip python3-venv
-
-# 4. 安装 OpenClaw
-sudo npm install -g openclaw
-
-# 5. 克隆项目
-cd /opt
-sudo git clone git@gitee.com:kenny-chenym/feed-sales-ai-mvp.git
-sudo chown -R $USER:$USER feed-sales-ai-mvp
-cd feed-sales-ai-mvp
-
-# 6. 安装依赖
-pip3 install -r requirements.txt
-
-# 7. 配置环境变量
-cp .env.example .env
-nano .env  # 填写实际配置
-
-# 8. 初始化数据库
-mkdir -p data
-python3 scripts/init_database.py
-
-# 9. 配置 systemd 服务
-sudo nano /etc/systemd/system/feed-sales-ai.service
-```
-
-**systemd 服务配置**：
-```ini
-[Unit]
-Description=FeedSales AI MVP
-After=network.target
-
-[Service]
-Type=simple
-User=kenny
-WorkingDirectory=/opt/feed-sales-ai-mvp
-Environment="PATH=/opt/feed-sales-ai-mvp/.venv/bin"
-ExecStart=/opt/feed-sales-ai-mvp/.venv/bin/python -m openclaw gateway
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**启动服务**：
-```bash
-# 重载 systemd
-sudo systemctl daemon-reload
-
-# 启用服务
-sudo systemctl enable feed-sales-ai
-
-# 启动服务
-sudo systemctl start feed-sales-ai
-
-# 检查状态
-sudo systemctl status feed-sales-ai
-```
-
-### 4.3 配置防火墙
-
-```bash
-# 允许 OpenClaw 端口
-sudo ufw allow 18789/tcp
-
-# 如果需要 Web UI
-sudo ufw allow 18789
-
-# 检查防火墙状态
-sudo ufw status
-```
-
-### 4.4 配置 Nginx（可选）
-
-```bash
-# 安装 Nginx
-sudo apt install -y nginx
-
-# 配置反向代理
-sudo nano /etc/nginx/sites-available/feed-sales-ai
-```
-
-**Nginx 配置**：
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    location / {
-        proxy_pass http://localhost:18789;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
+# 5. 配置 Agent 工具权限
+echo "🔧 配置 Agent 工具权限..."
+cat > ~/.openclaw/agents/feedsales/agent/tools.json << 'EOF'
+{
+  "allow": [
+    "formula_cost_skill",
+    "price_lookup_skill",
+    "nutrition_analysis_skill",
+    "customer_record_skill"
+  ],
+  "deny": [
+    "exec",
+    "shell",
+    "bash",
+    "skill",
+    "update_superpowers_skills",
+    "superpowers_version"
+  ],
+  "exec": {
+    "enabled": false
+  }
 }
+EOF
+
+# 6. 更新 Agent IDENTITY
+echo "📝 更新 Agent IDENTITY..."
+cat > ~/.openclaw/agents/feedsales/agent/IDENTITY.md << 'EOF'
+# 📊 FeedSales AI - 饲料配方成本计算专家
+
+你是 FeedSales AI，专门帮助用户计算饲料配方成本和查询原料价格的专业助手。
+
+## ⚠️ 重要规则
+
+### 绝对禁止
+- ❌ **禁止**让用户自己运行任何命令（SQL、shell、Python 等）
+- ❌ **禁止**给用户 SQL 查询语句
+- ❌ **禁止**说"你可以运行这个命令..."
+- ❌ **禁止**说"要查询数据库，请运行..."
+
+### 必须执行
+- ✅ **直接**调用技能获取数据
+- ✅ **直接**给出答案
+- ✅ 如果技能失败，友好说明原因并提供帮助
+
+## 核心能力
+
+### 1. 配方成本计算
+当用户询问配方成本时：
+1. **立即调用** `formula_cost_skill` 技能
+2. 等待技能返回结果
+3. **直接格式化输出**成本信息
+
+### 2. 原料价格查询
+当用户询问原料价格时：
+1. **立即调用** `price_lookup_skill` 技能
+2. 等待技能返回结果
+3. **直接格式化输出**价格信息
+
+### 3. 价格更新
+当用户要求更新价格时：
+1. **立即调用**价格更新脚本
+2. 等待执行结果
+3. **直接报告**更新状态
+
+## 响应原则
+
+### 正确做法 ✅
+```
+用户：查询豆粕价格
+
+[直接调用技能]
+
+豆粕价格：
+- $350.00/吨
+- 2026-03-28
+- CBOT
 ```
 
-**启用配置**：
-```bash
-# 创建软链接
-sudo ln -s /etc/nginx/sites-available/feed-sales-ai /etc/nginx/sites-enabled/
+### 错误做法 ❌
+```
+用户：查询豆粕价格
 
-# 测试配置
-sudo nginx -t
+你可以运行这个命令查询：
+sqlite3 ~/.openclaw/workspace/... "SELECT * FROM ..."
+```
 
-# 重载 Nginx
-sudo systemctl reload nginx
+## 技能列表
+
+你拥有以下技能，**必须使用它们**：
+- `formula_cost_skill` - 配方成本计算
+- `price_lookup_skill` - 原料价格查询
+- `nutrition_analysis_skill` - 营养分析
+- `customer_record_skill` - 客户记录
+
+## 故障处理
+
+如果技能调用失败：
+1. 道歉并说明原因
+2. 提供替代方案
+3. **不要**给用户 shell 命令
+
+**示例**：
+```
+抱歉，暂时无法查询到价格数据。可能是数据库连接问题。请稍后再试或联系管理员。
+```
+
+## 记住
+
+你的工作是**直接提供答案**，不是教用户如何查询数据库！
+EOF
+
+# 7. 更新 Agent 模型配置
+echo "⚙️ 更新 Agent 模型配置..."
+sed -i 's|"model": "modelstudio/glm-5"|"model": "modelstudio/qwen3.5-plus"|g' ~/.openclaw/openclaw.json
+
+# 8. 重启 Gateway
+echo "🔄 重启 Gateway..."
+systemctl --user restart openclaw-gateway.service
+sleep 5
+
+# 9. 验证部署
+echo "✅ 验证部署..."
+openclaw status | grep -A5 "feedsales"
+
+echo ""
+echo "🎉 部署完成！"
+echo ""
+echo "📝 测试步骤："
+echo "1. 在 Telegram 中发送 '玉米价格'"
+echo "2. 在 Telegram 中发送 'Nursery Diet 1 成本'"
+echo "3. 确认直接返回结果，没有 shell 命令"
+echo ""
+echo "🐛 如有问题，查看日志：journalctl --user -u openclaw-gateway -f"
 ```
 
 ---
 
-## 5. Docker 部署
+## 📚 分步部署（详细版）
 
-### 5.1 创建 Dockerfile
+### 步骤 1：准备技能文件
 
-```dockerfile
-FROM python:3.12-slim
+**问题**：技能路径不能逃逸 workspace 根目录
 
-WORKDIR /app
-
-# 安装 Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-RUN apt-get install -y nodejs
-
-# 安装 OpenClaw
-RUN npm install -g openclaw
-
-# 安装 Python 依赖
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 复制代码
-COPY . .
-
-# 创建数据目录
-RUN mkdir -p data logs
-
-# 启动命令
-CMD ["openclaw", "gateway"]
-```
-
-### 5.2 创建 docker-compose.yml
-
-```yaml
-version: '3.8'
-
-services:
-  feed-sales-ai:
-    build: .
-    container_name: feed-sales-ai-v1.6
-    ports:
-      - "18789:18789"
-    environment:
-      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
-      - BARCHART_API_KEY=${BARCHART_API_KEY}
-      - DATABASE_URL=sqlite:///data/feed_sales.db
-      - LOG_LEVEL=INFO
-    volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-      - ~/.openclaw:/root/.openclaw
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-```
-
-### 5.3 启动 Docker
-
+**解决方案**：
 ```bash
-# 构建镜像
-docker-compose build
+# ❌ 错误：使用 symlink 会逃逸
+ln -sf /home/kenny/.openclaw/workspace/feed-sales-ai-mvp/skills/xxx ~/.openclaw/workspace-feedsales/skills/
 
-# 启动容器
-docker-compose up -d
+# ✅ 正确：直接复制文件
+cp -r /home/kenny/.openclaw/workspace/feed-sales-ai-mvp/skills/xxx ~/.openclaw/workspace-feedsales/skills/
+```
 
-# 查看日志
-docker-compose logs -f
-
-# 检查状态
-docker-compose ps
+**验证**：
+```bash
+ls ~/.openclaw/workspace-feedsales/skills/
+# 应该看到：
+# - formula_cost_skill
+# - price_lookup_skill
+# - nutrition_analysis_skill
+# - customer_record_skill
 ```
 
 ---
 
-## 6. 配置 Telegram Bot
+### 步骤 2：创建 FeedSales Agent
 
-### 6.1 创建 Bot
+**命令**：
+```bash
+openclaw agents add feedsales \
+  --workspace ~/.openclaw/workspace-feedsales \
+  --model modelstudio/qwen3.5-plus
+```
 
-1. 在 Telegram 搜索 `@BotFather`
+**验证**：
+```bash
+openclaw agents list | grep feedsales
+```
+
+---
+
+### 步骤 3：配置 Telegram Bot
+
+**获取 Bot Token**：
+1. 在 Telegram 搜索 @BotFather
 2. 发送 `/newbot`
-3. 输入 Bot 名称：FeedSales AI Assistant
-4. 输入 Bot 用户名：feedsales_ai_bot
-5. 保存 Token
+3. 按提示设置名称和用户名
+4. 保存 Bot Token
 
-### 6.2 配置 OpenClaw
+**获取用户 Telegram ID**：
+1. 在 Telegram 搜索 @userinfobot
+2. 发送任意消息
+3. 保存返回的 ID
 
-编辑 `~/.openclaw/openclaw.json`：
-
-```json
-{
-  "channels": {
-    "telegram": {
-      "enabled": true,
-      "botToken": "YOUR_BOT_TOKEN"
-    }
-  }
-}
-```
-
-### 6.3 重启 Gateway
-
+**配置命令**：
 ```bash
-openclaw gateway restart
+openclaw config set --json channels.telegram "{
+  \"enabled\": true,
+  \"botToken\": \"YOUR_BOT_TOKEN\",
+  \"allowFrom\": [YOUR_USER_ID],
+  \"groupPolicy\": \"allowlist\",
+  \"groupAllowFrom\": [YOUR_USER_ID],
+  \"groups\": {\"*\": {\"requireMention\": true}},
+  \"streaming\": \"partial\",
+  \"proxy\": \"http://127.0.0.1:7897\"
+}"
 ```
 
 ---
 
-## 7. 配置飞书 Bot
+### 步骤 4：绑定 Telegram 到 FeedSales Agent
 
-### 7.1 创建飞书应用
+**命令**：
+```bash
+openclaw config set --json bindings "[{
+  \"agentId\": \"feedsales\",
+  \"match\": {
+    \"channel\": \"telegram\",
+    \"accountId\": \"default\"
+  }
+}]"
+```
 
-1. 访问 https://open.feishu.cn/app
-2. 创建企业自建应用
-3. 获取 App ID 和 App Secret
+**验证**：
+```bash
+openclaw status | grep -A3 "Telegram"
+```
 
-### 7.2 配置 OpenClaw
+---
 
-编辑 `~/.openclaw/openclaw.json`：
+### 步骤 5：配置 Agent 工具权限
+
+**问题**：Agent 默认有 exec 权限，会让用户运行 shell 命令
+
+**解决方案**：创建 `tools.json` 禁用 exec
+
+**文件**：`~/.openclaw/agents/feedsales/agent/tools.json`
 
 ```json
 {
-  "channels": {
-    "feishu": {
-      "enabled": true,
-      "appId": "cli_xxxxxxxxxxxxx",
-      "appSecret": "xxxxxxxxxxxxxxxx"
-    }
+  "allow": [
+    "formula_cost_skill",
+    "price_lookup_skill",
+    "nutrition_analysis_skill",
+    "customer_record_skill"
+  ],
+  "deny": [
+    "exec",
+    "shell",
+    "bash",
+    "skill",
+    "update_superpowers_skills",
+    "superpowers_version"
+  ],
+  "exec": {
+    "enabled": false
   }
 }
 ```
 
 ---
 
-## 8. 监控和日志
+### 步骤 6：配置 Agent IDENTITY
 
-### 8.1 查看日志
+**问题**：Agent 不知道应该直接调用技能，而是给用户 shell 命令
+
+**解决方案**：明确禁止给命令，强制直接回答
+
+**文件**：`~/.openclaw/agents/feedsales/agent/IDENTITY.md`
+
+**关键内容**：
+```markdown
+## ⚠️ 重要规则
+
+### 绝对禁止
+- ❌ **禁止**让用户自己运行任何命令（SQL、shell、Python 等）
+- ❌ **禁止**给用户 SQL 查询语句
+- ❌ **禁止**说"你可以运行这个命令..."
+
+### 必须执行
+- ✅ **直接**调用技能获取数据
+- ✅ **直接**给出答案
+```
+
+---
+
+### 步骤 7：更新 Agent 模型
+
+**命令**：
+```bash
+sed -i 's|"model": "modelstudio/glm-5"|"model": "modelstudio/qwen3.5-plus"|g' ~/.openclaw/openclaw.json
+```
+
+**验证**：
+```bash
+cat ~/.openclaw/openclaw.json | python3 -c "import sys,json; d=json.load(sys.stdin); agents=d.get('agents',{}).get('list',[]); print([a['model'] for a in agents if a.get('id')=='feedsales'])"
+```
+
+---
+
+### 步骤 8：重启 Gateway
+
+**命令**：
+```bash
+systemctl --user restart openclaw-gateway.service
+sleep 5
+```
+
+**验证**：
+```bash
+systemctl --user status openclaw-gateway.service
+```
+
+---
+
+### 步骤 9：测试验证
+
+**测试命令**（在 Telegram 中）：
+1. "玉米价格" - 应该直接返回价格
+2. "Nursery Diet 1 成本" - 应该直接计算成本
+3. "更新价格" - 应该直接调用更新脚本
+
+**预期结果**：
+- ✅ 直接返回答案
+- ❌ 不给任何 shell/SQL 命令
+
+---
+
+## 🐛 已知问题和解决方案
+
+### 问题 1：技能路径逃逸
+
+**错误信息**：
+```
+Detected workspace `skills/**/SKILL.md` paths whose realpath escapes their workspace root
+```
+
+**原因**：使用 symlink 链接技能文件
+
+**解决方案**：
+```bash
+# 删除 symlink
+rm -rf ~/.openclaw/workspace-feedsales/skills
+
+# 重新复制
+mkdir -p ~/.openclaw/workspace-feedsales/skills
+cp -r ~/feed-sales-ai-mvp/skills/* ~/.openclaw/workspace-feedsales/skills/
+```
+
+---
+
+### 问题 2：Agent 给用户 shell 命令
+
+**现象**：Agent 回复"你可以运行这个 SQL 命令..."
+
+**原因**：
+1. tools.json 没有禁用 exec
+2. IDENTITY.md 没有明确禁止
+
+**解决方案**：
+1. 创建 `tools.json` 禁用 exec
+2. 更新 `IDENTITY.md` 明确规则
+3. 重启 Gateway
+
+---
+
+### 问题 3：Agent 使用错误的模型
+
+**现象**：Agent 使用 glm-5 而不是 qwen3.5-plus
+
+**原因**：创建 Agent 时默认使用 glm-5
+
+**解决方案**：
+```bash
+sed -i 's|"model": "modelstudio/glm-5"|"model": "modelstudio/qwen3.5-plus"|g' ~/.openclaw/openclaw.json
+systemctl --user restart openclaw-gateway.service
+```
+
+---
+
+### 问题 4：Telegram Bot 不响应
+
+**检查清单**：
+1. Bot Token 是否正确
+2. 用户 ID 是否在 allowFrom 列表
+3. Gateway 是否运行
+4. Telegram 通道是否启用
+
+**调试命令**：
+```bash
+# 检查 Gateway 状态
+systemctl --user status openclaw-gateway.service
+
+# 检查配置
+openclaw status | grep -A5 "Telegram"
+
+# 查看日志
+journalctl --user -u openclaw-gateway -f
+```
+
+---
+
+## 📊 配置验证清单
+
+部署完成后，运行以下验证：
 
 ```bash
-# OpenClaw 日志
-openclaw logs --follow
+# 1. 检查 Agent 配置
+echo "=== Agent 配置 ==="
+openclaw agents list | grep -A5 "feedsales"
+
+# 2. 检查技能文件
+echo "=== 技能文件 ==="
+ls ~/.openclaw/workspace-feedsales/skills/
+
+# 3. 检查工具权限
+echo "=== 工具权限 ==="
+cat ~/.openclaw/agents/feedsales/agent/tools.json
+
+# 4. 检查 Telegram 配置
+echo "=== Telegram 配置 ==="
+openclaw status | grep -A5 "Telegram"
+
+# 5. 检查模型配置
+echo "=== 模型配置 ==="
+cat ~/.openclaw/openclaw.json | python3 -c "import sys,json; d=json.load(sys.stdin); print([a for a in d.get('agents',{}).get('list',[]) if a.get('id')=='feedsales'])"
+```
+
+---
+
+## 🔧 故障排查
+
+### Gateway 无法启动
+
+```bash
+# 查看详细错误
+journalctl --user -u openclaw-gateway -n 50 --no-pager
+
+# 检查配置语法
+cat ~/.openclaw/openclaw.json | python3 -m json.tool
+
+# 重启服务
+systemctl --user daemon-reload
+systemctl --user restart openclaw-gateway.service
+```
+
+### 技能不加载
+
+```bash
+# 检查技能路径
+ls -la ~/.openclaw/workspace-feedsales/skills/
+
+# 检查 SKILL.md 是否存在
+find ~/.openclaw/workspace-feedsales/skills/ -name "SKILL.md"
+
+# 查看技能加载日志
+journalctl --user -u openclaw-gateway -f | grep -i skill
+```
+
+### Agent 不响应
+
+```bash
+# 检查 Agent 状态
+openclaw agents list
+
+# 检查绑定关系
+openclaw status | grep -A10 "Sessions"
+
+# 查看会话日志
+journalctl --user -u openclaw-gateway -f | grep -i feedsales
+```
+
+---
+
+## 📝 维护指南
+
+### 日常维护
+
+```bash
+# 查看服务状态
+systemctl --user status openclaw-gateway.service
+
+# 查看日志
+journalctl --user -u openclaw-gateway -n 100 --no-pager
+
+# 重启服务
+systemctl --user restart openclaw-gateway.service
+```
+
+### 技能更新
+
+```bash
+# 1. 更新技能文件
+cp -r ~/feed-sales-ai-mvp/skills/xxx ~/.openclaw/workspace-feedsales/skills/
+
+# 2. 重启 Gateway
+systemctl --user restart openclaw-gateway.service
+```
+
+### 配置备份
+
+```bash
+# 备份配置
+cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.backup.$(date +%Y%m%d)
+
+# 恢复配置
+cp ~/.openclaw/openclaw.json.backup.YYYYMMDD ~/.openclaw/openclaw.json
+systemctl --user restart openclaw-gateway.service
+```
+
+---
+
+## 🎯 性能优化
+
+### 数据库优化
+
+```bash
+# 定期清理旧会话
+sqlite3 ~/.openclaw/workspace-feedsales/data.db "DELETE FROM sessions WHERE last_access < datetime('now', '-30 days');"
+
+# 优化数据库
+sqlite3 ~/.openclaw/workspace-feedsales/data.db "VACUUM;"
+```
+
+### 日志轮转
+
+```bash
+# 创建日志轮转配置
+cat > /etc/systemd/system/openclaw-gateway.service.d/log-rotate.conf << 'EOF'
+[Service]
+StandardOutput=journal
+StandardError=journal
+EOF
+
+systemctl --user daemon-reload
+```
+
+---
+
+## 📞 技术支持
+
+### 日志位置
+
+```bash
+# Gateway 日志
+journalctl --user -u openclaw-gateway -f
 
 # 系统日志
-sudo journalctl -u feed-sales-ai -f
-
-# Docker 日志
-docker-compose logs -f
+journalctl -f | grep openclaw
 ```
 
-### 8.2 健康检查
+### 常见问题
 
-```bash
-# HTTP 健康检查
-curl http://localhost:18789/health
+- **技能不加载**：检查路径和 SKILL.md
+- **Agent 不响应**：检查绑定和模型配置
+- **Telegram 不工作**：检查 Token 和 allowFrom
 
-# systemd 状态
-sudo systemctl status feed-sales-ai
+### 获取帮助
 
-# Docker 状态
-docker-compose ps
-```
-
-### 8.3 性能监控
-
-```bash
-# CPU 使用
-top -p $(pgrep -f openclaw)
-
-# 内存使用
-free -h
-
-# 磁盘使用
-df -h data/
-```
+1. 查看日志
+2. 检查配置
+3. 重启服务
+4. 联系技术支持
 
 ---
 
-## 9. 备份和恢复
+## 📚 参考文档
 
-### 9.1 数据库备份
-
-```bash
-# 备份数据库
-cp data/feed_sales.db data/feed_sales.db.backup.$(date +%Y%m%d)
-cp data/feed_sales.db-wal data/feed_sales.db-wal.backup.$(date +%Y%m%d)
-
-# 压缩备份
-tar -czf feed-sales-backup-$(date +%Y%m%d).tar.gz data/
-```
-
-### 9.2 数据库恢复
-
-```bash
-# 停止服务
-openclaw gateway stop
-
-# 恢复数据库
-cp data/feed_sales.db.backup.20260327 data/feed_sales.db
-
-# 启动服务
-openclaw gateway start
-```
+- [OpenClaw 官方文档](https://docs.openclaw.ai/)
+- [OpenClaw 技能开发](https://docs.openclaw.ai/skills/)
+- [OpenClaw Agent 配置](https://docs.openclaw.ai/agents/)
 
 ---
 
-## 10. 故障排查
-
-### 10.1 常见问题
-
-| 问题 | 可能原因 | 解决方案 |
-|------|---------|---------|
-| Gateway 无法启动 | 端口被占用 | `lsof -i :18789` 检查端口 |
-| 数据库错误 | 权限问题 | `chmod 644 data/*.db` |
-| API 调用失败 | Key 配置错误 | 检查 .env 文件 |
-| Bot 无响应 | Channel 未启用 | 检查 openclaw.json |
-
-### 10.2 调试模式
-
-```bash
-# 启用调试日志
-export LOG_LEVEL=DEBUG
-
-# 重启 Gateway
-openclaw gateway restart
-
-# 查看详细日志
-openclaw logs --follow | grep DEBUG
-```
-
----
-
-## 11. 版本升级
-
-### 11.1 备份数据
-
-```bash
-# 备份数据库
-cp -r data/ data.backup.$(date +%Y%m%d)
-
-# 备份配置
-cp .env .env.backup.$(date +%Y%m%d)
-```
-
-### 11.2 升级代码
-
-```bash
-# 拉取最新代码
-git pull origin master
-
-# 安装新依赖
-pip install -r requirements.txt --upgrade
-
-# 数据库迁移（如有）
-python3 scripts/migrate_database.py
-```
-
-### 11.3 重启服务
-
-```bash
-# systemd
-sudo systemctl restart feed-sales-ai
-
-# Docker
-docker-compose restart
-
-# 本地
-openclaw gateway restart
-```
-
----
-
-## 12. 安全检查清单
-
-- [ ] API Key 未提交到 Git
-- [ ] 数据库文件权限正确（644）
-- [ ] 防火墙配置正确
-- [ ] 使用 HTTPS（生产环境）
-- [ ] 定期备份数据库
-- [ ] 监控系统资源使用
-- [ ] 更新系统和依赖
-
----
-
-## 13. 版本历史
-
-| 版本 | 日期 | 变更说明 |
-|------|------|---------|
-| v1.6.0 | 2026-03-27 | 初始版本 |
-
----
-
-**文档结束**
+**最后更新**：2026-03-28  
+**版本**：1.0  
+**适用版本**：OpenClaw 2026.3.24+
