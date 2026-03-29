@@ -45,7 +45,9 @@ CREATE TABLE IF NOT EXISTS formulas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     owner_open_id TEXT NOT NULL,           -- 所有者 ID
     name TEXT NOT NULL,                    -- 配方名称
+    animal_type TEXT,                      -- 动物类型（Swine, Beef Cattle, Broiler 等）
     stage_type TEXT NOT NULL,              -- 饲养阶段
+    weight_range TEXT,                     -- 体重范围
     notes TEXT,                            -- 备注
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -165,7 +165,7 @@ class FormulaCostSkill:
         
         return {
             'formula_name': formula.get('name'),
-            'animal_type': formula.get('animal_category'),
+            'animal_type': formula.get('animal_type'),
             'stage': formula.get('stage_type'),
             'cost_per_ton': round(total_cost, 2),
             'cost_per_kg': round(total_cost / 1000, 2),
