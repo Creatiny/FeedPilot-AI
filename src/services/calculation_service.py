@@ -48,7 +48,7 @@ class CalculationService:
     
     def calculate_cost(self, user_id: str, formula_name: str) -> ServiceResult:
         """
-        计算配方成本
+        计算配方成本（优化版，避免 N+1 查询）
         
         Args:
             user_id: 用户 ID
@@ -69,22 +69,29 @@ class CalculationService:
         formula = formula_result.data
         formula_source = formula_result.source
         
-        # 2. 计算成本
+        # 2. 批量获取价格（优化 N+1 问题）
+        ingredients = formula.get('ingredients', [])
+        ingredient_names = [ing['name'] for ing in ingredients]
+        
+        # 批量查询价格
+        prices = self._batch_get_prices(user_id, ingredient_names)
+        
+        # 3. 计算成本
         details = []
         total_cost = 0.0
         price_sources = {}
         missing_prices = []
         
-        for ingredient in formula.get('ingredients', []):
+        for ingredient in ingredients:
             name = ingredient['name']
             ratio = ingredient['ratio']  # 百分比
             
-            # 获取价格（私有优先）
-            price_result = self.price_service.get_price(user_id, name)
+            # 从批量结果中获取价格
+            price_info = prices.get(name)
             
-            if price_result.success:
-                price = price_result.data['price']
-                price_source = price_result.source
+            if price_info:
+                price = price_info['price']
+                price_source = price_info['source']
             else:
                 # 使用默认价格
                 price = self._get_default_price(name)
@@ -120,6 +127,41 @@ class CalculationService:
                 'formula_source': formula_source
             }
         )
+    
+    def _batch_get_prices(self, user_id: str, ingredient_names: List[str]) -> Dict:
+        """
+        批量获取原料价格（优化 N+1 查询）
+        
+        Args:
+            user_id: 用户 ID
+            ingredient_names: 原料名称列表
+            
+        Returns:
+            Dict: {ingredient_name: {price, source}}
+        """
+        results = {}
+        
+        # 批量查询私有价格
+        private_prices = self.price_service._batch_get_private_prices(user_id, ingredient_names)
+        
+        # 批量查询公共价格（仅查询私有价格未覆盖的）
+        missing_names = [name for name in ingredient_names if name not in private_prices]
+        public_prices = self.price_service._batch_get_public_prices(missing_names)
+        
+        # 合并结果（私有优先）
+        for name in ingredient_names:
+            if name in private_prices:
+                results[name] = {
+                    'price': private_prices[name]['price'],
+                    'source': 'private'
+                }
+            elif name in public_prices:
+                results[name] = {
+                    'price': public_prices[name]['price'],
+                    'source': 'public'
+                }
+        
+        return results
     
     def compare_formulas(self, user_id: str, names: List[str]) -> ServiceResult:
         """

@@ -5,6 +5,8 @@ FeedSales AI - FeedSalesHarness
 """
 
 import logging
+import json
+from datetime import datetime
 from typing import Dict, Any, Optional
 
 from ..database.pool import DatabasePool
@@ -17,6 +19,50 @@ from .session_state import SessionStateManager
 from .result_validator import ResultValidator
 
 logger = logging.getLogger(__name__)
+
+
+class AuditLogger:
+    """审计日志记录器"""
+    
+    def __init__(self, db_pool: DatabasePool = None):
+        self.db_pool = db_pool
+    
+    def log(self, user_id: str, action: str, details: Dict, result: str):
+        """记录审计日志"""
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "user_id": user_id,
+            "action": action,
+            "details": details,
+            "result": result
+        }
+        
+        # 输出到日志
+        logger.info(f"AUDIT: {json.dumps(log_entry)}")
+        
+        # 可选：写入数据库
+        if self.db_pool:
+            self._write_to_db(log_entry)
+    
+    def _write_to_db(self, entry: Dict):
+        """写入数据库（可选）"""
+        try:
+            with self.db_pool.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO audit_log 
+                    (timestamp, user_id, action, details, result)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    entry['timestamp'],
+                    entry['user_id'],
+                    entry['action'],
+                    json.dumps(entry['details']),
+                    entry['result']
+                ))
+                conn.commit()
+        except Exception as e:
+            logger.warning(f"Failed to write audit log to DB: {e}")
 
 
 class FeedSalesHarness:
@@ -45,6 +91,7 @@ class FeedSalesHarness:
         self.task_router = TaskRouter()
         self.session_manager = SessionStateManager()
         self.result_validator = ResultValidator()
+        self.audit_logger = AuditLogger(db_pool)
         
         logger.info("FeedSalesHarness initialized")
     
@@ -131,6 +178,14 @@ class FeedSalesHarness:
         formula_name = match.group(1).strip()
         
         result = self.calculation_service.calculate_cost(user_id, formula_name)
+        
+        # 审计日志
+        self.audit_logger.log(
+            user_id, 
+            'formula_cost_query',
+            {'formula_name': formula_name},
+            'success' if result.success else 'failed'
+        )
         
         if result.success:
             # 校验结果
@@ -242,6 +297,14 @@ class FeedSalesHarness:
         
         result = self.price_service.set_private_price(user_id, ingredient, price)
         
+        # 审计日志
+        self.audit_logger.log(
+            user_id,
+            'set_private_price',
+            {'ingredient': ingredient, 'price': price},
+            'success' if result.success else 'failed'
+        )
+        
         if result.success:
             return {
                 'success': True,
@@ -268,6 +331,14 @@ class FeedSalesHarness:
             }
             
             result = self.customer_service.create_customer(user_id, customer_data)
+            
+            # 审计日志
+            self.audit_logger.log(
+                user_id,
+                'create_customer',
+                {'name': customer_data.get('name')},
+                'success' if result.success else 'failed'
+            )
             
             if result.success:
                 return {'success': True, 'data': result.data}

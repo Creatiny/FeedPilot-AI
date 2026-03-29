@@ -116,3 +116,20 @@ CREATE TABLE IF NOT EXISTS calculation_history (
 -- 索引优化
 CREATE INDEX IF NOT EXISTS idx_history_owner ON calculation_history(owner_open_id);
 CREATE INDEX IF NOT EXISTS idx_history_date ON calculation_history(created_at);
+
+-- ============================================
+-- 审计日志表
+-- ============================================
+CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    details TEXT,
+    result TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 索引优化
+CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(user_id, timestamp);
+

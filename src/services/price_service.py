@@ -199,6 +199,63 @@ class PriceService:
                 return dict(row)
             return None
     
+    def _batch_get_private_prices(self, user_id: str, ingredient_names: List[str]) -> Dict:
+        """批量获取私有价格（优化 N+1 查询）"""
+        if not ingredient_names:
+            return {}
+        
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # 构建查询条件
+            placeholders = ' OR '.join(['ingredient_name LIKE ?' for _ in ingredient_names])
+            params = [f'%{name}%' for name in ingredient_names]
+            params.insert(0, user_id)
+            
+            cursor.execute(f'''
+                SELECT ingredient_name, price, price_date
+                FROM ingredient_prices
+                WHERE owner_open_id = ? AND ({placeholders})
+                ORDER BY price_date DESC
+            ''', params)
+            
+            results = {}
+            for row in cursor.fetchall():
+                # 取每个原料的最新价格
+                name = row['ingredient_name']
+                if name not in results:
+                    results[name] = {'price': row['price']}
+            
+            return results
+    
+    def _batch_get_public_prices(self, ingredient_names: List[str]) -> Dict:
+        """批量获取公共价格（优化 N+1 查询）"""
+        if not ingredient_names:
+            return {}
+        
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # 构建查询条件
+            placeholders = ' OR '.join(['ingredient_name LIKE ?' for _ in ingredient_names])
+            params = [f'%{name}%' for name in ingredient_names]
+            params.insert(0, 'system_public')
+            
+            cursor.execute(f'''
+                SELECT ingredient_name, price, price_date
+                FROM ingredient_prices
+                WHERE owner_open_id = ? AND ({placeholders})
+                ORDER BY price_date DESC
+            ''', params)
+            
+            results = {}
+            for row in cursor.fetchall():
+                name = row['ingredient_name']
+                if name not in results:
+                    results[name] = {'price': row['price']}
+            
+            return results
+    
     def _generate_ingredient_code(self, ingredient_name: str) -> str:
         """生成原料代码"""
         # 从原料名称生成代码
