@@ -215,3 +215,82 @@ class PriceRepository:
             
             conn.commit()
             return cursor.lastrowid
+
+
+class CustomerRepository:
+    """客户数据访问层"""
+    
+    def __init__(self, db_pool: DatabasePool):
+        self.db_pool = db_pool
+    
+    def get_customer(self, owner_open_id: str, customer_name: str) -> Optional[Dict]:
+        """获取客户"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, name, phone, address, animal_type, scale, notes, created_at
+                FROM customers
+                WHERE owner_open_id = ? AND name = ?
+            """, (owner_open_id, customer_name))
+            
+            row = cursor.fetchone()
+            return dict(row) if row else None
+    
+    def list_customers(self, owner_open_id: str) -> List[Dict]:
+        """列出用户所有客户"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, name, phone, address, animal_type, scale, notes, created_at
+                FROM customers
+                WHERE owner_open_id = ?
+                ORDER BY created_at DESC
+            """, (owner_open_id,))
+            
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def create_customer(self, owner_open_id: str, customer_data: Dict) -> int:
+        """创建客户"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO customers (owner_open_id, name, phone, address, animal_type, scale, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (owner_open_id, customer_data['name'],
+                  customer_data.get('phone'), customer_data.get('address'),
+                  customer_data.get('animal_type'), customer_data.get('scale'),
+                  customer_data.get('notes')))
+            
+            conn.commit()
+            logger.info(f"Created customer (ID: {cursor.lastrowid}, owner: {owner_open_id})")
+            return cursor.lastrowid
+    
+    def update_customer(self, owner_open_id: str, customer_id: int, 
+                       customer_data: Dict) -> bool:
+        """更新客户"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE customers
+                SET name = ?, phone = ?, address = ?, animal_type = ?, scale = ?, notes = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND owner_open_id = ?
+            """, (customer_data['name'], customer_data.get('phone'),
+                  customer_data.get('address'), customer_data.get('animal_type'),
+                  customer_data.get('scale'), customer_data.get('notes'),
+                  customer_id, owner_open_id))
+            
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def delete_customer(self, owner_open_id: str, customer_id: int) -> bool:
+        """删除客户"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                DELETE FROM customers
+                WHERE id = ? AND owner_open_id = ?
+            """, (customer_id, owner_open_id))
+            
+            conn.commit()
+            return cursor.rowcount > 0
