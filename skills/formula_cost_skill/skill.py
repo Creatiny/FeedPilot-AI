@@ -140,7 +140,7 @@ class FormulaCostSkill:
             cursor.execute('''
                 SELECT price, unit FROM ingredient_prices
                 WHERE ingredient_name = ?
-                ORDER BY date DESC LIMIT 1
+                ORDER BY price_date DESC LIMIT 1
             ''', (ingredient_name,))
             
             price_row = cursor.fetchone()

@@ -64,25 +64,30 @@ class PriceLookupSkill:
         """从消息中提取原料名称"""
         import re
         
-        # 简单匹配常见原料
-        ingredients = ['玉米', '豆粕', '豆油', '小麦', '鱼粉', '预混料']
+        # 匹配常见原料（英文名称，北美市场）
+        ingredients = ['Corn', 'Soybean meal', 'Fish meal', 'Wheat', 'Limestone', 
+                       'Premix', 'Dicalcium phosphate', 'Salt', 'L-Lysine', 'Methionine']
         for ingredient in ingredients:
-            if ingredient in message:
+            if ingredient.lower() in message.lower():
                 return ingredient
         
         return None
     
     def _get_default_price(self, ingredient: str) -> float:
-        """获取默认价格"""
+        """获取默认价格（USD/ton）"""
         default_prices = {
-            '玉米': 2800.00,
-            '豆粕': 4200.00,
-            '豆油': 6500.00,
-            '小麦': 2700.00,
-            '鱼粉': 9000.00,
-            '预混料': 3200.00,
+            'Corn': 180.00,
+            'Soybean meal': 350.00,
+            'Fish meal': 1800.00,
+            'Wheat': 200.00,
+            'Limestone': 120.00,
+            'Premix': 450.00,
+            'Dicalcium phosphate': 650.00,
+            'Salt': 150.00,
+            'L-Lysine': 1200.00,
+            'Methionine': 2500.00,
         }
-        return default_prices.get(ingredient, 3000.00)
+        return default_prices.get(ingredient, 300.00)
     
     def _success(self, data: Dict) -> Dict[str, Any]:
         """成功响应"""
