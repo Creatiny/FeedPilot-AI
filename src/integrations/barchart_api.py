@@ -55,7 +55,7 @@ class BarchartAPIClient:
             价格数据字典，失败返回 None
         """
         if not self.api_key:
-            logger.warning(" BARCHART_API_KEY 未配置")
+            logger.warning("BARCHART_API_KEY 未配置")
             return None
         
         try:
@@ -86,14 +86,14 @@ class BarchartAPIClient:
                     "unit": "bushel"
                 }
             else:
-                print(f"❌ API 错误：{data.get('status', {}).get('message')}")
+                logger.error(f"API 错误：{data.get('status', {}).get('message')}")
                 return None
                 
         except requests.exceptions.RequestException as e:
-            print(f"❌ 请求失败：{e}")
+            logger.error(f"请求失败：{e}")
             return None
         except (KeyError, ValueError) as e:
-            print(f"❌ 数据解析失败：{e}")
+            logger.error(f"数据解析失败：{e}")
             return None
     
     def get_grain_prices(self) -> List[Dict]:

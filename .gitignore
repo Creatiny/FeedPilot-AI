@@ -8,11 +8,10 @@ __pycache__/
 dist/
 build/
 
-# 数据库
-*.db
+# 数据库（运行时生成的 WAL/SHM 排除，但保留主数据库和种子数据）
 *.db-wal
 *.db-shm
-data/
+# data/*.json 和 data/*.db 需要提交作为种子数据
 
 # 虚拟环境
 .venv/

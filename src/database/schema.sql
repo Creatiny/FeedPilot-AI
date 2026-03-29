@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ingredient_prices (
     ingredient_code TEXT NOT NULL,         -- 原料代码
     ingredient_name TEXT NOT NULL,         -- 原料名称
     price REAL NOT NULL,                   -- 价格
-    currency TEXT DEFAULT 'CNY',           -- 货币
+    currency TEXT DEFAULT 'USD',           -- 货币（北美市场统一 USD）
     unit TEXT DEFAULT 'ton',               -- 单位
     source TEXT DEFAULT 'barchart',        -- 数据来源
     price_date DATE NOT NULL,              -- 价格日期

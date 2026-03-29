@@ -1,0 +1,447 @@
+[
+  {
+    "name": "Nursery Diet 1",
+    "animal_type": "Swine",
+    "stage": "Nursery",
+    "weight_range": "5-10kg",
+    "ingredients": [
+      {"name": "Corn", "ratio": 60.0},
+      {"name": "Soybean meal, 48%", "ratio": 25.0},
+      {"name": "Fish meal, 65%", "ratio": 3.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 18.0,
+      "lysine": 1.2,
+      "methionine": 0.35,
+      "calcium": 0.8,
+      "phosphorus": 0.6
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Nursery Diet 2",
+    "animal_type": "Swine",
+    "stage": "Nursery",
+    "weight_range": "10-20kg",
+    "ingredients": [
+      {"name": "Corn", "ratio": 62.0},
+      {"name": "Soybean meal, 48%", "ratio": 23.0},
+      {"name": "Fish meal, 65%", "ratio": 2.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "lysine": 1.1,
+      "methionine": 0.32,
+      "calcium": 0.75,
+      "phosphorus": 0.55
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Nursery Diet 3",
+    "animal_type": "Swine",
+    "stage": "Nursery",
+    "weight_range": "20-30kg",
+    "ingredients": [
+      {"name": "Corn", "ratio": 65.0},
+      {"name": "Soybean meal, 48%", "ratio": 21.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 16.0,
+      "lysine": 1.0,
+      "methionine": 0.3,
+      "calcium": 0.7,
+      "phosphorus": 0.5
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Grower Diet 1",
+    "animal_type": "Swine",
+    "stage": "Growing",
+    "weight_range": "30-60kg",
+    "ingredients": [
+      {"name": "Corn", "ratio": 68.0},
+      {"name": "Soybean meal, 48%", "ratio": 18.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 15.0,
+      "lysine": 0.9,
+      "methionine": 0.28,
+      "calcium": 0.65,
+      "phosphorus": 0.45
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Grower Diet 2",
+    "animal_type": "Swine",
+    "stage": "Growing",
+    "weight_range": "60-90kg",
+    "ingredients": [
+      {"name": "Corn", "ratio": 70.0},
+      {"name": "Soybean meal, 48%", "ratio": 16.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 14.0,
+      "lysine": 0.8,
+      "methionine": 0.25,
+      "calcium": 0.6,
+      "phosphorus": 0.4
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Finisher Diet",
+    "animal_type": "Swine",
+    "stage": "Finishing",
+    "weight_range": "90kg+",
+    "ingredients": [
+      {"name": "Corn", "ratio": 72.0},
+      {"name": "Soybean meal, 48%", "ratio": 14.0},
+      {"name": "Premix, swine", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 13.0,
+      "lysine": 0.7,
+      "methionine": 0.22,
+      "calcium": 0.55,
+      "phosphorus": 0.35
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Gestating Sow Diet",
+    "animal_type": "Swine",
+    "stage": "Gestating",
+    "weight_range": "Gestation",
+    "ingredients": [
+      {"name": "Corn", "ratio": 68.0},
+      {"name": "Soybean meal, 48%", "ratio": 13.0},
+      {"name": "Wheat middlings", "ratio": 10.0},
+      {"name": "Premix, sow", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 13.0,
+      "lysine": 0.65,
+      "calcium": 0.65,
+      "phosphorus": 0.45
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Lactating Sow Diet",
+    "animal_type": "Swine",
+    "stage": "Lactating",
+    "weight_range": "Lactation",
+    "ingredients": [
+      {"name": "Corn", "ratio": 60.0},
+      {"name": "Soybean meal, 48%", "ratio": 22.0},
+      {"name": "Fish meal, 65%", "ratio": 3.0},
+      {"name": "Premix, sow", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "lysine": 1.0,
+      "calcium": 0.85,
+      "phosphorus": 0.6
+    },
+    "source": "NRC 2012"
+  },
+  {
+    "name": "Beef Cattle Starter",
+    "animal_type": "Beef Cattle",
+    "stage": "Starter",
+    "weight_range": "150-250kg",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 50.0},
+      {"name": "Soybean meal, 48%", "ratio": 20.0},
+      {"name": "Alfalfa hay", "ratio": 20.0},
+      {"name": "Premix, beef", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 16.0,
+      "tdn": 70.0,
+      "calcium": 0.7,
+      "phosphorus": 0.5
+    },
+    "source": "NRC 2016"
+  },
+  {
+    "name": "Beef Cattle Grower",
+    "animal_type": "Beef Cattle",
+    "stage": "Growing",
+    "weight_range": "250-400kg",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 60.0},
+      {"name": "Soybean meal, 48%", "ratio": 15.0},
+      {"name": "Alfalfa hay", "ratio": 15.0},
+      {"name": "Premix, beef", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 14.0,
+      "tdn": 75.0,
+      "calcium": 0.65,
+      "phosphorus": 0.45
+    },
+    "source": "NRC 2016"
+  },
+  {
+    "name": "Beef Cattle Finisher",
+    "animal_type": "Beef Cattle",
+    "stage": "Finishing",
+    "weight_range": "400kg+",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 70.0},
+      {"name": "Soybean meal, 48%", "ratio": 10.0},
+      {"name": "Alfalfa hay", "ratio": 10.0},
+      {"name": "Premix, beef", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 12.0,
+      "tdn": 80.0,
+      "calcium": 0.6,
+      "phosphorus": 0.4
+    },
+    "source": "NRC 2016"
+  },
+  {
+    "name": "Dairy Calf Starter",
+    "animal_type": "Dairy Cattle",
+    "stage": "Calf",
+    "weight_range": "0-3 months",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 45.0},
+      {"name": "Soybean meal, 48%", "ratio": 25.0},
+      {"name": "Alfalfa hay", "ratio": 15.0},
+      {"name": "Milk replacer", "ratio": 10.0},
+      {"name": "Premix, calf", "ratio": 5.0}
+    ],
+    "nutrition": {
+      "crude_protein": 20.0,
+      "tdn": 72.0,
+      "calcium": 0.8,
+      "phosphorus": 0.55
+    },
+    "source": "NRC 2001"
+  },
+  {
+    "name": "Dairy Heifer Grower",
+    "animal_type": "Dairy Cattle",
+    "stage": "Heifer",
+    "weight_range": "3-12 months",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 50.0},
+      {"name": "Soybean meal, 48%", "ratio": 18.0},
+      {"name": "Alfalfa hay", "ratio": 22.0},
+      {"name": "Premix, heifer", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 16.0,
+      "tdn": 68.0,
+      "calcium": 0.7,
+      "phosphorus": 0.45
+    },
+    "source": "NRC 2001"
+  },
+  {
+    "name": "Lactating Cow Diet",
+    "animal_type": "Dairy Cattle",
+    "stage": "Lactating",
+    "weight_range": "Milking",
+    "ingredients": [
+      {"name": "Corn silage", "ratio": 35.0},
+      {"name": "Corn, grain", "ratio": 30.0},
+      {"name": "Soybean meal, 48%", "ratio": 18.0},
+      {"name": "Alfalfa hay", "ratio": 10.0},
+      {"name": "Premix, dairy", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.0}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "tdn": 74.0,
+      "calcium": 0.8,
+      "phosphorus": 0.5
+    },
+    "source": "NRC 2001"
+  },
+  {
+    "name": "Broiler Starter",
+    "animal_type": "Broiler",
+    "stage": "Starter",
+    "weight_range": "0-10 days",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 52.0},
+      {"name": "Soybean meal, 48%", "ratio": 32.0},
+      {"name": "Fish meal, 65%", "ratio": 5.0},
+      {"name": "Premix, broiler", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 23.0,
+      "metabolizable_energy": 3000.0,
+      "calcium": 1.0,
+      "phosphorus": 0.7
+    },
+    "source": "NRC 1994"
+  },
+  {
+    "name": "Broiler Grower",
+    "animal_type": "Broiler",
+    "stage": "Grower",
+    "weight_range": "11-24 days",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 56.0},
+      {"name": "Soybean meal, 48%", "ratio": 28.0},
+      {"name": "Fish meal, 65%", "ratio": 3.0},
+      {"name": "Premix, broiler", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 21.0,
+      "metabolizable_energy": 3100.0,
+      "calcium": 0.95,
+      "phosphorus": 0.65
+    },
+    "source": "NRC 1994"
+  },
+  {
+    "name": "Broiler Finisher",
+    "animal_type": "Broiler",
+    "stage": "Finisher",
+    "weight_range": "25 days+",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 60.0},
+      {"name": "Soybean meal, 48%", "ratio": 24.0},
+      {"name": "Premix, broiler", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3},
+      {"name": "L-Lysine HCl", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 19.0,
+      "metabolizable_energy": 3200.0,
+      "calcium": 0.9,
+      "phosphorus": 0.6
+    },
+    "source": "NRC 1994"
+  },
+  {
+    "name": "Layer Starter",
+    "animal_type": "Layer",
+    "stage": "Starter",
+    "weight_range": "0-6 weeks",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 55.0},
+      {"name": "Soybean meal, 48%", "ratio": 28.0},
+      {"name": "Premix, layer", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 20.0,
+      "metabolizable_energy": 2900.0,
+      "calcium": 1.0,
+      "phosphorus": 0.6
+    },
+    "source": "NRC 1994"
+  },
+  {
+    "name": "Layer Grower",
+    "animal_type": "Layer",
+    "stage": "Grower",
+    "weight_range": "7-18 weeks",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 60.0},
+      {"name": "Soybean meal, 48%", "ratio": 22.0},
+      {"name": "Premix, layer", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 1.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "metabolizable_energy": 2850.0,
+      "calcium": 0.9,
+      "phosphorus": 0.55
+    },
+    "source": "NRC 1994"
+  },
+  {
+    "name": "Layer Diet",
+    "animal_type": "Layer",
+    "stage": "Laying",
+    "weight_range": "19 weeks+",
+    "ingredients": [
+      {"name": "Corn, grain", "ratio": 62.0},
+      {"name": "Soybean meal, 48%", "ratio": 20.0},
+      {"name": "Premix, layer", "ratio": 5.0},
+      {"name": "Dicalcium phosphate", "ratio": 1.5},
+      {"name": "Limestone, ag", "ratio": 8.0},
+      {"name": "Salt, white", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 16.5,
+      "metabolizable_energy": 2850.0,
+      "calcium": 3.5,
+      "phosphorus": 0.5
+    },
+    "source": "NRC 1994"
+  }
+]

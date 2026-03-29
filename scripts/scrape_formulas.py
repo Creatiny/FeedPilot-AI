@@ -138,15 +138,15 @@ def main():
     scraper = FeedFormulaScraper()
     
     # 获取配方数据
-    formulas = scraper.scrape_standard_formulas()
+    formulas = scraper.scrape_nrc_formulas()
     save_to_json(formulas, 'formulas.json')
     
     # 获取原料营养
-    ingredients = scraper.scrape_ingredient_nutrition()
+    ingredients = scraper.scrape_usda_nutrition()
     save_to_json(ingredients, 'ingredients_nutrition.json')
     
     # 获取原料价格
-    prices = scraper.scrape_ingredient_prices()
+    prices = scraper.scrape_us_prices()
     save_to_json(prices, 'ingredient_prices.json')
     
     logger.info("\n" + "=" * 60)
