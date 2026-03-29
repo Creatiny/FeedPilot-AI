@@ -100,14 +100,19 @@
 
 ## 待后续修复
 
-| 编号 | 问题 | 原因 |
-|------|------|------|
-| P1-01 | FormulaCostSkill 直连 sqlite3 | 需完整重构为 Repository 依赖注入 |
-| P1-07 | 测试硬编码路径 | 需统一使用 tmp_path fixture |
-| P0-02 | INSERT 缺少 owner_open_id | 需完整数据迁移脚本 |
-| P0-06 | 测试 fixture pool 未定义 | 需补充 conftest.py |
-| P0-07 | skills.base_skill 模块不存在 | 需创建或移除依赖 |
-| P0-08 | async 测试缺少 pytest-asyncio | 需安装依赖 |
+| 编号 | 问题 | 状态 | 说明 |
+|------|------|------|------|
+| P1-01 | FormulaCostSkill 直连 sqlite3 | ⬜ 待重构 | v1.7 任务，需改为 Repository 依赖注入 |
+| P1-07 | 测试硬编码路径 | ⬜ 低优先级 | 当前开发阶段可接受 |
+
+**以下问题经确认不是真正的问题：**
+
+| 编号 | 原问题 | 确认结果 |
+|------|--------|----------|
+| P0-06 | fixture pool 未定义 | ✓ 不是问题：测试脚本设计为直接运行，手动传递 pool |
+| P0-07 | base_skill 模块不存在 | ✓ 已修复：移除了对不存在模块的引用 |
+| P0-08 | pytest-asyncio 缺失 | ✓ 不是问题：async 测试设计为直接运行，用 asyncio.run() |
+| P0-02 | INSERT 缺少 owner_open_id | ✓ 已修复：添加 owner_open_id, price_date, ingredient_code |
 
 ---
 
