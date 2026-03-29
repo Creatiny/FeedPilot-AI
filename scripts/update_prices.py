@@ -272,6 +272,42 @@ class PriceScraper:
         
         return price
     
+    def _get_ingredient_code(self, ingredient_name: str) -> str:
+        """
+        Generate ingredient code from name
+        
+        Args:
+            ingredient_name: Ingredient name
+            
+        Returns:
+            Ingredient code (e.g., 'ING_CORN')
+        """
+        # Map common names to codes
+        code_map = {
+            'Corn': 'ING_CORN',
+            'Soybean meal': 'ING_SBM',
+            'Soybeans': 'ING_SBEAN',
+            'Wheat': 'ING_WHEAT',
+            'Fish meal': 'ING_FISHM',
+            'Premix': 'ING_PREMIX',
+            'Dicalcium phosphate': 'ING_DCP',
+            'Limestone': 'ING_LIME',
+            'Salt': 'ING_SALT',
+            'L-Lysine': 'ING_LYS',
+            'DL-Methionine': 'ING_MET',
+            'Alfalfa': 'ING_ALFALFA',
+            'Corn silage': 'ING_CSILAGE',
+            'Wheat middlings': 'ING_WHEATMID',
+            'Milk replacer': 'ING_MILKREP',
+        }
+        
+        for key, code in code_map.items():
+            if key in ingredient_name:
+                return code
+        
+        # Default: generate from first word
+        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+    
     def update_database(self, prices: List[Dict]) -> int:
         """
         Update prices in database (UPSERT - updates existing, inserts new)
@@ -301,20 +337,20 @@ class PriceScraper:
             # UPSERT: Update if exists, insert if new
             cursor.execute('''
                 INSERT INTO ingredient_prices 
-                (ingredient_name, price, unit, date, market, trend)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(ingredient_name, date) DO UPDATE SET
+                (owner_open_id, ingredient_name, ingredient_code, price, currency, unit, price_date, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(ingredient_code, price_date, owner_open_id) DO UPDATE SET
                     price = excluded.price,
-                    unit = excluded.unit,
-                    market = excluded.market,
-                    trend = excluded.trend
+                    source = excluded.source
             ''', (
+                'system_public',
                 price_data['name'],
+                self._get_ingredient_code(price_data['name']),
                 round(price_usd_ton, 2),
-                'USD/ton',
+                'USD',
+                'ton',
                 today,
-                price_data.get('market', 'US'),
-                price_data.get('trend', 'stable')
+                price_data.get('market', 'US')
             ))
             
             updated += 1
