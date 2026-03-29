@@ -1,7 +1,7 @@
 """
 FeedSales AI - Formula Cost Skill
 
-Calculate feed formula cost
+Calculate feed formula cost using CalculationService (v1.7)
 """
 
 import logging
@@ -14,20 +14,16 @@ logger = logging.getLogger(__name__)
 class FormulaCostSkill:
     """Formula cost calculation skill"""
     
-    def __init__(self, db_path: str = "data/feed_sales.db"):
+    def __init__(self, db_path: str = "data/feed_sales.db", calc_service=None):
         """
         Initialize skill
         
         Args:
-            db_path: SQLite database path
+            db_path: SQLite database path (fallback for legacy mode)
+            calc_service: CalculationService instance (preferred)
         """
         self.db_path = db_path
-    
-    def _get_db_connection(self):
-        """Get database connection"""
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+        self.calc_service = calc_service
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """
@@ -48,30 +44,82 @@ class FormulaCostSkill:
             if not formula_name:
                 return self._error("Formula name not found, please specify the formula")
             
-            # Get formula data from database
-            formula = self._get_formula(formula_name)
-            if not formula:
-                return self._error(f"Formula not found: {formula_name}")
+            # Use CalculationService if available (v1.7+)
+            if self.calc_service:
+                return self._execute_with_service(user_id, formula_name)
             
-            # Calculate cost
-            cost_data = self._calculate_cost(formula)
-            
-            logger.info(f"Formula cost calculation completed: {formula_name}")
-            return self._success(cost_data)
+            # Fallback to legacy mode
+            return self._execute_legacy(user_id, formula_name)
             
         except Exception as e:
             logger.error(f"Formula cost calculation failed: {e}")
             return self._error(f"Calculation failed: {str(e)}")
     
+    def _execute_with_service(self, user_id: str, formula_name: str) -> Dict[str, Any]:
+        """Execute using CalculationService (v1.7+)"""
+        result = self.calc_service.calculate_cost(user_id, formula_name)
+        
+        if result.success:
+            return {
+                'success': True,
+                'data': result.data
+            }
+        else:
+            return {
+                'success': False,
+                'error': result.error_message,
+                'error_code': result.error_code
+            }
+    
+    def _execute_legacy(self, user_id: str, formula_name: str) -> Dict[str, Any]:
+        """Execute using legacy direct DB access"""
+        # Get formula data from database
+        formula = self._get_formula(formula_name)
+        if not formula:
+            return self._error(f"Formula not found: {formula_name}")
+        
+        # Calculate cost
+        cost_data = self._calculate_cost(formula)
+        
+        logger.info(f"Formula cost calculation completed: {formula_name}")
+        return self._success(cost_data)
+    
+    def _get_db_connection(self):
+        """Get database connection"""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+    
     def _extract_formula_name(self, message: str) -> Optional[str]:
         """Extract formula name from message"""
         import re
+        
+        # Match Chinese: 计算xxx的成本
+        match = re.search(r'计算(.+?)(的成本|成本)', message)
+        if match:
+            return match.group(1).strip()
+        
+        # Match: xxx成本
+        match = re.search(r'(.+?)成本', message)
+        if match:
+            name = match.group(1).strip()
+            if len(name) < 20:  # 避免匹配太长的
+                return name
+        
+        # Match Chinese: xxx多少钱
+        match = re.search(r'(.+?)(多少钱|多少钱一吨)', message)
+        if match:
+            return match.group(1).strip()
+        
+        # Match Chinese: xxx配方
+        match = re.search(r'(.+?)配方', message)
+        if match:
+            return match.group(1).strip()
         
         # Match: calculate cost of xxx
         match = re.search(r'calculate (.*?) cost', message, re.IGNORECASE)
         if match:
             name = match.group(1).strip()
-            # Remove "formula" suffix
             name = name.replace('formula', '').strip()
             return name
         
@@ -84,7 +132,6 @@ class FormulaCostSkill:
         match = re.search(r'(.*?) cost', message, re.IGNORECASE)
         if match:
             name = match.group(1).strip()
-            # Remove "how much" etc
             if 'how much' in name.lower():
                 return None
             return name
