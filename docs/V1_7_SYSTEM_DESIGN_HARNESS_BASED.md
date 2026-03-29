@@ -396,6 +396,7 @@ class FormulaCostSkill:
 | E003 | 权限错误 | 用户无权访问该数据 |
 | E004 | 业务错误 | 成分比例不等于100%等 |
 | E005 | 系统错误 | 数据库连接失败等 |
+| E006 | 并发冲突 | 数据已被其他用户修改，请刷新后重试 |
 
 #### 错误传递机制
 ```python
@@ -428,9 +429,22 @@ def handle_result(result: ServiceResult) -> Dict:
 ### 6.2 并发控制设计
 
 #### 乐观锁机制
+
+**应用范围**：所有可更新的业务表
+
+| 表名 | 是否需要 version | 说明 |
+|------|-----------------|------|
+| `formulas` | ✓ | 配方可被修改 |
+| `formula_ingredients` | ✗ | 随配方一起更新 |
+| `ingredient_prices` | ✓ | 私有价格可被修改 |
+| `customers` | ✓ | 客户信息可被修改 |
+| `quotes` | ✗ | 报价单生成后不可修改 |
+
 ```sql
--- formulas 表添加版本字段
+-- 为需要的表添加版本字段
 ALTER TABLE formulas ADD COLUMN version INTEGER DEFAULT 1;
+ALTER TABLE ingredient_prices ADD COLUMN version INTEGER DEFAULT 1;
+ALTER TABLE customers ADD COLUMN version INTEGER DEFAULT 1;
 
 -- 更新时检查版本
 UPDATE formulas 
@@ -518,6 +532,23 @@ class SessionStateManager:
 | 操作日志 | INFO | 用户操作记录（查询、创建、更新、删除） |
 | 错误日志 | ERROR | 业务错误、系统错误 |
 | 审计日志 | INFO | 敏感操作（私有数据访问、报价生成） |
+
+#### 日志保留策略
+| 日志类型 | 存储位置 | 保留期限 | 清理方式 |
+|----------|----------|----------|----------|
+| 操作日志 | `logs/operation.log` | 30 天 | 每日自动清理超过 30 天的日志 |
+| 错误日志 | `logs/error.log` | 90 天 | 每日自动清理超过 90 天的日志 |
+| 审计日志 | `logs/audit.log` | 365 天 | 每日自动清理超过 365 天的日志 |
+
+#### 清理脚本
+```bash
+# 每日清理脚本（可加入 cron）
+#!/bin/bash
+LOG_DIR="/var/log/feedsales"
+find $LOG_DIR -name "operation.log.*" -mtime +30 -delete
+find $LOG_DIR -name "error.log.*" -mtime +90 -delete
+find $LOG_DIR -name "audit.log.*" -mtime +365 -delete
+```
 
 #### 日志实现
 ```python
