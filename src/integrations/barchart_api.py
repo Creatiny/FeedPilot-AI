@@ -20,15 +20,13 @@ class BarchartAPIClient:
     
     BASE_URL = "https://www.barchart.com/ondemand/api/v1"
     
-    # 原料代码映射
+    # 原料代码映射（英文）
     SYMBOL_MAP = {
-        "玉米": "ZC",
-        "豆粕": "ZM",
-        "豆油": "ZL",
-        "小麦": "ZW",
-        "大米": "RR",
-        "高粱": "SORGHUM",
-        "大麦": "BARLEY",
+        "Corn": "ZC",
+        "Soybean meal": "ZM",
+        "Soybean oil": "ZL",
+        "Wheat": "ZW",
+        "Rice": "RR",
     }
     
     def __init__(self, api_key: Optional[str] = None):
@@ -113,31 +111,29 @@ class BarchartAPIClient:
         
         return prices
     
-    def convert_to_cny_ton(self, price_usd_bushel: float, commodity: str) -> float:
+    def convert_to_usd_ton(self, price_usd_bushel: float, commodity: str) -> float:
         """
-        将 USD/蒲式耳 转换为 CNY/吨
+        将 USD/蒲式耳 转换为 USD/吨
         
         Args:
             price_usd_bushel: 美元/蒲式耳价格
             commodity: 商品名称
             
         Returns:
-            人民币/吨价格
+            USD/吨价格
         """
-        # 转换系数（不同商品不同）
+        # 转换系数（不同商品不同，1 蒲式耳 = kg）
         conversion_factors = {
-            "玉米": 25.4,  # 1 蒲式耳 = 25.4 公斤
-            "豆粕": 27.2,
-            "小麦": 27.2,
+            "Corn": 25.4,  # 1 蒲式耳 = 25.4 kg
+            "Soybean meal": 27.2,
+            "Wheat": 27.2,
         }
         
-        # 汇率（应从 API 获取）
-        usd_cny_rate = 7.2
-        
         factor = conversion_factors.get(commodity, 25.4)
-        price_cny_ton = price_usd_bushel * factor * usd_cny_rate * 1000 / 453.6
+        # USD/bushel * kg/bushel * 1000 = USD/ton
+        price_usd_ton = price_usd_bushel * factor * 1000 / 453.6
         
-        return round(price_cny_ton, 2)
+        return round(price_usd_ton, 2)
     
     def test_connection(self) -> bool:
         """测试 API 连接"""
@@ -158,11 +154,11 @@ if __name__ == "__main__":
     # 获取玉米价格
     corn_price = client.get_commodity_price("ZC")
     if corn_price:
-        print(f"\n📊 玉米价格")
-        print(f"  价格：${corn_price['price']} / 蒲式耳")
-        print(f"  涨跌：{corn_price['change_percent']}%")
-        print(f"  成交量：{corn_price['volume']}")
+        print(f"\n📊 Corn price")
+        print(f"  Price: ${corn_price['price']} / bushel")
+        print(f"  Change: {corn_price['change_percent']}%")
+        print(f"  Volume: {corn_price['volume']}")
         
-        # 转换为 CNY/吨
-        price_cny = client.convert_to_cny_ton(corn_price['price'], "玉米")
-        print(f"  换算：¥{price_cny} / 吨")
+        # 转换为 USD/ton
+        price_usd = client.convert_to_usd_ton(corn_price['price'], "Corn")
+        print(f"  Converted: ${price_usd} / ton")
