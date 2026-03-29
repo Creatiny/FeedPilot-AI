@@ -14,14 +14,16 @@ logger = logging.getLogger(__name__)
 class CustomerRecordSkill:
     """Customer record management skill"""
     
-    def __init__(self, customer_repo=None):
+    def __init__(self, customer_repo=None, customer_service=None):
         """
         Initialize skill
         
         Args:
-            customer_repo: Customer repository
+            customer_repo: Customer repository (legacy)
+            customer_service: CustomerService instance (v1.7+)
         """
         self.customer_repo = customer_repo
+        self.customer_service = customer_service
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """

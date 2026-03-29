@@ -15,16 +15,18 @@ logger = logging.getLogger(__name__)
 class NutritionAnalysisSkill:
     """Nutrition analysis skill"""
     
-    def __init__(self, formula_repo=None, price_repo=None):
+    def __init__(self, formula_repo=None, price_repo=None, formula_service=None):
         """
         Initialize skill
         
         Args:
-            formula_repo: Formula repository
-            price_repo: Price repository (for ingredient nutrition data)
+            formula_repo: Formula repository (legacy)
+            price_repo: Price repository (legacy)
+            formula_service: FormulaService instance (v1.7+)
         """
         self.formula_repo = formula_repo
         self.price_repo = price_repo
+        self.formula_service = formula_service
     
     # NRC nutrition standards (minimum requirements)
     NRC_STANDARDS = {
