@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- ============================================
--- 原料价格表（支持多租户隔离）
+-- 原料价格表（支持多租户隔离 + 乐观锁）
 -- ============================================
 CREATE TABLE IF NOT EXISTS ingredient_prices (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS ingredient_prices (
     unit TEXT DEFAULT 'ton',               -- 单位
     source TEXT DEFAULT 'barchart',        -- 数据来源
     price_date DATE NOT NULL,              -- 价格日期
+    version INTEGER DEFAULT 1,             -- 乐观锁版本号
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
     UNIQUE(ingredient_code, price_date, owner_open_id)
 );
@@ -39,7 +41,7 @@ CREATE INDEX IF NOT EXISTS idx_prices_owner_date ON ingredient_prices(owner_open
 CREATE INDEX IF NOT EXISTS idx_prices_code ON ingredient_prices(ingredient_code);
 
 -- ============================================
--- 配方表（支持多租户隔离）
+-- 配方表（支持多租户隔离 + 乐观锁）
 -- ============================================
 CREATE TABLE IF NOT EXISTS formulas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,6 +51,7 @@ CREATE TABLE IF NOT EXISTS formulas (
     stage_type TEXT NOT NULL,              -- 饲养阶段
     weight_range TEXT,                     -- 体重范围
     notes TEXT,                            -- 备注
+    version INTEGER DEFAULT 1,             -- 乐观锁版本号
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
@@ -75,7 +78,7 @@ CREATE TABLE IF NOT EXISTS formula_ingredients (
 CREATE INDEX IF NOT EXISTS idx_formula_ingredients_formula ON formula_ingredients(formula_id);
 
 -- ============================================
--- 客户数据表（支持多租户隔离）
+-- 客户数据表（支持多租户隔离 + 乐观锁）
 -- ============================================
 CREATE TABLE IF NOT EXISTS customers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,6 +89,7 @@ CREATE TABLE IF NOT EXISTS customers (
     animal_type TEXT,                      -- 养殖类型
     scale INTEGER,                         -- 养殖规模
     notes TEXT,
+    version INTEGER DEFAULT 1,             -- 乐观锁版本号
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_open_id) REFERENCES users(open_id)
