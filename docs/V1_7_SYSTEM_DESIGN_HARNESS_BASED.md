@@ -185,6 +185,8 @@ class CalculationService:
 
 **公共数据**：`owner_open_id = 'system_public'`
 
+**注意**：`formulas` 表包含 `animal_type` 字段（Swine, Beef Cattle, Broiler 等），已在 v1.6.4 修复中添加。
+
 ### 3.2 新增表
 
 #### quotes（报价记录）
@@ -379,6 +381,185 @@ class FormulaCostSkill:
         
         return {"success": True, "data": result}
 ```
+
+---
+
+## 6. 非功能性需求（补充）
+
+### 6.1 错误处理流程
+
+#### 错误码定义
+| 错误码 | 类型 | 说明 |
+|-------|------|------|
+| E001 | 参数错误 | 缺少必填参数或参数格式错误 |
+| E002 | 数据不存在 | 配方/价格/客户不存在 |
+| E003 | 权限错误 | 用户无权访问该数据 |
+| E004 | 业务错误 | 成分比例不等于100%等 |
+| E005 | 系统错误 | 数据库连接失败等 |
+
+#### 错误传递机制
+```python
+class ServiceResult:
+    success: bool
+    data: Optional[Dict]
+    error_code: Optional[str]
+    error_message: Optional[str]
+
+# Service 层
+def get_formula(user_id: str, name: str) -> ServiceResult:
+    formula = self.repo.get_formula(user_id, name)
+    if not formula:
+        return ServiceResult(
+            success=False,
+            error_code="E002",
+            error_message=f"配方 '{name}' 不存在"
+        )
+    return ServiceResult(success=True, data=formula)
+
+# Harness 层
+def handle_result(result: ServiceResult) -> Dict:
+    if not result.success:
+        # 根据错误码生成用户友好消息
+        user_message = ERROR_MESSAGES.get(result.error_code, "操作失败")
+        return {"success": False, "error": user_message}
+    return {"success": True, "data": result.data}
+```
+
+### 6.2 并发控制设计
+
+#### 乐观锁机制
+```sql
+-- formulas 表添加版本字段
+ALTER TABLE formulas ADD COLUMN version INTEGER DEFAULT 1;
+
+-- 更新时检查版本
+UPDATE formulas 
+SET name = ?, stage_type = ?, version = version + 1
+WHERE id = ? AND owner_open_id = ? AND version = ?;
+```
+
+#### 更新流程
+```python
+def update_formula(user_id: str, formula_id: int, data: Dict, expected_version: int) -> ServiceResult:
+    result = self.repo.update_formula_with_version(
+        user_id, formula_id, data, expected_version
+    )
+    if result.rowcount == 0:
+        return ServiceResult(
+            success=False,
+            error_code="E006",
+            error_message="数据已被其他用户修改，请刷新后重试"
+        )
+    return ServiceResult(success=True, data=result.data)
+```
+
+### 6.3 Session State 持久化策略
+
+**策略**：内存 + 可选数据库持久化
+
+```python
+class SessionStateManager:
+    def __init__(self, db_pool: Optional[DatabasePool] = None):
+        self.memory_store = {}  # 内存缓存
+        self.db_pool = db_pool  # 可选数据库持久化
+        self.ttl = 3600  # 1小时过期
+    
+    def get_state(self, session_id: str) -> SessionState:
+        # 1. 先查内存
+        if session_id in self.memory_store:
+            return self.memory_store[session_id]
+        
+        # 2. 再查数据库（如果启用）
+        if self.db_pool:
+            state = self._load_from_db(session_id)
+            if state:
+                self.memory_store[session_id] = state
+                return state
+        
+        # 3. 创建新状态
+        state = SessionState()
+        self.memory_store[session_id] = state
+        return state
+    
+    def save_state(self, session_id: str, state: SessionState):
+        self.memory_store[session_id] = state
+        if self.db_pool:
+            self._save_to_db(session_id, state)
+    
+    def cleanup_expired(self):
+        """定期清理过期会话"""
+        now = time.time()
+        expired = [sid for sid, s in self.memory_store.items() 
+                   if now - s.last_access > self.ttl]
+        for sid in expired:
+            del self.memory_store[sid]
+```
+
+### 6.4 日志审计设计
+
+#### 日志格式
+```json
+{
+  "timestamp": "2026-03-29T13:00:00Z",
+  "level": "INFO",
+  "user_id": "user_123",
+  "session_id": "sess_456",
+  "action": "formula_cost_query",
+  "formula_name": "Nursery Diet 1",
+  "result": "success",
+  "duration_ms": 45,
+  "price_sources": {"Corn": "private", "Soybean meal": "public"}
+}
+```
+
+#### 日志类型
+| 类型 | 级别 | 说明 |
+|------|------|------|
+| 操作日志 | INFO | 用户操作记录（查询、创建、更新、删除） |
+| 错误日志 | ERROR | 业务错误、系统错误 |
+| 审计日志 | INFO | 敏感操作（私有数据访问、报价生成） |
+
+#### 日志实现
+```python
+class AuditLogger:
+    def log_operation(self, user_id: str, action: str, details: Dict, result: str):
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": "INFO",
+            "user_id": user_id,
+            "action": action,
+            "details": details,
+            "result": result
+        }
+        logger.info(json.dumps(log_entry))
+    
+    def log_sensitive_access(self, user_id: str, resource_type: str, resource_id: str):
+        self.log_operation(user_id, "sensitive_access", {
+            "resource_type": resource_type,
+            "resource_id": resource_id
+        }, "success")
+```
+
+### 6.5 SQL 注入防护
+
+**策略**：Repository 层强制使用参数化查询
+
+```python
+# ✅ 正确：参数化查询
+cursor.execute(
+    "SELECT * FROM formulas WHERE owner_open_id = ? AND name = ?",
+    (user_id, formula_name)
+)
+
+# ❌ 错误：字符串拼接（禁止）
+cursor.execute(
+    f"SELECT * FROM formulas WHERE owner_open_id = '{user_id}'"
+)
+```
+
+**代码审查规则**：
+- 所有 SQL 语句必须使用 `?` 占位符
+- 禁止任何形式的字符串拼接 SQL
 
 ---
 
