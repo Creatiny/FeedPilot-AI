@@ -6,10 +6,10 @@ FeedSales AI - CalculationService
 
 import logging
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from ..database.pool import DatabasePool
 from .formula_service import FormulaService
 from .price_service import PriceService
+from ..types import ServiceResult
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +27,6 @@ DEFAULT_PRICES = {
     'L-Lysine': 1200.00,
     'Methionine': 2500.00,
 }
-
-
-@dataclass
-class ServiceResult:
-    """服务返回结果"""
-    success: bool
-    data: Optional[Dict] = None
-    error_code: Optional[str] = None
-    error_message: Optional[str] = None
 
 
 class CalculationService:

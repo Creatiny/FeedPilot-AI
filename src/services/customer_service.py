@@ -6,19 +6,10 @@ FeedSales AI - CustomerService
 
 import logging
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from ..database.pool import DatabasePool
+from ..types import ServiceResult
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class ServiceResult:
-    """服务返回结果"""
-    success: bool
-    data: Optional[Dict] = None
-    error_code: Optional[str] = None
-    error_message: Optional[str] = None
 
 
 class CustomerService:

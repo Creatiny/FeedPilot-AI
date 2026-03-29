@@ -6,21 +6,11 @@ FeedSales AI - PriceService
 
 import logging
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from datetime import date
 from ..database.pool import DatabasePool
+from ..types import ServiceResult
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class ServiceResult:
-    """服务返回结果"""
-    success: bool
-    data: Optional[Dict] = None
-    error_code: Optional[str] = None
-    error_message: Optional[str] = None
-    source: Optional[str] = None  # 'private' | 'public' | None
 
 
 class PriceService:
@@ -90,15 +80,17 @@ class PriceService:
         )
     
     def set_private_price(self, user_id: str, ingredient_name: str, 
-                         price: float, source: str = 'manual') -> ServiceResult:
+                         price: float, source: str = 'manual',
+                         expected_version: int = None) -> ServiceResult:
         """
-        设置私有价格
+        设置私有价格（支持乐观锁）
         
         Args:
             user_id: 用户 ID
             ingredient_name: 原料名称
             price: 价格 (USD/ton)
             source: 价格来源
+            expected_version: 期望版本号（用于乐观锁，更新时必须提供）
             
         Returns:
             ServiceResult: 操作结果
@@ -117,15 +109,36 @@ class PriceService:
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
-            # UPSERT: 如果存在则更新，否则插入
+            # 检查现有记录版本
             cursor.execute('''
-                INSERT INTO ingredient_prices 
-                (owner_open_id, ingredient_code, ingredient_name, price, price_date, source)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(owner_open_id, ingredient_code, price_date) DO UPDATE SET
-                    price = excluded.price,
-                    source = excluded.source
-            ''', (user_id, ingredient_code, ingredient_name, price, today, source))
+                SELECT id, version FROM ingredient_prices
+                WHERE owner_open_id = ? AND ingredient_code = ? AND price_date = ?
+            ''', (user_id, ingredient_code, today))
+            
+            existing = cursor.fetchone()
+            
+            if existing and expected_version is not None:
+                # 乐观锁检查
+                if existing['version'] != expected_version:
+                    return ServiceResult(
+                        success=False,
+                        error_code='E006',
+                        error_message='数据已被其他用户修改，请刷新后重试'
+                    )
+            
+            # UPSERT
+            if existing:
+                cursor.execute('''
+                    UPDATE ingredient_prices 
+                    SET price = ?, source = ?, version = version + 1, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ''', (price, source, existing['id']))
+            else:
+                cursor.execute('''
+                    INSERT INTO ingredient_prices 
+                    (owner_open_id, ingredient_code, ingredient_name, price, price_date, source)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (user_id, ingredient_code, ingredient_name, price, today, source))
             
             conn.commit()
             
