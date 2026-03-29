@@ -77,41 +77,6 @@ def test_multi_tenant_isolation():
     return True
 
 
-def test_owner_open_id_fallback():
-    """测试 owner_open_id 降级策略"""
-    print("\n🧪 测试 owner_open_id 降级策略...")
-    
-    from skills.base_skill import BaseSkill
-    
-    class MockContext:
-        def __init__(self, **kwargs):
-            for k, v in kwargs.items():
-                setattr(self, k, v)
-    
-    skill = BaseSkill()
-    
-    # 测试 1: 有 owner_open_id
-    context1 = MockContext(_meta={'owner_open_id': 'user_123'})
-    context1.get_meta = lambda k: context1._meta.get(k)
-    result1 = skill.get_owner_open_id(context1)
-    assert result1 == 'user_123', f"应该返回 user_123，实际 {result1}"
-    print("✅ 测试 1 通过：从 meta 获取 owner_open_id")
-    
-    # 测试 2: 降级到 user_id
-    context2 = MockContext(user_id='456')
-    result2 = skill.get_owner_open_id(context2)
-    assert result2 == 'user_456', f"应该返回 user_456，实际 {result2}"
-    print("✅ 测试 2 通过：降级到 user_id")
-    
-    # 测试 3: 使用默认值
-    context3 = MockContext()
-    result3 = skill.get_owner_open_id(context3)
-    assert result3 == 'default_user', f"应该返回 default_user，实际 {result3}"
-    print("✅ 测试 3 通过：使用默认值")
-    
-    return True
-
-
 def run_all_tests():
     """运行所有测试"""
     print("=" * 60)
@@ -122,8 +87,8 @@ def run_all_tests():
         # 测试多租户隔离
         test_multi_tenant_isolation()
         
-        # 测试降级策略
-        test_owner_open_id_fallback()
+        # 注意：test_owner_open_id_fallback() 已移除
+        # OpenClaw 3.24 无 base_skill 模块，skill 基于 SKILL.md
         
         print("\n" + "=" * 60)
         print("✅ 所有测试通过！")
