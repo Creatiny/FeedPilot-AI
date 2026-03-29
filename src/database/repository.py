@@ -44,7 +44,7 @@ class FormulaRepository:
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT f.id, f.name, f.stage_type, f.notes,
+                SELECT f.id, f.name, f.animal_type, f.stage_type, f.notes,
                        fi.ingredient_name, fi.ratio_percent
                 FROM formulas f
                 LEFT JOIN formula_ingredients fi ON f.id = fi.formula_id
@@ -59,8 +59,42 @@ class FormulaRepository:
             formula = {
                 'id': rows[0]['id'],
                 'name': rows[0]['name'],
+                'animal_type': rows[0]['animal_type'],
                 'stage_type': rows[0]['stage_type'],
                 'notes': rows[0]['notes'],
+                'owner_open_id': owner_open_id,
+                'ingredients': []
+            }
+            for row in rows:
+                if row['ingredient_name']:
+                    formula['ingredients'].append({
+                        'name': row['ingredient_name'],
+                        'ratio': row['ratio_percent']
+                    })
+            return formula
+    
+    def get_formula_by_id(self, formula_id: int) -> Optional[Dict]:
+        """通过 ID 获取配方"""
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT f.id, f.name, f.stage_type, f.notes, f.owner_open_id,
+                       fi.ingredient_name, fi.ratio_percent
+                FROM formulas f
+                LEFT JOIN formula_ingredients fi ON f.id = fi.formula_id
+                WHERE f.id = ?
+            """, (formula_id,))
+            
+            rows = cursor.fetchall()
+            if not rows:
+                return None
+            
+            formula = {
+                'id': rows[0]['id'],
+                'name': rows[0]['name'],
+                'stage_type': rows[0]['stage_type'],
+                'notes': rows[0]['notes'],
+                'owner_open_id': rows[0]['owner_open_id'],
                 'ingredients': []
             }
             for row in rows:
