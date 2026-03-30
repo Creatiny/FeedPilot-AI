@@ -1,8 +1,8 @@
 """
 FeedSales AI - Nutrition Analysis Skill
 
-Analyze formula nutrition composition and compare with NRC standards
-Target market: North America
+Analyze formula nutrition content and compare to NRC standards
+Uses FormulaService (v1.7 architecture: Skill → Service → Repository)
 """
 
 import logging
@@ -11,251 +11,188 @@ from typing import Dict, Any, Optional, List
 
 logger = logging.getLogger(__name__)
 
+# NRC Standard Reference Values
+NRC_STANDARDS = {
+    'Swine': {
+        'Nursery': {'protein': 18.0, 'calcium': 0.70, 'phosphorus': 0.55, 'lysine': 1.2},
+        'Growing': {'protein': 16.0, 'calcium': 0.60, 'phosphorus': 0.50, 'lysine': 0.9},
+        'Finishing': {'protein': 14.0, 'calcium': 0.50, 'phosphorus': 0.40, 'lysine': 0.7},
+        'Gestating': {'protein': 13.0, 'calcium': 0.75, 'phosphorus': 0.60, 'lysine': 0.6},
+        'Lactating': {'protein': 17.0, 'calcium': 0.85, 'phosphorus': 0.70, 'lysine': 0.9},
+    },
+    'Broiler': {
+        'Starter': {'protein': 22.0, 'calcium': 1.00, 'phosphorus': 0.45, 'lysine': 1.3},
+        'Grower': {'protein': 20.0, 'calcium': 0.90, 'phosphorus': 0.40, 'lysine': 1.1},
+        'Finisher': {'protein': 18.0, 'calcium': 0.80, 'phosphorus': 0.35, 'lysine': 0.9},
+    },
+    'Layer': {
+        'Starter': {'protein': 20.0, 'calcium': 1.00, 'phosphorus': 0.50, 'lysine': 1.0},
+        'Grower': {'protein': 16.0, 'calcium': 0.90, 'phosphorus': 0.40, 'lysine': 0.7},
+        'Laying': {'protein': 17.0, 'calcium': 3.50, 'phosphorus': 0.35, 'lysine': 0.8},
+    },
+    'Beef Cattle': {
+        'Starter': {'protein': 16.0, 'calcium': 0.60, 'phosphorus': 0.40, 'lysine': 0.8},
+        'Growing': {'protein': 14.0, 'calcium': 0.50, 'phosphorus': 0.35, 'lysine': 0.6},
+        'Finishing': {'protein': 12.0, 'calcium': 0.40, 'phosphorus': 0.30, 'lysine': 0.5},
+    },
+}
+
+# Ingredient nutrition reference
+INGREDIENT_NUTRITION = {
+    'Corn': {'protein': 8.5, 'calcium': 0.02, 'phosphorus': 0.28, 'lysine': 0.25},
+    'Soybean meal': {'protein': 48.0, 'calcium': 0.30, 'phosphorus': 0.65, 'lysine': 3.0},
+    'Fish meal': {'protein': 65.0, 'calcium': 5.0, 'phosphorus': 2.8, 'lysine': 5.0},
+    'Wheat': {'protein': 12.0, 'calcium': 0.05, 'phosphorus': 0.35, 'lysine': 0.35},
+    'DDGS': {'protein': 28.0, 'calcium': 0.10, 'phosphorus': 0.80, 'lysine': 0.9},
+    'Alfalfa': {'protein': 17.0, 'calcium': 1.40, 'phosphorus': 0.25, 'lysine': 0.8},
+    'Premix': {'protein': 0, 'calcium': 20.0, 'phosphorus': 10.0, 'lysine': 2.0},
+    'Limestone': {'protein': 0, 'calcium': 38.0, 'phosphorus': 0, 'lysine': 0},
+    'Dicalcium phosphate': {'protein': 0, 'calcium': 18.0, 'phosphorus': 21.0, 'lysine': 0},
+}
+
 
 class NutritionAnalysisSkill:
-    """Nutrition analysis skill"""
+    """Nutrition analysis skill - uses FormulaService"""
     
-    def __init__(self, formula_repo=None, price_repo=None, formula_service=None):
+    FORMULA_KEYWORDS = [
+        "Nursery Diet", "Grower Diet", "Finisher Diet",
+        "Broiler Starter", "Broiler Grower", "Broiler Finisher",
+        "Layer Starter", "Layer Grower", "Layer Diet",
+        "Beef Cattle Starter", "Beef Cattle Grower", "Beef Cattle Finisher",
+        "Turkey", "Lamb", "Goat", "Duck", "Trout", "Catfish",
+        "Sow", "Gestating", "Lactating",
+    ]
+    
+    def __init__(self, formula_service=None):
         """
         Initialize skill
         
         Args:
-            formula_repo: Formula repository (legacy)
-            price_repo: Price repository (legacy)
-            formula_service: FormulaService instance (v1.7+)
+            formula_service: FormulaService instance (injected)
         """
-        self.formula_repo = formula_repo
-        self.price_repo = price_repo
         self.formula_service = formula_service
     
-    # NRC nutrition standards (minimum requirements)
-    NRC_STANDARDS = {
-        'Swine': {
-            'Nursery': {'crude_protein': 18.0, 'lysine': 1.2, 'calcium': 0.8, 'phosphorus': 0.6},
-            'Growing': {'crude_protein': 15.0, 'lysine': 0.9, 'calcium': 0.65, 'phosphorus': 0.45},
-            'Finishing': {'crude_protein': 13.0, 'lysine': 0.7, 'calcium': 0.55, 'phosphorus': 0.35},
-        },
-        'Beef Cattle': {
-            'Starter': {'crude_protein': 16.0, 'calcium': 0.7, 'phosphorus': 0.5},
-            'Growing': {'crude_protein': 14.0, 'calcium': 0.65, 'phosphorus': 0.45},
-            'Finishing': {'crude_protein': 12.0, 'calcium': 0.6, 'phosphorus': 0.4},
-        },
-        'Dairy Cattle': {
-            'Calf': {'crude_protein': 20.0, 'calcium': 0.8, 'phosphorus': 0.55},
-            'Heifer': {'crude_protein': 16.0, 'calcium': 0.7, 'phosphorus': 0.45},
-            'Lactating': {'crude_protein': 17.0, 'calcium': 0.8, 'phosphorus': 0.5},
-        },
-        'Broiler': {
-            'Starter': {'crude_protein': 23.0, 'calcium': 1.0, 'phosphorus': 0.7},
-            'Grower': {'crude_protein': 21.0, 'calcium': 0.95, 'phosphorus': 0.65},
-            'Finisher': {'crude_protein': 19.0, 'calcium': 0.9, 'phosphorus': 0.6},
-        },
-        'Layer': {
-            'Starter': {'crude_protein': 20.0, 'calcium': 1.0, 'phosphorus': 0.6},
-            'Grower': {'crude_protein': 17.0, 'calcium': 0.9, 'phosphorus': 0.55},
-            'Laying': {'crude_protein': 16.5, 'calcium': 3.5, 'phosphorus': 0.5},
-        },
-    }
-    
-    # Ingredient nutrition composition (per kg, typical values)
-    INGREDIENT_NUTRITION = {
-        'Corn, grain': {'crude_protein': 8.5, 'lysine': 0.25, 'calcium': 0.02, 'phosphorus': 0.27},
-        'Soybean meal, 48%': {'crude_protein': 48.0, 'lysine': 3.0, 'calcium': 0.3, 'phosphorus': 0.6},
-        'Fish meal, 65%': {'crude_protein': 65.0, 'lysine': 5.0, 'calcium': 4.0, 'phosphorus': 2.5},
-        'Wheat middlings': {'crude_protein': 16.0, 'lysine': 0.5, 'calcium': 0.1, 'phosphorus': 0.5},
-        'Alfalfa hay, early bloom': {'crude_protein': 18.0, 'lysine': 0.7, 'calcium': 1.5, 'phosphorus': 0.25},
-        'Corn silage': {'crude_protein': 8.0, 'lysine': 0.2, 'calcium': 0.25, 'phosphorus': 0.22},
-        'Premix, swine': {'crude_protein': 0, 'lysine': 0, 'calcium': 20.0, 'phosphorus': 10.0},  # Mineral premix
-        'Premix, beef': {'crude_protein': 0, 'lysine': 0, 'calcium': 18.0, 'phosphorus': 9.0},
-        'Premix, dairy': {'crude_protein': 0, 'lysine': 0, 'calcium': 20.0, 'phosphorus': 10.0},
-        'Premix, broiler': {'crude_protein': 0, 'lysine': 0, 'calcium': 20.0, 'phosphorus': 10.0},
-        'Premix, layer': {'crude_protein': 0, 'lysine': 0, 'calcium': 25.0, 'phosphorus': 8.0},
-        'Dicalcium phosphate': {'crude_protein': 0, 'lysine': 0, 'calcium': 22.0, 'phosphorus': 18.5},
-        'Limestone, ag': {'crude_protein': 0, 'lysine': 0, 'calcium': 38.0, 'phosphorus': 0},
-        'Salt, white': {'crude_protein': 0, 'lysine': 0, 'calcium': 0, 'phosphorus': 0},
-        'L-Lysine HCl': {'crude_protein': 0, 'lysine': 78.0, 'calcium': 0, 'phosphorus': 0},
-    }
-    
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
-        """
-        Execute skill
-        
-        Args:
-            user_id: User ID
-            message: User message
-            
-        Returns:
-            Dict: Execution result
-        """
+        """Execute skill"""
         try:
-            logger.info(f"Executing nutrition analysis (user: {user_id})")
+            logger.info(f"NutritionAnalysisSkill.execute: {message[:50]}...")
             
-            # Extract formula name from message
-            formula_name = self._extract_formula_name(message)
+            if not self.formula_service:
+                return self._error("FormulaService not initialized")
             
-            if not formula_name:
-                return self._error("Formula name not found, please specify the formula")
+            formula_name = self._find_formula(message)
             
-            # Get formula from repository
-            formula = self.formula_repo.get_formula(user_id, formula_name)
-            
-            if not formula:
-                return self._error(f"Formula '{formula_name}' not found")
-            
-            # Calculate nutrition composition
-            nutrition_result = self._calculate_nutrition(formula)
-            
-            # Compare with NRC standards
-            comparison = self._compare_with_nrc(formula, nutrition_result)
-            
-            logger.info(f"Nutrition analysis completed: {formula_name}")
-            return self._success({
-                'formula_name': formula_name,
-                'nutrition_composition': nutrition_result,
-                'nrc_comparison': comparison,
-                'recommendations': self._generate_recommendations(comparison)
-            })
-            
+            if formula_name:
+                return self._analyze_formula(user_id, formula_name)
+            elif 'all' in message.lower() or 'list' in message.lower():
+                return self._list_formulas(user_id)
+            else:
+                return self._error("Formula name not found. Try: 'analyze Nursery Diet 1 nutrition'")
+                
         except Exception as e:
-            logger.error(f"Nutrition analysis failed: {e}")
+            logger.error(f"NutritionAnalysisSkill error: {e}")
             return self._error(f"Analysis failed: {str(e)}")
     
-    def _extract_formula_name(self, message: str) -> Optional[str]:
-        """Extract formula name from message"""
-        # Match: analyze nutrition of xxx
-        match = re.search(r'analyze\s+(.*?)\s+(?:nutrition|formula)', message, re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
+    def _find_formula(self, message: str) -> Optional[str]:
+        msg = message.lower()
         
-        # Match: xxx formula nutrition
-        match = re.search(r'(.*?)\s+formula\s+nutrition', message, re.IGNORECASE)
+        # 先匹配完整名称（包含数字）
+        import re
+        match = re.search(r'(Nursery Diet \d|Grower Diet \d|Finisher Diet|Beef Cattle \w+|Broiler \w+|Layer \w+|Turkey \w+|Lamb \w+|Trout \w+|Catfish \w+)', message, re.IGNORECASE)
         if match:
-            return match.group(1).strip()
+            return match.group(1)
         
-        # Match: nutrition analysis for xxx
-        match = re.search(r'nutrition\s+analysis\s+for\s+(.+)', message, re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
+        # 再匹配关键词
+        for keyword in self.FORMULA_KEYWORDS:
+            if keyword.lower() in msg:
+                return keyword
         
         return None
     
-    def _calculate_nutrition(self, formula: Dict) -> Dict:
-        """Calculate nutrition composition from formula ingredients"""
+    def _analyze_formula(self, user_id: str, formula_name: str) -> Dict:
+        # Get formula from service
+        result = self.formula_service.get_formula(user_id, formula_name)
+        
+        if not result.success:
+            return self._error(result.error_message)
+        
+        formula = result.data
+        
+        # Get ingredients from formula data
         ingredients = formula.get('ingredients', [])
         
-        total_nutrition = {
-            'crude_protein': 0.0,
-            'lysine': 0.0,
-            'calcium': 0.0,
-            'phosphorus': 0.0,
-        }
+        # Calculate nutrition
+        nutrition = {'protein': 0, 'calcium': 0, 'phosphorus': 0, 'lysine': 0}
         
-        ingredient_details = []
-        
-        for ingredient in ingredients:
-            name = ingredient.get('name')
-            ratio = ingredient.get('ratio', 0)  # percentage
+        for ing in ingredients:
+            name = ing.get('name', '')
+            ratio = ing.get('ratio', 0)
+            ing_nutrition = self._get_ingredient_nutrition(name)
             
-            # Get ingredient nutrition data
-            nutrition = self.INGREDIENT_NUTRITION.get(name, {})
-            
-            # Calculate contribution (ratio% of 100kg formula)
-            contribution = {}
-            for nutrient, value in nutrition.items():
-                if nutrient in total_nutrition:
-                    contrib = value * ratio / 100.0
-                    total_nutrition[nutrient] += contrib
-                    contribution[nutrient] = round(contrib, 2)
-            
-            ingredient_details.append({
-                'name': name,
-                'ratio': ratio,
-                'nutrition': nutrition,
-                'contribution': contribution
-            })
-        
-        # Round totals
-        for nutrient in total_nutrition:
-            total_nutrition[nutrient] = round(total_nutrition[nutrient], 2)
-        
-        return {
-            'total': total_nutrition,
-            'ingredient_details': ingredient_details
-        }
-    
-    def _compare_with_nrc(self, formula: Dict, nutrition_result: Dict) -> Dict:
-        """Compare with NRC standards"""
-        animal_type = formula.get('animal_type', 'Swine')
-        stage = formula.get('stage_type', 'Nursery')
+            for key in nutrition:
+                nutrition[key] += (ing_nutrition.get(key, 0) * ratio / 100)
         
         # Get NRC standard
-        nrc_standard = self.NRC_STANDARDS.get(animal_type, {}).get(stage, {})
+        nrc = self._get_nrc_standard(formula.get('animal_type'), formula.get('stage_type'))
         
-        if not nrc_standard:
-            return {
-                'status': 'no_standard',
-                'message': f"No NRC standard found for {animal_type} {stage}"
-            }
-        
-        total = nutrition_result['total']
-        
+        # Compare
         comparison = {}
-        for nutrient, standard_value in nrc_standard.items():
-            actual_value = total.get(nutrient, 0)
-            difference = actual_value - standard_value
-            percentage = (actual_value / standard_value * 100) if standard_value > 0 else 0
-            
-            comparison[nutrient] = {
-                'actual': actual_value,
-                'standard': standard_value,
-                'difference': round(difference, 2),
-                'percentage': round(percentage, 1),
-                'status': 'met' if actual_value >= standard_value else 'deficient'
-            }
+        for key in nutrition:
+            if nrc and key in nrc:
+                actual = round(nutrition[key], 2)
+                standard = nrc[key]
+                status = '✓ Meets' if actual >= standard * 0.95 else '⚠ Below'
+                comparison[key] = {'actual': actual, 'standard': standard, 'status': status}
         
-        return {
-            'animal_type': animal_type,
-            'stage': stage,
-            'comparison': comparison,
-            'overall_status': 'pass' if all(c['status'] == 'met' for c in comparison.values()) else 'fail'
-        }
+        return self._success({
+            'formula': formula.get('name'),
+            'animal_type': formula.get('animal_type'),
+            'stage': formula.get('stage_type'),
+            'nutrition': {k: round(v, 2) for k, v in nutrition.items()},
+            'nrc_comparison': comparison,
+            'ingredients_count': len(ingredients),
+            'source': result.source,
+        })
     
-    def _generate_recommendations(self, comparison: Dict) -> List[str]:
-        """Generate recommendations based on comparison"""
-        if comparison.get('status') == 'no_standard':
-            return ["Unable to generate recommendations without NRC standard"]
-        
-        recommendations = []
-        comp_data = comparison.get('comparison', {})
-        
-        for nutrient, data in comp_data.items():
-            if data['status'] == 'deficient':
-                deficit = data['standard'] - data['actual']
-                recommendations.append(
-                    f"Increase {nutrient} by {round(deficit, 2)}% to meet NRC standard ({data['standard']}%)"
-                )
-        
-        if not recommendations:
-            recommendations.append("Formula meets all NRC nutrition standards")
-        
-        return recommendations
+    def _get_ingredient_nutrition(self, ingredient_name: str) -> Dict:
+        name_lower = ingredient_name.lower().split(',')[0].strip()
+        for key, values in INGREDIENT_NUTRITION.items():
+            if key.lower() in name_lower or name_lower in key.lower():
+                return values
+        return {'protein': 10, 'calcium': 0.1, 'phosphorus': 0.3, 'lysine': 0.5}
     
-    def _success(self, data: Dict) -> Dict[str, Any]:
-        """Success response"""
-        return {
-            'success': True,
-            'data': data
-        }
+    def _get_nrc_standard(self, animal_type: str, stage: str) -> Optional[Dict]:
+        animal_map = {'Swine': 'Swine', 'Broiler': 'Broiler', 'Layer': 'Layer', 'Beef Cattle': 'Beef Cattle'}
+        stage_map = {'Nursery': 'Nursery', 'Growing': 'Growing', 'Finishing': 'Finishing',
+                     'Starter': 'Starter', 'Grower': 'Grower', 'Finisher': 'Finisher',
+                     'Laying': 'Laying', 'Gestating': 'Gestating', 'Lactating': 'Lactating'}
+        
+        animal = animal_map.get(animal_type)
+        stage_key = stage_map.get(stage)
+        
+        if animal and stage_key:
+            return NRC_STANDARDS.get(animal, {}).get(stage_key)
+        return None
     
-    def _error(self, message: str) -> Dict[str, Any]:
-        """Error response"""
-        return {
-            'success': False,
-            'error': message
-        }
+    def _list_formulas(self, user_id: str) -> Dict:
+        result = self.formula_service.list_formulas(user_id)
+        
+        if result.success:
+            formulas = result.data.get('formulas', [])
+            return self._success({
+                'message': f'{len(formulas)} formulas available',
+                'formulas': [{'name': f.get('name'), 'animal': f.get('animal_type'), 'stage': f.get('stage_type')} for f in formulas],
+            })
+        else:
+            return self._error(result.error_message)
+    
+    def _success(self, data: Dict) -> Dict:
+        return {'success': True, 'data': data}
+    
+    def _error(self, msg: str) -> Dict:
+        return {'success': False, 'error': msg}
 
 
-# Skill factory function
-def create_skill(formula_repo, price_repo=None):
-    """Create skill instance"""
-    return NutritionAnalysisSkill(formula_repo, price_repo)
+def create_skill(formula_service):
+    """Factory function - requires FormulaService"""
+    return NutritionAnalysisSkill(formula_service)

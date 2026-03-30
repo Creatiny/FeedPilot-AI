@@ -2,6 +2,7 @@
 FeedSales AI - CustomerService
 
 客户管理服务，支持多租户隔离
+字段与 schema.sql 一致：id, owner_open_id, name, phone, address, animal_type, scale, notes, version
 """
 
 import logging
@@ -19,20 +20,11 @@ class CustomerService:
         self.db_pool = db_pool
     
     def get_customer(self, user_id: str, name: str) -> ServiceResult:
-        """
-        获取客户
-        
-        Args:
-            user_id: 用户 ID
-            name: 客户名称
-            
-        Returns:
-            ServiceResult: 包含客户数据
-        """
+        """获取客户（精确匹配）"""
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT id, name, company, phone, email, region, notes, created_at
+                SELECT id, name, phone, address, animal_type, scale, notes, created_at
                 FROM customers
                 WHERE owner_open_id = ? AND name = ?
             ''', (user_id, name))
@@ -48,19 +40,11 @@ class CustomerService:
             )
     
     def list_customers(self, user_id: str) -> ServiceResult:
-        """
-        列出用户所有客户
-        
-        Args:
-            user_id: 用户 ID
-            
-        Returns:
-            ServiceResult: 包含客户列表
-        """
+        """列出用户所有客户"""
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT id, name, company, phone, email, region, notes, created_at
+                SELECT id, name, phone, address, animal_type, scale, notes, created_at
                 FROM customers
                 WHERE owner_open_id = ?
                 ORDER BY created_at DESC
@@ -74,17 +58,7 @@ class CustomerService:
             )
     
     def create_customer(self, user_id: str, data: Dict) -> ServiceResult:
-        """
-        创建客户
-        
-        Args:
-            user_id: 用户 ID
-            data: 客户数据
-            
-        Returns:
-            ServiceResult: 包含创建的客户
-        """
-        # 验证必填字段
+        """创建客户"""
         if not data.get('name'):
             return ServiceResult(
                 success=False,
@@ -107,49 +81,38 @@ class CustomerService:
                     error_message=f"客户 '{data['name']}' 已存在"
                 )
             
-            # 插入客户
+            # 插入客户（字段与 schema.sql 一致）
             cursor.execute('''
-                INSERT INTO customers (owner_open_id, name, company, phone, email, region, notes)
+                INSERT INTO customers (owner_open_id, name, phone, address, animal_type, scale, notes)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (
                 user_id,
                 data['name'],
-                data.get('company'),
                 data.get('phone'),
-                data.get('email'),
-                data.get('region'),
+                data.get('address'),
+                data.get('animal_type'),
+                data.get('scale'),
                 data.get('notes')
             ))
             
             customer_id = cursor.lastrowid
             conn.commit()
             
-            # 返回创建的客户
             return ServiceResult(
                 success=True,
                 data={
                     'id': customer_id,
                     'name': data['name'],
-                    'company': data.get('company'),
                     'phone': data.get('phone'),
-                    'email': data.get('email'),
-                    'region': data.get('region'),
+                    'address': data.get('address'),
+                    'animal_type': data.get('animal_type'),
+                    'scale': data.get('scale'),
                     'notes': data.get('notes')
                 }
             )
     
     def update_customer(self, user_id: str, customer_id: int, data: Dict) -> ServiceResult:
-        """
-        更新客户
-        
-        Args:
-            user_id: 用户 ID
-            customer_id: 客户 ID
-            data: 更新数据
-            
-        Returns:
-            ServiceResult: 包含更新后的客户
-        """
+        """更新客户"""
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
@@ -165,11 +128,11 @@ class CustomerService:
                     error_message='无权修改此客户或客户不存在'
                 )
             
-            # 构建更新语句
+            # 构建更新语句（字段与 schema.sql 一致）
             update_fields = []
             update_values = []
             
-            for field in ['name', 'company', 'phone', 'email', 'region', 'notes']:
+            for field in ['name', 'phone', 'address', 'animal_type', 'scale', 'notes']:
                 if field in data:
                     update_fields.append(f'{field} = ?')
                     update_values.append(data[field])
@@ -193,7 +156,7 @@ class CustomerService:
             
             # 返回更新后的客户
             cursor.execute(
-                "SELECT id, name, company, phone, email, region, notes FROM customers WHERE id = ?",
+                "SELECT id, name, phone, address, animal_type, scale, notes FROM customers WHERE id = ?",
                 (customer_id,)
             )
             customer = dict(cursor.fetchone())
@@ -201,16 +164,7 @@ class CustomerService:
             return ServiceResult(success=True, data=customer)
     
     def delete_customer(self, user_id: str, customer_id: int) -> ServiceResult:
-        """
-        删除客户
-        
-        Args:
-            user_id: 用户 ID
-            customer_id: 客户 ID
-            
-        Returns:
-            ServiceResult: 操作结果
-        """
+        """删除客户"""
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             

@@ -2,11 +2,12 @@
 FeedSales AI - Customer Record Skill
 
 Manage customer records for North America feed sales
+Uses CustomerService (v1.7 architecture: Skill → Service → Repository)
 """
 
 import logging
 import re
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -14,237 +15,220 @@ logger = logging.getLogger(__name__)
 class CustomerRecordSkill:
     """Customer record management skill"""
     
-    def __init__(self, customer_repo=None, customer_service=None):
+    def __init__(self, customer_service=None):
         """
         Initialize skill
         
         Args:
-            customer_repo: Customer repository (legacy)
-            customer_service: CustomerService instance (v1.7+)
+            customer_service: CustomerService instance (injected)
         """
-        self.customer_repo = customer_repo
         self.customer_service = customer_service
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
-        """
-        Execute skill
-        
-        Args:
-            user_id: User ID
-            message: User message
-            
-        Returns:
-            Dict: Execution result
-        """
+        """Execute skill"""
         try:
-            logger.info(f"Executing customer record (user: {user_id})")
+            logger.info(f"CustomerRecordSkill.execute: {message[:50]}...")
             
-            # Parse action from message
+            if not self.customer_service:
+                return self._error("CustomerService not initialized")
+            
             action = self._parse_action(message)
             
             if action == 'add':
-                return self._handle_add(user_id, message)
+                return self._add_customer(user_id, message)
             elif action == 'list':
-                return self._handle_list(user_id)
-            elif action == 'get':
-                return self._handle_get(user_id, message)
+                return self._list_customers(user_id)
+            elif action == 'get' or action == 'find':
+                return self._get_customer(user_id, message)
             elif action == 'update':
-                return self._handle_update(user_id, message)
+                return self._update_customer(user_id, message)
             elif action == 'delete':
-                return self._handle_delete(user_id, message)
+                return self._delete_customer(user_id, message)
+            elif action == 'count':
+                return self._count_customers(user_id)
             else:
                 return self._success({
-                    'message': 'Customer record management',
-                    'hint': 'Available actions: add customer, list customers, get customer [name], update customer [name], delete customer [name]'
+                    'message': 'Customer management ready',
+                    'hint': 'Try: "show all customers", "add customer John"'
                 })
             
         except Exception as e:
-            logger.error(f"Customer record failed: {e}")
+            logger.error(f"CustomerRecordSkill error: {e}")
             return self._error(f"Operation failed: {str(e)}")
     
     def _parse_action(self, message: str) -> str:
-        """Parse action from message"""
-        message_lower = message.lower()
-        
-        if 'add' in message_lower or 'new' in message_lower or 'create' in message_lower:
+        msg = message.lower()
+        if 'add' in msg or 'new' in msg or 'create' in msg:
             return 'add'
-        elif 'list' in message_lower or 'show' in message_lower or 'all' in message_lower:
+        elif 'list' in msg or 'all' in msg or 'show' in msg:
             return 'list'
-        elif 'get' in message_lower or 'find' in message_lower or 'search' in message_lower:
+        elif 'find' in msg or 'search' in msg:
+            return 'find'
+        elif 'get' in msg:
             return 'get'
-        elif 'update' in message_lower or 'edit' in message_lower or 'modify' in message_lower:
+        elif 'update' in msg or 'change' in msg:
             return 'update'
-        elif 'delete' in message_lower or 'remove' in message_lower:
+        elif 'delete' in msg or 'remove' in msg:
             return 'delete'
-        
+        elif 'how many' in msg or 'count' in msg:
+            return 'count'
         return 'unknown'
     
-    def _handle_add(self, user_id: str, message: str) -> Dict[str, Any]:
-        """Handle add customer"""
-        customer_data = self._extract_customer_info(message)
-        
-        if not customer_data.get('name'):
-            return self._error("Customer name is required")
-        
-        customer_id = self.customer_repo.create_customer(user_id, customer_data)
-        
-        return self._success({
-            'message': f"Customer '{customer_data['name']}' added successfully",
-            'customer_id': customer_id,
-            'customer': customer_data
-        })
-    
-    def _handle_list(self, user_id: str) -> Dict[str, Any]:
-        """Handle list customers"""
-        customers = self.customer_repo.list_customers(user_id)
-        
-        if not customers:
-            return self._success({
-                'message': 'No customers found',
-                'customers': []
-            })
-        
-        return self._success({
-            'message': f"Found {len(customers)} customers",
-            'customers': customers
-        })
-    
-    def _handle_get(self, user_id: str, message: str) -> Dict[str, Any]:
-        """Handle get customer"""
-        name = self._extract_customer_name(message)
-        
-        if not name:
-            return self._error("Customer name not specified")
-        
-        customer = self.customer_repo.get_customer(user_id, name)
-        
-        if not customer:
-            return self._error(f"Customer '{name}' not found")
-        
-        return self._success({
-            'message': f"Customer '{name}' found",
-            'customer': customer
-        })
-    
-    def _handle_update(self, user_id: str, message: str) -> Dict[str, Any]:
-        """Handle update customer"""
-        name = self._extract_customer_name(message)
-        
-        if not name:
-            return self._error("Customer name not specified")
-        
-        customer = self.customer_repo.get_customer(user_id, name)
-        if not customer:
-            return self._error(f"Customer '{name}' not found")
-        
-        customer_data = self._extract_customer_info(message)
-        customer_data['name'] = name  # Keep original name
-        
-        success = self.customer_repo.update_customer(user_id, customer['id'], customer_data)
-        
-        if success:
-            return self._success({
-                'message': f"Customer '{name}' updated successfully",
-                'customer': customer_data
-            })
-        else:
-            return self._error(f"Failed to update customer '{name}'")
-    
-    def _handle_delete(self, user_id: str, message: str) -> Dict[str, Any]:
-        """Handle delete customer"""
-        name = self._extract_customer_name(message)
-        
-        if not name:
-            return self._error("Customer name not specified")
-        
-        customer = self.customer_repo.get_customer(user_id, name)
-        if not customer:
-            return self._error(f"Customer '{name}' not found")
-        
-        success = self.customer_repo.delete_customer(user_id, customer['id'])
-        
-        if success:
-            return self._success({
-                'message': f"Customer '{name}' deleted successfully"
-            })
-        else:
-            return self._error(f"Failed to delete customer '{name}'")
-    
-    def _extract_customer_name(self, message: str) -> Optional[str]:
-        """Extract customer name from message"""
-        # Match patterns like "get customer John" or "find John"
-        patterns = [
-            r'customer\s+([A-Za-z]+)',
-            r'get\s+([A-Za-z]+)',
-            r'find\s+([A-Za-z]+)',
-            r'update\s+([A-Za-z]+)',
-            r'delete\s+([A-Za-z]+)',
-        ]
-        
-        for pattern in patterns:
-            match = re.search(pattern, message, re.IGNORECASE)
-            if match:
-                return match.group(1).strip()
-        
+    def _extract_name(self, message: str) -> Optional[str]:
+        match = re.search(r'customer\s+([A-Za-z][A-Za-z\s]+?)(?:,|\s+(?:phone|address|animal|$))', message, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        match = re.search(r'customer\s+([A-Za-z\s]+)', message, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
         return None
     
-    def _extract_customer_info(self, message: str) -> Dict:
-        """Extract customer info from message"""
-        data = {}
+    def _add_customer(self, user_id: str, message: str) -> Dict:
+        name = self._extract_name(message)
+        if not name:
+            return self._error("Customer name required")
         
-        # Extract name
-        name_match = re.search(r'name[:\s]+([A-Za-z\s]+)', message, re.IGNORECASE)
-        if name_match:
-            data['name'] = name_match.group(1).strip()
+        # Extract fields
+        animal_type = None
+        for kw in ['pig', 'swine', 'cattle', 'beef', 'dairy', 'chicken', 'broiler', 'layer']:
+            if kw in message.lower():
+                animal_type = kw
+                break
+        
+        phone_match = re.search(r'phone[:\s]*([\d\-]+)', message, re.IGNORECASE)
+        phone = phone_match.group(1) if phone_match else None
+        
+        customer_data = {
+            'name': name,
+            'phone': phone,
+            'notes': message,
+        }
+        
+        result = self.customer_service.create_customer(user_id, customer_data)
+        
+        if result.success:
+            return self._success({
+                'message': f"Customer '{name}' added",
+                'customer': result.data,
+            })
         else:
-            # Try to extract name after "add/new customer"
-            name_match = re.search(r'(?:add|new|create)\s+customer\s+([A-Za-z]+)', message, re.IGNORECASE)
-            if name_match:
-                data['name'] = name_match.group(1).strip()
-        
-        # Extract phone
-        phone_match = re.search(r'phone[:\s]+(\d[\d\s\-]+)', message, re.IGNORECASE)
-        if phone_match:
-            data['phone'] = phone_match.group(1).strip()
-        
-        # Extract address
-        address_match = re.search(r'address[:\s]+([A-Za-z0-9\s,]+)', message, re.IGNORECASE)
-        if address_match:
-            data['address'] = address_match.group(1).strip()
-        
-        # Extract animal type
-        animal_match = re.search(r'(?:animal|type)[:\s]+([A-Za-z]+)', message, re.IGNORECASE)
-        if animal_match:
-            data['animal_type'] = animal_match.group(1).strip()
-        
-        # Extract scale
-        scale_match = re.search(r'scale[:\s]+(\d+)', message, re.IGNORECASE)
-        if scale_match:
-            data['scale'] = int(scale_match.group(1))
-        
-        # Extract notes
-        notes_match = re.search(r'notes[:\s]+(.+)', message, re.IGNORECASE)
-        if notes_match:
-            data['notes'] = notes_match.group(1).strip()
-        
-        return data
+            return self._error(result.error_message)
     
-    def _success(self, data: Dict) -> Dict[str, Any]:
-        """Success response"""
-        return {
-            'success': True,
-            'data': data
-        }
+    def _list_customers(self, user_id: str) -> Dict:
+        result = self.customer_service.list_customers(user_id)
+        
+        if result.success:
+            customers = result.data.get('customers', [])
+            return self._success({
+                'message': f"Found {len(customers)} customers",
+                'count': len(customers),
+                'customers': customers,
+            })
+        else:
+            return self._error(result.error_message)
     
-    def _error(self, message: str) -> Dict[str, Any]:
-        """Error response"""
-        return {
-            'success': False,
-            'error': message
-        }
+    def _get_customer(self, user_id: str, message: str) -> Dict:
+        name = self._extract_name(message)
+        if not name:
+            return self._error("Customer name required")
+        
+        result = self.customer_service.get_customer(user_id, name)
+        
+        if result.success:
+            return self._success({
+                'message': f"Customer found",
+                'customers': [result.data],
+            })
+        else:
+            # 尝试模糊搜索 - 先列出所有，再本地过滤
+            list_result = self.customer_service.list_customers(user_id)
+            if list_result.success:
+                all_customers = list_result.data.get('customers', [])
+                matches = [c for c in all_customers if name.lower() in c.get('name', '').lower()]
+                if matches:
+                    return self._success({
+                        'message': f"Found {len(matches)} customer(s)",
+                        'customers': matches,
+                    })
+            return self._error(f"Customer '{name}' not found")
+    
+    def _update_customer(self, user_id: str, message: str) -> Dict:
+        name = self._extract_name(message)
+        if not name:
+            return self._error("Customer name required")
+        
+        phone_match = re.search(r'phone[:\s]*([\d\-]+)', message, re.IGNORECASE)
+        if not phone_match:
+            return self._error("New phone value required")
+        
+        # 先查找客户
+        result = self.customer_service.get_customer(user_id, name)
+        if not result.success:
+            # 模糊搜索
+            list_result = self.customer_service.list_customers(user_id)
+            if list_result.success:
+                matches = [c for c in list_result.data.get('customers', []) 
+                          if name.lower() in c.get('name', '').lower()]
+                if matches:
+                    result = type('obj', (object,), {'success': True, 'data': matches[0]})()
+        
+        if not result.success:
+            return self._error(f"Customer '{name}' not found")
+        
+        customer_id = result.data.get('id')
+        update_result = self.customer_service.update_customer(user_id, customer_id, {'phone': phone_match.group(1)})
+        
+        if update_result.success:
+            return self._success({'message': f"Customer '{name}' updated"})
+        else:
+            return self._error(update_result.error_message)
+    
+    def _delete_customer(self, user_id: str, message: str) -> Dict:
+        name = self._extract_name(message)
+        if not name:
+            return self._error("Customer name required")
+        
+        # 先查找客户
+        result = self.customer_service.get_customer(user_id, name)
+        if not result.success:
+            # 模糊搜索
+            list_result = self.customer_service.list_customers(user_id)
+            if list_result.success:
+                matches = [c for c in list_result.data.get('customers', []) 
+                          if name.lower() in c.get('name', '').lower()]
+                if matches:
+                    result = type('obj', (object,), {'success': True, 'data': matches[0]})()
+        
+        if not result.success:
+            return self._error(f"Customer '{name}' not found")
+        
+        customer_id = result.data.get('id')
+        delete_result = self.customer_service.delete_customer(user_id, customer_id)
+        
+        if delete_result.success:
+            return self._success({'message': f"Customer '{name}' deleted"})
+        else:
+            return self._error(delete_result.error_message)
+    
+    def _count_customers(self, user_id: str) -> Dict:
+        result = self.customer_service.list_customers(user_id)
+        
+        if result.success:
+            count = result.data.get('total', 0)
+            return self._success({
+                'message': f"You have {count} customer(s)",
+                'count': count,
+            })
+        else:
+            return self._error(result.error_message)
+    
+    def _success(self, data: Dict) -> Dict:
+        return {'success': True, 'data': data}
+    
+    def _error(self, msg: str) -> Dict:
+        return {'success': False, 'error': msg}
 
 
-# Skill factory function
-def create_skill(customer_repo):
-    """Create skill instance"""
-    return CustomerRecordSkill(customer_repo)
+def create_skill(customer_service):
+    """Factory function - requires CustomerService"""
+    return CustomerRecordSkill(customer_service)
