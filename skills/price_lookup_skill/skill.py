@@ -2,6 +2,8 @@
 FeedSales AI - Price Lookup Skill
 
 Query ingredient prices. Uses PriceService (v1.7 architecture).
+
+Requires PriceService to be injected at initialization.
 """
 
 import logging
@@ -12,9 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class PriceLookupSkill:
-    """Ingredient price lookup skill - uses PriceService"""
+    """Ingredient price lookup skill"""
     
-    # Common ingredient keywords for quick matching
     INGREDIENT_KEYWORDS = [
         "Corn", "Soybean meal", "Wheat", "Barley", "Rice",
         "Fish meal", "DDGS", "Canola meal", "Cottonseed meal",
@@ -28,7 +29,7 @@ class PriceLookupSkill:
         Initialize skill
         
         Args:
-            price_service: PriceService instance (injected)
+            price_service: PriceService instance (required)
         """
         self.price_service = price_service
     
