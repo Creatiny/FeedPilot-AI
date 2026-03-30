@@ -45,8 +45,15 @@ def test_result_validator():
     
     validator = ResultValidator()
     
-    # 测试成功结果（需要 total_cost 字段）
-    result = {'success': True, 'data': {'cost_per_ton': 284.3, 'total_cost': 284.3}}
+    # 测试成功结果（完整结构，明细和 = 总成本）
+    result = {
+        'success': True, 
+        'total_cost': 195.5, 
+        'details': [
+            {'ingredient': 'Corn', 'cost': 108.0, 'price_source': 'public'},
+            {'ingredient': 'Soybean meal', 'cost': 87.5, 'price_source': 'public'},
+        ]
+    }
     validated = validator.validate_cost_result(result)
     assert validated.valid, f"应该验证成功: {validated.errors}"
     print(f"✅ 结果验证成功")

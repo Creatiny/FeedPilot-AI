@@ -18,6 +18,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.database.pool import DatabasePool
 
 
+@pytest.fixture(autouse=True)
+def reset_database_pool():
+    """每个测试前重置 DatabasePool 单例"""
+    DatabasePool._instance = None
+    DatabasePool._lock = threading.Lock()
+    yield
+    DatabasePool._instance = None
+
+
 @pytest.fixture
 def pool():
     """Database pool fixture using actual database"""
