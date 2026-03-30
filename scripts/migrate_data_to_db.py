@@ -1,7 +1,8 @@
 """
-FeedSales AI - Migrate JSON data to SQLite database
+FeedSales AI - Migrate JSON data to SQLite database (v1.7)
 
 Migrate NRC formulas, USDA ingredients, and USD prices to SQLite
+Schema aligned with src/database/schema.sql
 """
 
 import json
@@ -15,66 +16,84 @@ logger = logging.getLogger(__name__)
 
 
 def create_tables(conn):
-    """Create database tables"""
+    """Create database tables (aligned with schema.sql)"""
     cursor = conn.cursor()
     
-    # Formulas table
+    # Enable WAL mode
+    cursor.execute("PRAGMA journal_mode = WAL")
+    cursor.execute("PRAGMA foreign_keys = ON")
+    
+    # Users table
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS formulas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            animal_category TEXT NOT NULL,
-            stage TEXT NOT NULL,
-            weight_range TEXT,
-            source TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        CREATE TABLE IF NOT EXISTS users (
+            open_id TEXT PRIMARY KEY,
+            telegram_user_id TEXT UNIQUE,
+            feishu_user_id TEXT UNIQUE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
-    # Formula ingredients table
+    # Formulas table (v1.7 schema)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS formulas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            owner_open_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            animal_type TEXT,
+            stage_type TEXT NOT NULL,
+            weight_range TEXT,
+            notes TEXT,
+            version INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
+            UNIQUE(owner_open_id, name)
+        )
+    ''')
+    
+    # Formula ingredients table (v1.7 schema)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS formula_ingredients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             formula_id INTEGER NOT NULL,
             ingredient_name TEXT NOT NULL,
-            ratio REAL NOT NULL,
-            FOREIGN KEY (formula_id) REFERENCES formulas(id)
+            ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
         )
     ''')
     
-    # Ingredients table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS ingredients (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            category TEXT,
-            usda_id TEXT,
-            nutrition TEXT,
-            unit TEXT,
-            source TEXT
-        )
-    ''')
-    
-    # Prices table
+    # Ingredient prices table (v1.7 schema)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS ingredient_prices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            owner_open_id TEXT NOT NULL,
+            ingredient_code TEXT NOT NULL,
             ingredient_name TEXT NOT NULL,
             price REAL NOT NULL,
-            unit TEXT NOT NULL,
-            date TEXT NOT NULL,
-            market TEXT,
-            trend TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            currency TEXT DEFAULT 'USD',
+            unit TEXT DEFAULT 'ton',
+            source TEXT DEFAULT 'barchart',
+            price_date DATE NOT NULL,
+            version INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
+            UNIQUE(ingredient_code, price_date, owner_open_id)
         )
     ''')
     
+    # Create indexes
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_prices_owner_date ON ingredient_prices(owner_open_id, price_date)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_formulas_owner ON formulas(owner_open_id)')
+    
     conn.commit()
-    logger.info("Tables created successfully")
+    logger.info("Tables created successfully (v1.7 schema)")
 
 
 def migrate_formulas(conn, formulas_file: str):
-    """Migrate formulas from JSON to SQLite"""
+    """Migrate formulas from JSON to SQLite (v1.7 schema)"""
     logger.info(f"Migrating formulas from {formulas_file}...")
     
     with open(formulas_file, 'r', encoding='utf-8') as f:
@@ -82,25 +101,29 @@ def migrate_formulas(conn, formulas_file: str):
     
     cursor = conn.cursor()
     
+    # Ensure public user exists
+    cursor.execute("INSERT OR IGNORE INTO users (open_id) VALUES ('system_public')")
+    
     for formula in formulas:
-        # Insert formula
+        # Insert formula (v1.7 schema)
         cursor.execute('''
-            INSERT INTO formulas (name, animal_category, stage, weight_range, source)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO formulas (owner_open_id, name, animal_type, stage_type, weight_range, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
         ''', (
+            'system_public',  # Public data
             formula['name'],
-            formula['animal_type'],
-            formula['stage'],
+            formula.get('animal_type', formula.get('animal_category', '')),  # Support both field names
+            formula.get('stage_type', formula.get('stage', '')),  # Support both field names
             formula.get('weight_range', ''),
             formula.get('source', '')
         ))
         
         formula_id = cursor.lastrowid
         
-        # Insert ingredients
+        # Insert ingredients (v1.7 schema: ratio_percent)
         for ingredient in formula.get('ingredients', []):
             cursor.execute('''
-                INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio)
+                INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
                 VALUES (?, ?, ?)
             ''', (formula_id, ingredient['name'], ingredient['ratio']))
     
@@ -108,35 +131,8 @@ def migrate_formulas(conn, formulas_file: str):
     logger.info(f"Migrated {len(formulas)} formulas")
 
 
-def migrate_ingredients(conn, ingredients_file: str):
-    """Migrate ingredients from JSON to SQLite"""
-    logger.info(f"Migrating ingredients from {ingredients_file}...")
-    
-    with open(ingredients_file, 'r', encoding='utf-8') as f:
-        ingredients = json.load(f)
-    
-    cursor = conn.cursor()
-    
-    for ingredient in ingredients:
-        cursor.execute('''
-            INSERT OR REPLACE INTO ingredients 
-            (name, category, usda_id, nutrition, unit, source)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (
-            ingredient['name'],
-            ingredient.get('category', ''),
-            ingredient.get('usda_id', ''),
-            json.dumps(ingredient.get('nutrition', {})),
-            ingredient.get('unit', ''),
-            ingredient.get('source', '')
-        ))
-    
-    conn.commit()
-    logger.info(f"Migrated {len(ingredients)} ingredients")
-
-
 def migrate_prices(conn, prices_file: str):
-    """Migrate prices from JSON to SQLite"""
+    """Migrate prices from JSON to SQLite (v1.7 schema)"""
     logger.info(f"Migrating prices from {prices_file}...")
     
     with open(prices_file, 'r', encoding='utf-8') as f:
@@ -144,18 +140,26 @@ def migrate_prices(conn, prices_file: str):
     
     cursor = conn.cursor()
     
+    # Ensure public user exists
+    cursor.execute("INSERT OR IGNORE INTO users (open_id) VALUES ('system_public')")
+    
     for price in prices:
+        # Generate ingredient code if not present
+        ingredient_code = price.get('code', f"ING_{price['name'].upper()[:10]}")
+        
+        # Insert price (v1.7 schema)
         cursor.execute('''
-            INSERT INTO ingredient_prices 
-            (ingredient_name, price, unit, date, market, trend)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO ingredient_prices 
+            (owner_open_id, ingredient_code, ingredient_name, price, unit, source, price_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (
+            'system_public',  # Public data
+            ingredient_code,
             price['name'],
             price['price'],
-            price['unit'],
-            price['date'],
-            price.get('market', ''),
-            price.get('trend', '')
+            price.get('unit', 'ton'),
+            price.get('source', 'usda'),
+            price.get('date', price.get('price_date', datetime.now().strftime('%Y-%m-%d')))  # Support both field names
         ))
     
     conn.commit()
@@ -165,7 +169,7 @@ def migrate_prices(conn, prices_file: str):
 def main():
     """Main function"""
     logger.info("=" * 60)
-    logger.info("FeedSales AI - Database Migration")
+    logger.info("FeedSales AI - Database Migration (v1.7)")
     logger.info("=" * 60)
     
     # Database path
@@ -176,12 +180,11 @@ def main():
     conn = sqlite3.connect(db_path)
     
     try:
-        # Create tables
+        # Create tables (v1.7 schema)
         create_tables(conn)
         
         # Migrate data
         migrate_formulas(conn, "data/nrc_formulas_full.json")
-        migrate_ingredients(conn, "data/usda_ingredients.json")
         migrate_prices(conn, "data/usd_prices.json")
         
         logger.info("\n" + "=" * 60)
