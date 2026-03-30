@@ -1,7 +1,8 @@
 """
 FeedSales AI - Price Lookup Skill
 
-Query ingredient prices. Uses PriceService (v1.7 architecture).
+Query ingredient prices. Supports auto-adding missing ingredients.
+Uses PriceService (v1.7 architecture).
 
 Requires PriceService to be injected at initialization.
 """
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class PriceLookupSkill:
-    """Ingredient price lookup skill"""
+    """Ingredient price lookup skill with auto-add support"""
     
     INGREDIENT_KEYWORDS = [
         "Corn", "Soybean meal", "Wheat", "Barley", "Rice",
@@ -60,15 +61,19 @@ class PriceLookupSkill:
                 if result.success:
                     data = result.data
                     return self._success({
-                        'ingredient': data['ingredient_name'],
-                        'price': data['price'],
+                        'ingredient': data.get('ingredient_name', ingredient),
+                        'price': data.get('price'),
                         'currency': data.get('currency', 'USD'),
                         'unit': data.get('unit', 'ton'),
                         'date': data.get('price_date'),
                         'source': result.source,
                     })
                 else:
-                    return self._error(result.error_message)
+                    # Try auto-add if not found
+                    if 'not found' in result.error_message.lower():
+                        return self._try_auto_add(ingredient)
+                    else:
+                        return self._error(result.error_message)
             else:
                 # Return all prices if no specific ingredient
                 result = self.price_service.list_public_prices()
@@ -109,6 +114,32 @@ class PriceLookupSkill:
                 return name
         
         return None
+    
+    def _try_auto_add(self, ingredient: str) -> Dict:
+        """Try to auto-add missing ingredient"""
+        try:
+            from scripts.auto_add_ingredient import auto_add_ingredient
+            
+            result = auto_add_ingredient(ingredient)
+            
+            if result.get('success'):
+                data = result.get('data', {})
+                return self._success({
+                    'ingredient': data.get('name', ingredient),
+                    'price': data.get('price'),
+                    'currency': 'USD',
+                    'unit': 'ton',
+                    'source': data.get('source', 'auto'),
+                    'auto_added': True,
+                    'message': result.get('message', 'Ingredient auto-added'),
+                })
+            else:
+                return self._error(result.get('message', f"Could not auto-add '{ingredient}'"))
+                
+        except ImportError:
+            return self._error(f"Ingredient '{ingredient}' not found. Auto-add not available.")
+        except Exception as e:
+            return self._error(f"Auto-add failed: {str(e)}")
     
     def _success(self, data: Dict) -> Dict:
         return {'success': True, 'data': data}
