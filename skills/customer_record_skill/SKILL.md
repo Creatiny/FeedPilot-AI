@@ -1,32 +1,86 @@
 ---
 name: customer_record_skill
-description: 客户记录管理技能。当用户需要添加客户、查看客户信息、管理客户列表时触发。使用示例："添加新客户"、"查看客户列表"、"客户信息"
+description: Customer record management. Triggers when user needs to add, view, or manage customer records. Examples: "add new customer John", "show all customers", "find customer John"
 ---
 
-# 客户记录管理技能
+# Customer Record Management Skill
 
-## 何时使用
+## ⚠️ Important Rules
 
-当用户请求以下任一场景时使用此技能：
-- 添加新客户
-- 查看客户列表
-- 更新客户信息
-- 删除客户记录
+- ❌ **NEVER** give users commands to run themselves
+- ✅ **ALWAYS reply in English**
+- ✅ **Call the unified skill runner via exec tool**
 
-## 工作流程
+## When to Use
 
-1. **提取客户信息** - 从用户消息中提取客户姓名、电话等
-2. **数据库操作** - 执行 CRUD 操作
-3. **返回结果** - 确认操作成功
+- "add new customer John Smith"
+- "show all my customers"
+- "find customer John"
+- "update John's phone number"
+- "delete customer John"
+- "how many customers do I have"
 
-## 输出格式
+## How to Execute
 
-- 客户姓名
-- 联系方式
-- 养殖类型
-- 养殖规模
+Use exec tool to call the unified skill runner:
 
-## 错误处理
+```bash
+python3 {baseDir}/../../scripts/run_skill.py customer "<user message>"
+```
 
-- **客户已存在**: 提示用户
-- **信息不完整**: 询问缺失信息
+Examples:
+```bash
+# Add customer
+python3 {baseDir}/../../scripts/run_skill.py customer "add customer John Smith phone 555-1234"
+
+# List customers
+python3 {baseDir}/../../scripts/run_skill.py customer "show all customers"
+
+# Find customer
+python3 {baseDir}/../../scripts/run_skill.py customer "find customer John"
+```
+
+## Workflow
+
+1. Parse action from user message (add/list/find/update/delete)
+2. Call unified skill runner with appropriate message
+3. Parse JSON output and format in English
+
+## Output Format (English)
+
+**Add Customer:**
+```
+✓ Customer 'John Smith' added
+ID: 123
+Phone: 555-1234
+```
+
+**List Customers:**
+```
+Found 3 customers:
+
+1. John Smith (Swine, 500 head)
+   Phone: 555-1234
+
+2. Jane Doe (Beef Cattle, 200 head)
+   Phone: 555-5678
+
+3. Bob Wilson (Broiler, 10,000 head)
+   Phone: 555-9012
+```
+
+**Find Customer:**
+```
+Found: John Smith
+Farm Type: Swine
+Scale: 500 head
+Phone: 555-1234
+Notes: Prefers text contact
+```
+
+## Error Handling
+
+- Customer not found: Suggest similar names or offer to add
+- Missing required info: Ask for customer name
+- Duplicate name: Warn and offer to update instead
+- Script error: Apologize and suggest retry

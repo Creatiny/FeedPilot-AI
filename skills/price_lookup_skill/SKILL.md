@@ -1,38 +1,77 @@
 ---
 name: price_lookup_skill
-description: 原料价格查询。当用户询问原料价格、今天价格时触发。示例："今天玉米价格"、"查询豆粕价格"
+description: Ingredient price lookup. Triggers when user asks about ingredient prices, current prices. Examples: "corn price", "soybean meal price", "Barley price"
 ---
 
-# 原料价格查询技能
+# Ingredient Price Lookup Skill
 
-## ⚠️ 重要规则
+## ⚠️ Important Rules
 
-- ❌ **禁止**给用户任何 shell/SQL/Python 命令
-- ❌ **禁止**说"运行这个命令查询..."
-- ✅ **必须直接调用技能**获取数据并返回结果
+- ❌ **NEVER** give users commands to run themselves
+- ✅ **ALWAYS reply in English**
+- ✅ **Call the unified skill runner via exec tool**
 
-## 何时使用
+## When to Use
 
-- "今天玉米价格"
-- "原料价格查询"
-- "豆粕多少钱"
-- 查询多个原料价格
+- "corn price", "Barley price", "soybean meal price"
+- "what's the price of X"
+- "ingredient price query"
+- "玉米价格" (Chinese input → English output)
 
-## 工作流程
+## How to Execute
 
-1. 提取原料名称
-2. 调用数据库查询技能获取最新价格
-3. 直接格式化输出
+Use exec tool to call the unified skill runner:
 
-## 输出格式
+```bash
+python3 {baseDir}/../../scripts/run_skill.py price "<user message>"
+```
 
-- 原料名称
-- 价格（元/吨）
-- 价格日期
-- 数据来源
+Example for "Barley price":
+```bash
+python3 {baseDir}/../../scripts/run_skill.py price "Barley price"
+```
 
-## 错误处理
+## Workflow
 
-- 价格不存在：友好提示
-- 名称模糊：询问确认
-- 技能失败：道歉并建议重试，**不要**给命令
+1. Extract ingredient name from user message
+2. Call: `python3 {baseDir}/../../scripts/run_skill.py price "<ingredient_name> price"`
+3. Parse JSON output and format in English
+
+## Output Format (English)
+
+**Price Found:**
+```
+Ingredient: Barley
+Price: $158/ton
+Source: USDA NASS
+Date: 2026-03-31
+```
+
+**Auto-added:**
+```
+Ingredient: Oats
+Price: $150/ton
+Source: Reference (auto-added)
+```
+
+**Not Found:**
+```
+Ingredient 'X' not found in database.
+Supported ingredients: Corn, Wheat, Barley, Soybean meal, Fish meal...
+```
+
+## Supported Ingredients
+
+| Category | Ingredients |
+|----------|-------------|
+| Grains | Corn, Wheat, Barley, Sorghum, Oats, Rice |
+| Proteins | Soybean meal, Fish meal, Canola meal, Cottonseed meal |
+| Minerals | Limestone, Dicalcium phosphate, Salt |
+| Additives | L-Lysine, DL-Methionine, Premix |
+| Forage | Alfalfa, Corn silage, Grass hay |
+
+## Error Handling
+
+- Price not found: Skill will attempt auto-add
+- Auto-add fails: Return friendly message with supported ingredients
+- Script error: Apologize and suggest retry

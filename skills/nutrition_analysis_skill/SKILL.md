@@ -1,39 +1,68 @@
 ---
 name: nutrition_analysis_skill
-description: 营养分析技能。当用户需要分析配方营养、对比 NRC 标准时触发。示例："分析保育料 1 号营养"、"对比 NRC 标准"
+description: Nutrition analysis for feed formulas. Triggers when user asks to analyze formula nutrition, compare to NRC standards. Examples: "analyze Nursery Diet 1 nutrition", "compare to NRC standard"
 ---
 
-# 营养分析技能
+# Nutrition Analysis Skill
 
-## ⚠️ 重要规则
+## ⚠️ Important Rules
 
-- ❌ **禁止**给用户任何 shell/SQL/Python 命令
-- ❌ **禁止**说"运行这个命令查询..."
-- ✅ **必须直接调用技能**获取数据并返回结果
+- ❌ **NEVER** give users commands to run themselves
+- ✅ **ALWAYS reply in English**
+- ✅ **Call the unified skill runner via exec tool**
 
-## 何时使用
+## When to Use
 
-- 分析配方营养成分
-- 对比 NRC 标准
-- 优化营养配比
-- 检查营养是否达标
+- "analyze Nursery Diet 1 nutrition"
+- "compare Beef Cattle Starter to NRC"
+- "check if formula meets nutritional requirements"
+- "营养分析" (Chinese input → English output)
 
-## 工作流程
+## How to Execute
 
-1. 调用数据库查询技能获取配方成分
-2. 计算营养含量
-3. 对比 NRC 标准
-4. 直接输出分析报告
+Use exec tool to call the unified skill runner:
 
-## 输出格式
+```bash
+python3 {baseDir}/../../scripts/run_skill.py nutrition "<user message>"
+```
 
-- 营养成分列表
-- NRC 标准对比
-- 达标情况
-- 优化建议
+Example for "analyze Beef Cattle Starter nutrition":
+```bash
+python3 {baseDir}/../../scripts/run_skill.py nutrition "analyze Beef Cattle Starter nutrition"
+```
 
-## 错误处理
+## Workflow
 
-- 配方不存在：提示用户
-- 数据不完整：询问缺失信息
-- 技能失败：道歉并建议重试，**不要**给命令
+1. Extract formula name from user message
+2. Call: `python3 {baseDir}/../../scripts/run_skill.py nutrition "analyze <formula_name> nutrition"`
+3. Parse JSON output and format in English
+
+## Output Format (English)
+
+```
+Formula: Beef Cattle Starter
+Animal: Beef Cattle | Stage: Starter
+
+Nutrition Analysis:
+| Nutrient  | Actual | NRC Standard | Status    |
+|-----------|--------|--------------|-----------|
+| Protein   | 17.28% | 16.0%        | ✓ Meets   |
+| Calcium   | 2.00%  | 0.6%         | ✓ Meets   |
+| Phosphorus| 1.14%  | 0.4%         | ✓ Meets   |
+| Lysine    | 0.99%  | 0.8%         | ✓ Meets   |
+
+Ingredients: 7 components
+```
+
+## NRC Standards Reference
+
+- **Swine Nursery**: Protein 18%, Calcium 0.70%, Phosphorus 0.55%, Lysine 1.2%
+- **Swine Growing**: Protein 16%, Calcium 0.60%, Phosphorus 0.50%, Lysine 0.9%
+- **Broiler Starter**: Protein 22%, Calcium 1.00%, Phosphorus 0.45%, Lysine 1.3%
+- **Beef Cattle Starter**: Protein 16%, Calcium 0.60%, Phosphorus 0.40%, Lysine 0.8%
+
+## Error Handling
+
+- Formula not found: List available formulas
+- Incomplete data: Show partial analysis with warning
+- Script error: Apologize and suggest retry

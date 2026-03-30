@@ -8,13 +8,17 @@ FeedSales AI - Auto Add Ingredient
 import sqlite3
 import logging
 import requests
+import os
 from datetime import datetime
 from typing import Dict, Optional, List
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DB_PATH = "data/feed_sales.db"
+# 计算数据库绝对路径
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE = os.path.dirname(SCRIPT_DIR)
+DB_PATH = os.path.join(WORKSPACE, "data", "feed_sales.db")
 
 # 数据源配置
 BARCHART_CBOT_URL = "https://www.cmegroup.com/CmeWS/mvc/Quotes/Futures/G/{product}/G"
@@ -22,31 +26,31 @@ USDA_API_URL = "https://api.ams.usda.gov/mandated_reports/v1/data"
 
 # 支持的原料映射（英文名 -> 数据源查询代码）
 SUPPORTED_INGREDIENTS = {
-    # Grains (CBOT/CME)
-    "Corn": {"source": "cme", "code": "ZC", "unit": "bushel"},
-    "Wheat": {"source": "cme", "code": "ZW", "unit": "bushel"},
-    "Soybeans": {"source": "cme", "code": "ZS", "unit": "bushel"},
-    "Soybean Meal": {"source": "cme", "code": "ZM", "unit": "ton"},
-    "Soybean Oil": {"source": "cme", "code": "ZL", "unit": "lb"},
-    "Oats": {"source": "cme", "code": "ZO", "unit": "bushel"},
-    "Rough Rice": {"source": "cme", "code": "ZR", "unit": "cwt"},
+    # Grains (CBOT/CME) - with reference price fallback
+    "Corn": {"source": "cme", "code": "ZC", "unit": "bushel", "ref_price": 280},
+    "Wheat": {"source": "cme", "code": "ZW", "unit": "bushel", "ref_price": 190},
+    "Soybeans": {"source": "cme", "code": "ZS", "unit": "bushel", "ref_price": 440},
+    "Soybean Meal": {"source": "cme", "code": "ZM", "unit": "ton", "ref_price": 350},
+    "Soybean Oil": {"source": "cme", "code": "ZL", "unit": "lb", "ref_price": 0.35},
+    "Oats": {"source": "cme", "code": "ZO", "unit": "bushel", "ref_price": 150},
+    "Rough Rice": {"source": "cme", "code": "ZR", "unit": "cwt", "ref_price": 12},
     
-    # USDA 报告原料
-    "Alfalfa Hay": {"source": "usda", "code": "HAY_ALFALFA", "unit": "ton"},
-    "Barley": {"source": "usda", "code": "BARLEY", "unit": "bushel"},
-    "Sorghum": {"source": "usda", "code": "SORGHUM", "unit": "cwt"},
-    "Cottonseed Meal": {"source": "usda", "code": "COTTONSEED_MEAL", "unit": "ton"},
-    "Canola Meal": {"source": "usda", "code": "CANOLA_MEAL", "unit": "ton"},
-    "Fish Meal": {"source": "usda", "code": "FISH_MEAL", "unit": "ton"},
-    "Meat Bone Meal": {"source": "usda", "code": "MBM", "unit": "ton"},
-    "Blood Meal": {"source": "usda", "code": "BLOOD_MEAL", "unit": "ton"},
-    "Feather Meal": {"source": "usda", "code": "FEATHER_MEAL", "unit": "ton"},
-    "Poultry Meal": {"source": "usda", "code": "POULTRY_MEAL", "unit": "ton"},
-    "DDGS": {"source": "usda", "code": "DDGS", "unit": "ton"},
-    "Hominy Feed": {"source": "usda", "code": "HOMINY", "unit": "ton"},
-    "Wheat Midds": {"source": "usda", "code": "WHEAT_MIDDS", "unit": "ton"},
-    "Corn Gluten Feed": {"source": "usda", "code": "CGF", "unit": "ton"},
-    "Corn Gluten Meal": {"source": "usda", "code": "CGM", "unit": "ton"},
+    # USDA 报告原料 (带参考价格后备)
+    "Alfalfa Hay": {"source": "usda", "code": "HAY_ALFALFA", "unit": "ton", "ref_price": 220},
+    "Barley": {"source": "usda", "code": "BARLEY", "unit": "bushel", "ref_price": 180},
+    "Sorghum": {"source": "usda", "code": "SORGHUM", "unit": "cwt", "ref_price": 160},
+    "Cottonseed Meal": {"source": "usda", "code": "COTTONSEED_MEAL", "unit": "ton", "ref_price": 280},
+    "Canola Meal": {"source": "usda", "code": "CANOLA_MEAL", "unit": "ton", "ref_price": 260},
+    "Fish Meal": {"source": "usda", "code": "FISH_MEAL", "unit": "ton", "ref_price": 1800},
+    "Meat Bone Meal": {"source": "usda", "code": "MBM", "unit": "ton", "ref_price": 450},
+    "Blood Meal": {"source": "usda", "code": "BLOOD_MEAL", "unit": "ton", "ref_price": 600},
+    "Feather Meal": {"source": "usda", "code": "FEATHER_MEAL", "unit": "ton", "ref_price": 350},
+    "Poultry Meal": {"source": "usda", "code": "POULTRY_MEAL", "unit": "ton", "ref_price": 400},
+    "DDGS": {"source": "usda", "code": "DDGS", "unit": "ton", "ref_price": 150},
+    "Hominy Feed": {"source": "usda", "code": "HOMINY", "unit": "ton", "ref_price": 140},
+    "Wheat Midds": {"source": "usda", "code": "WHEAT_MIDDS", "unit": "ton", "ref_price": 170},
+    "Corn Gluten Feed": {"source": "usda", "code": "CGF", "unit": "ton", "ref_price": 165},
+    "Corn Gluten Meal": {"source": "usda", "code": "CGM", "unit": "ton", "ref_price": 380},
     
     # Minerals & Additives (固定价格参考)
     "Limestone": {"source": "fixed", "price": 120, "unit": "ton"},
@@ -148,6 +152,10 @@ class AutoIngredientManager:
         
         return None
     
+    def get_reference_price(self, ingredient_config: Dict) -> Optional[float]:
+        """获取参考价格（作为实时价格的后备）"""
+        return ingredient_config.get("ref_price")
+    
     def add_ingredient(self, ingredient_name: str, price: float, source: str = "auto") -> bool:
         """添加新原料到数据库"""
         conn = self.get_connection()
@@ -199,6 +207,7 @@ class AutoIngredientManager:
         
         # 获取价格
         price = None
+        source_name = None
         
         if source == "cme":
             code = supported.get("code")
@@ -213,6 +222,14 @@ class AutoIngredientManager:
             source_name = "Reference"
         else:
             price = None
+        
+        # 如果实时价格获取失败，使用参考价格作为后备
+        if price is None:
+            ref_price = self.get_reference_price(supported)
+            if ref_price is not None:
+                price = ref_price
+                source_name = "Reference"
+                logger.info(f"Using reference price for {ingredient_name}: ${price}/ton")
         
         if price is None:
             return {

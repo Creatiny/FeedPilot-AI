@@ -1,45 +1,68 @@
 ---
 name: formula_cost_skill
-description: 饲料配方成本计算。当用户询问配方成本、价格计算时触发。示例："计算保育料 1 号成本"、"这个配方多少钱"
+description: Feed formula cost calculation. Triggers when user asks about formula cost, price calculation. Examples: "calculate Nursery Diet 1 cost", "how much is Beef Cattle Starter per ton"
 ---
 
-# 饲料配方成本计算技能
+# Formula Cost Calculation Skill
 
-## ⚠️ 重要规则
+## ⚠️ Important Rules
 
-- ❌ **禁止**给用户任何 shell/SQL/Python 命令
-- ❌ **禁止**说"运行这个命令查询..."
-- ✅ **必须直接调用技能**获取数据并返回结果
+- ❌ **NEVER** give users commands to run themselves
+- ✅ **ALWAYS reply in English**
+- ✅ **Call the unified skill runner via exec tool**
 
-## 何时使用
+## When to Use
 
-- "这个配方多少钱"
-- "配方成本计算"
-- "多少钱一吨"
-- "保育料成本"、"育肥料成本"
+- "calculate Nursery Diet 1 cost"
+- "how much is Beef Cattle Starter per ton"
+- "formula cost query"
+- "价格计算" (Chinese input → English output)
 
-## 工作流程
+## How to Execute
 
-1. 提取配方名称
-2. 调用数据库查询技能获取配方成分
-3. 调用价格查询技能获取最新价格
-4. 计算每吨/每公斤成本
-5. 直接格式化输出
+Use exec tool to call the unified skill runner:
 
-## 输出格式
+```bash
+python3 {baseDir}/../../scripts/run_skill.py cost "<user message>"
+```
 
-- 配方名称
-- 每吨成本（元/吨）
-- 每公斤成本（元/公斤）
-- 各成分成本明细
+Example for "Beef Cattle Starter cost":
+```bash
+python3 {baseDir}/../../scripts/run_skill.py cost "Beef Cattle Starter cost"
+```
 
-## 错误处理
+## Workflow
 
-- 配方不存在：询问是否创建
-- 价格缺失：使用默认价格
-- 技能失败：道歉并建议重试，**不要**给命令
+1. Extract formula name from user message
+2. Call: `python3 {baseDir}/../../scripts/run_skill.py cost "<formula_name> cost"`
+3. Parse JSON output and format in English
 
-## 参考文档
+## Output Format (English)
 
-- 数据库 Schema: `{baseDir}/../../src/database/schema.sql`
-- 价格数据源：`{baseDir}/../../docs/API.md`
+```
+Formula: Beef Cattle Starter
+Cost: $125.40/ton ($0.125/kg)
+Animal: Beef Cattle
+Stage: Starter
+
+Ingredient Breakdown:
+- Soybean meal (20%): $70.00
+- Alfalfa hay (20%): $44.00
+- Dicalcium phosphate (1.5%): $9.75
+- Limestone (1%): $1.20
+- Salt (0.3%): $0.45
+```
+
+## Available Formulas
+
+- **Swine**: Nursery Diet 1, Growing Diet, Finishing Diet
+- **Beef Cattle**: Starter, Grower, Finisher
+- **Broiler**: Starter, Grower, Finisher
+- **Layer**: Starter, Grower, Laying
+- **Others**: Turkey, Lamb, Goat, Duck, Trout, Catfish
+
+## Error Handling
+
+- Formula not found: List available formulas
+- Price missing: Show partial calculation with warning
+- Script error: Apologize and suggest retry
