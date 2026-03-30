@@ -42,16 +42,16 @@ def setup_test_db():
         )
     ''')
     
-    # 创建客户表
+    # 创建客户表（与 schema.sql 一致）
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             owner_open_id TEXT NOT NULL,
             name TEXT NOT NULL,
-            company TEXT,
             phone TEXT,
-            email TEXT,
-            region TEXT,
+            address TEXT,
+            animal_type TEXT,
+            scale INTEGER,
             notes TEXT,
             version INTEGER DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -81,11 +81,11 @@ def test_create_customer():
         
         customer_data = {
             'name': 'John Smith',
-            'company': 'Smith Farm',
             'phone': '555-1234',
-            'email': 'john@smithfarm.com',
-            'region': 'Iowa',
-            'notes': 'Swine farmer, 5000 head'
+            'address': '123 Farm Road, Iowa',
+            'animal_type': 'swine',
+            'scale': 5000,
+            'notes': 'Swine farmer'
         }
         
         result = service.create_customer('user_a', customer_data)
@@ -109,7 +109,7 @@ def test_create_customer_missing_name():
         service = CustomerService(pool)
         
         customer_data = {
-            'company': 'Test Farm',
+            'animal_type': 'Test Farm',
             'phone': '555-9999'
         }
         
@@ -133,7 +133,7 @@ def test_get_customer():
         service = CustomerService(pool)
         
         # 先创建
-        customer_data = {'name': 'Jane Doe', 'company': 'Doe Ranch'}
+        customer_data = {'name': 'Jane Doe', 'address': 'Doe Ranch'}
         create_result = service.create_customer('user_a', customer_data)
         assert create_result.success
         
@@ -142,7 +142,7 @@ def test_get_customer():
         
         assert result.success, f"应该成功，但返回: {result.error_message}"
         assert result.data['name'] == 'Jane Doe', f"名称错误: {result.data['name']}"
-        assert result.data['company'] == 'Doe Ranch', f"公司错误: {result.data['company']}"
+        assert result.data['address'] == 'Doe Ranch', f"地址错误: {result.data['address']}"
         
         print("  ✅ 获取成功")
         
@@ -213,19 +213,19 @@ def test_update_customer():
         # 创建客户
         create_result = service.create_customer('user_a', {
             'name': 'Update Test',
-            'company': 'Original Company'
+            'address': 'Original Address'
         })
         customer_id = create_result.data['id']
         
         # 更新客户
         update_data = {
-            'company': 'Updated Company',
+            'address': 'Updated Address',
             'notes': 'Updated notes'
         }
         result = service.update_customer('user_a', customer_id, update_data)
         
         assert result.success, f"应该成功，但返回: {result.error_message}"
-        assert result.data['company'] == 'Updated Company', f"公司应该更新，实际: {result.data['company']}"
+        assert result.data['address'] == 'Updated Address', f"地址应该更新，实际: {result.data['address']}"
         
         print("  ✅ 更新成功")
         

@@ -49,9 +49,9 @@ def test_barchart_api_mock():
         print(f"  ✅ Mock 测试通过：${result['price']} / 蒲式耳")
         
         # 测试单位转换
-        price_cny = client.convert_to_cny_ton(5.0, "玉米")
-        assert price_cny > 0, "单位转换失败"
-        print(f"  ✅ 单位转换测试通过：¥{price_cny} / 吨")
+        price_usd_ton = client.convert_to_usd_ton(5.0, "玉米")
+        assert price_usd_ton > 0, "单位转换失败"
+        print(f"  ✅ 单位转换测试通过：${price_usd_ton} / 吨")
     
     return True
 
@@ -112,7 +112,7 @@ def test_repository_mock():
     
     # 配置 Mock 返回值
     mock_cursor.fetchall.return_value = [
-        {"id": 1, "name": "测试配方", "stage_type": "保育", "notes": "", 
+        {"id": 1, "name": "测试配方", "animal_type": "Swine", "stage_type": "保育", "notes": "", 
          "ingredient_name": "玉米", "ratio_percent": 60.0}
     ]
     mock_cursor.fetchone.return_value = mock_cursor.fetchall.return_value[0]
