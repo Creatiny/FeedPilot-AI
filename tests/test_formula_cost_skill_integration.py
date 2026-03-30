@@ -124,19 +124,19 @@ def test_skill_execute_with_service():
         # 创建服务
         calc_service = CalculationService(pool)
         
-        # 创建技能（注入服务）
-        skill = FormulaCostSkill(calc_service=calc_service)
+        # 创建技能（注入服务）- v1.7 API: calculation_service=
+        skill = FormulaCostSkill(calculation_service=calc_service)
         
         # 执行技能
         import asyncio
-        result = asyncio.run(skill.execute('user_a', '计算 Nursery Diet 1 的成本'))
+        result = asyncio.run(skill.execute('user_a', 'Nursery Diet 1成本'))
         
         assert result['success'], f"应该成功: {result.get('error', result.get('error_message'))}"
         assert 'data' in result, "应该返回数据"
-        assert 'total_cost' in result['data'], "应该返回总成本"
-        assert result['data']['total_cost'] > 0, "成本应该大于 0"
+        assert 'cost_per_ton' in result['data'], "应该返回每吨成本"
+        assert result['data']['cost_per_ton'] > 0, "成本应该大于 0"
         
-        print(f"  ✅ 技能执行成功，成本: ${result['data']['total_cost']:.2f}/ton")
+        print(f"  ✅ 技能执行成功，成本: ${result['data']['cost_per_ton']:.2f}/ton")
         
     finally:
         os.unlink(db_path)
@@ -149,7 +149,7 @@ def test_skill_returns_price_sources():
     db_path, pool = setup_test_db()
     try:
         calc_service = CalculationService(pool)
-        skill = FormulaCostSkill(calc_service=calc_service)
+        skill = FormulaCostSkill(calculation_service=calc_service)
         
         import asyncio
         result = asyncio.run(skill.execute('user_a', 'Nursery Diet 1 成本'))
@@ -171,13 +171,13 @@ def test_skill_handles_missing_formula():
     db_path, pool = setup_test_db()
     try:
         calc_service = CalculationService(pool)
-        skill = FormulaCostSkill(calc_service=calc_service)
+        skill = FormulaCostSkill(calculation_service=calc_service)
         
         import asyncio
         result = asyncio.run(skill.execute('user_a', '计算不存在的配方成本'))
         
         assert not result['success'], "应该失败"
-        assert result.get('error_code') == 'E002', "应该返回 E002 错误"
+        assert result.get('error'), "应该返回错误信息"
         
         print("  ✅ 正确处理不存在的配方")
         

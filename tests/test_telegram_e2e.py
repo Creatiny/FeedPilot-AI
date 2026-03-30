@@ -18,7 +18,7 @@ from typing import Optional
 import time
 
 # 添加项目路径
-sys.path.insert(0, str(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 try:
     from telegram import Bot
