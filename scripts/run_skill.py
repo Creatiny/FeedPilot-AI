@@ -203,9 +203,15 @@ class SimpleCustomerService:
     def update_customer(self, user_id: str, customer_id: int, data: dict):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        sets = ', '.join([f'{k} = ?' for k in data.keys()])
+        # P0 FIX: 白名单验证字段名，防止 SQL 注入
+        ALLOWED_FIELDS = {'name', 'phone', 'notes', 'animal_type', 'scale'}
+        filtered_data = {k: v for k, v in data.items() if k in ALLOWED_FIELDS}
+        if not filtered_data:
+            conn.close()
+            return ServiceResult(success=False, error_message="No valid fields to update")
+        sets = ', '.join([f'{k} = ?' for k in filtered_data.keys()])
         cursor.execute(f'UPDATE customers SET {sets} WHERE id = ? AND owner_open_id = ?', 
-                      list(data.values()) + [customer_id, user_id])
+                      list(filtered_data.values()) + [customer_id, user_id])
         conn.commit()
         conn.close()
         return ServiceResult(success=True)
