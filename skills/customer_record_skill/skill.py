@@ -3,17 +3,15 @@ FeedSales AI - Customer Record Skill
 
 Manage customer records for North America feed sales
 Uses CustomerService (v1.7 architecture: Skill → Service → Repository)
+
+Requires CustomerService to be injected at initialization.
 """
 
 import logging
 import re
-import os
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
-
-# Database path from environment or default
-DB_PATH = os.environ.get('FEEDSALES_DB_PATH', 'data/feed_sales.db')
 
 
 class CustomerRecordSkill:
@@ -24,20 +22,9 @@ class CustomerRecordSkill:
         Initialize skill
         
         Args:
-            customer_service: CustomerService instance (injected or auto-created)
+            customer_service: CustomerService instance (required)
         """
         self.customer_service = customer_service
-        
-        # Auto-initialize if not injected
-        if self.customer_service is None:
-            try:
-                # Use simple import (workspace should be in PYTHONPATH)
-                from src.database.pool import DatabasePool
-                from src.services.customer_service import CustomerService
-                db_pool = DatabasePool(DB_PATH)
-                self.customer_service = CustomerService(db_pool)
-            except ImportError as e:
-                logger.warning(f"CustomerRecordSkill: Could not import Service layer: {e}")
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """Execute skill"""

@@ -2,16 +2,15 @@
 FeedSales AI - Formula Cost Skill
 
 Calculate feed formula cost. Uses CalculationService (v1.7 architecture).
+
+Requires CalculationService to be injected at initialization.
 """
 
 import logging
 import re
-import os
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
-
-DB_PATH = os.environ.get('FEEDSALES_DB_PATH', 'data/feed_sales.db')
 
 
 class FormulaCostSkill:
@@ -22,19 +21,9 @@ class FormulaCostSkill:
         Initialize skill
         
         Args:
-            calculation_service: CalculationService instance (injected or auto-created)
+            calculation_service: CalculationService instance (required)
         """
         self.calculation_service = calculation_service
-        
-        # Auto-initialize if not injected
-        if self.calculation_service is None:
-            try:
-                from src.database.pool import DatabasePool
-                from src.services.calculation_service import CalculationService
-                db_pool = DatabasePool(DB_PATH)
-                self.calculation_service = CalculationService(db_pool)
-            except ImportError as e:
-                logger.warning(f"FormulaCostSkill: Could not import Service layer: {e}")
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """
