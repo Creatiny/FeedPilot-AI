@@ -2,15 +2,16 @@
 FeedSales AI - Price Lookup Skill
 
 Query ingredient prices. Uses PriceService (v1.7 architecture).
-
-Requires PriceService to be injected at initialization.
 """
 
 import logging
 import re
+import os
 from typing import Dict, Any, Optional, List
 
 logger = logging.getLogger(__name__)
+
+DB_PATH = os.environ.get('FEEDSALES_DB_PATH', 'data/feed_sales.db')
 
 
 class PriceLookupSkill:
@@ -29,9 +30,19 @@ class PriceLookupSkill:
         Initialize skill
         
         Args:
-            price_service: PriceService instance (required)
+            price_service: PriceService instance (injected or auto-created)
         """
         self.price_service = price_service
+        
+        # Auto-initialize if not injected
+        if self.price_service is None:
+            try:
+                from src.database.pool import DatabasePool
+                from src.services.price_service import PriceService
+                db_pool = DatabasePool(DB_PATH)
+                self.price_service = PriceService(db_pool)
+            except ImportError as e:
+                logger.warning(f"PriceLookupSkill: Could not import Service layer: {e}")
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """

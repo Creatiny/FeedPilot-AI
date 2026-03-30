@@ -7,9 +7,12 @@ Uses FormulaService (v1.7 architecture: Skill → Service → Repository)
 
 import logging
 import re
+import os
 from typing import Dict, Any, Optional, List
 
 logger = logging.getLogger(__name__)
+
+DB_PATH = os.environ.get('FEEDSALES_DB_PATH', 'data/feed_sales.db')
 
 # NRC Standard Reference Values
 NRC_STANDARDS = {
@@ -68,9 +71,19 @@ class NutritionAnalysisSkill:
         Initialize skill
         
         Args:
-            formula_service: FormulaService instance (injected)
+            formula_service: FormulaService instance (injected or auto-created)
         """
         self.formula_service = formula_service
+        
+        # Auto-initialize if not injected
+        if self.formula_service is None:
+            try:
+                from src.database.pool import DatabasePool
+                from src.services.formula_service import FormulaService
+                db_pool = DatabasePool(DB_PATH)
+                self.formula_service = FormulaService(db_pool)
+            except ImportError as e:
+                logger.warning(f"NutritionAnalysisSkill: Could not import Service layer: {e}")
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """Execute skill"""
