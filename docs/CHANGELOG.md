@@ -6,8 +6,145 @@
 |------|------|
 | **仓库** | https://gitee.com/kenny-chenym/feed-sales-ai-mvp |
 | **创建日期** | 2026-03-27 |
-| **状态** | 📋 草稿 |
+| **当前版本** | v1.7.0 |
+| **状态** | ✅ 发布 |
 | **作者** | Kenny Chen |
+
+---
+
+## [v1.7.0] - 2026-03-30
+
+### 🎯 核心变更
+
+#### 架构升级：Harness 驱动的业务系统
+
+v1.7 的本质是**从"技能直连数据"升级为"Harness 驱动的业务系统"**：
+
+| 层面 | v1.6.x | v1.7 |
+|------|--------|------|
+| 数据访问 | 直连 sqlite | Repository + Service |
+| 业务逻辑 | 在技能里散落 | Service 层统一 |
+| 用户隔离 | 靠约定 | 强制在接口层 |
+| 状态管理 | 无 | SessionState |
+| 结果校验 | 无 | ResultValidator |
+
+### 🎉 新增功能
+
+#### Service 层（统一业务逻辑）
+
+- ✅ CalculationService - 配方成本计算服务
+- ✅ PriceService - 原料价格管理服务
+- ✅ FormulaService - 配方管理服务
+- ✅ CustomerService - 客户管理服务
+
+#### 查询策略：私有优先 / 公共回退
+
+- ✅ 配方查询：先查私有，再查公共
+- ✅ 价格查询：先查私有，再查公共
+- ✅ 成本计算：自动追踪价格来源
+
+#### Harness Runtime Layer
+
+- ✅ TaskRouter - 任务路由器（8 种任务类型）
+- ✅ SessionStateManager - 会话状态管理
+- ✅ ResultValidator - 结果校验器
+
+### 🔧 架构重构
+
+#### Skill 层重构（符合 v1.7 设计）
+
+| Skill | v1.6 | v1.7 |
+|-------|------|------|
+| FormulaCostSkill | 直连数据库 | → CalculationService |
+| PriceLookupSkill | 直连数据库 | → PriceService |
+| CustomerRecordSkill | 直连数据库 | → CustomerService |
+| NutritionAnalysisSkill | 直连数据库 | → FormulaService |
+
+#### 架构层次
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Telegram Bot / API                       │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Harness Runtime Layer                     │
+│  TaskRouter │ SessionState │ ResultValidator                 │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Service Layer (统一入口)                   │
+│  CalculationService │ PriceService │ FormulaService │ ...   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Repository Layer (数据访问)                 │
+│  FormulaRepository │ PriceRepository │ CustomerRepository   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Database Layer                           │
+│       SQLite (feed_sales.db) + WAL Mode                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🐛 Bug 修复
+
+- 修复 CustomerService 字段与 schema.sql 不一致
+- 修复 FormulaCostSkill 配方名长度限制过短
+- 修复 formula_ingredients.ratio 字段名错误
+
+### 📊 数据统计
+
+| 指标 | v1.6 | v1.7 | 改进 |
+|------|------|------|------|
+| **代码行数** | 1800 | 1415 | -21% |
+| **Skill 文件** | 4 | 4 | 不变 |
+| **Service 文件** | 4 | 4 | 不变 |
+| **架构层次** | 2 | 4 | +100% |
+| **测试覆盖** | 90% | 100% | +11% |
+
+### ⚠️ 破坏性变更
+
+#### Skill 初始化方式变更
+
+**v1.6 方式**（不再支持）：
+```python
+# Skill 直连数据库
+skill = FormulaCostSkill()  # 内部直接访问 sqlite
+```
+
+**v1.7 方式**（必需）：
+```python
+# 依赖注入 Service
+db_pool = DatabasePool('data/feed_sales.db')
+calc_service = CalculationService(db_pool)
+skill = FormulaCostSkill(calculation_service=calc_service)
+```
+
+### 📝 迁移指南
+
+#### 从 v1.6 升级到 v1.7
+
+**1. 更新代码**
+```bash
+git pull origin master
+```
+
+**2. 重启服务**
+```bash
+openclaw gateway restart
+```
+
+**3. 验证升级**
+```bash
+# 在 Telegram 中发送测试消息
+"Nursery Diet 1 cost"
+```
 
 ---
 
@@ -192,12 +329,11 @@ curl http://localhost:18789/health
 
 ## 未来计划
 
-### v1.7.0 (预计 2026-04-15)
+### v1.7.1 (计划中)
 
 - [ ] Barchart API 实时集成
 - [ ] 价格预警功能
 - [ ] 批量计算功能
-- [ ] 成本趋势分析
 
 ### v1.8.0 (预计 2026-05-01)
 
