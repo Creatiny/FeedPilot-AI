@@ -52,33 +52,44 @@ After starting, you can:
 
 ### Supported Species
 
-FeedSales AI supports formula calculations for **9 species**:
+FeedSales AI supports formula calculations for **30 species**:
 
-| Species | Description |
-|---------|-------------|
-| Swine | Nursery, Grower, Finisher diets |
-| Beef Cattle | Growing and finishing cattle |
-| Dairy Cattle | Lactating and dry cows |
-| Broiler | Starter, Grower, Finisher phases |
-| Layer | Egg production hens |
-| Turkey | Starter, Grower, Finisher phases |
-| Sheep | Breeding and market lambs |
-| Goat | Dairy and meat goats |
-| Duck | Starter and finisher diets |
+| Category | Species |
+|----------|---------|
+| **Livestock** | Swine, Beef Cattle, Dairy Cattle, Sheep, Goat, Water Buffalo, Bison |
+| **Poultry** | Broiler, Layer, Turkey, Duck |
+| **Equine** | Horse |
+| **Companion** | Cat, Dog |
+| **Aquatic** | Rainbow Trout, Catfish, Channel Catfish, Tilapia, Salmon, Carp, Pangasius, Seabass, Shrimp |
+| **Small Ruminant** | Alpaca, Llama, Deer, Elk |
+| **Apiculture** | Honey Bee |
+| **Other** | Rabbit |
 
 ### Standard Formulas
 
-The system includes **38 NRC-standard formulas** including:
+The system includes **87 NRC-standard formulas** across all 30 species:
 
-- **Swine**: Nursery Diet 1, Nursery Diet 2, Grower Diet 1, Grower Diet 2, Finisher Diet 1, Finisher Diet 2, Gestation Diet, Lactation Diet
-- **Beef Cattle**: Growing Calf, Finishing Steer, Breeding Bull
-- **Dairy Cattle**: Lactating Cow High Production, Lactating Cow Medium Production, Dry Cow, Heifer Development
-- **Broiler**: Broiler Starter, Broiler Grower, Broiler Finisher
-- **Layer**: Layer Starter, Layer Developer, Layer Production
-- **Turkey**: Turkey Starter, Turkey Grower, Turkey Finisher
-- **Sheep**: Lamb Starter, Lamb Grower, Breeding Ewe
-- **Goat**: Kid Starter, Dairy Goat Lactating, Meat Goat Finisher
-- **Duck**: Duck Starter, Duck Finisher
+- **Swine** (9): Nursery Diet 1/2/3, Grower Diet 1/2, Finisher Diet, Gestating Sow Diet, Lactating Sow Diet, Weaner Diet
+- **Beef Cattle** (4): Starter, Grower, Finisher, Feedlot High Energy
+- **Dairy Cattle** (4): Calf Starter, Heifer Grower, Lactating Cow Diet, Dairy Cow High Production
+- **Broiler** (4): Pre-Starter, Starter, Grower, Finisher
+- **Layer** (5): Starter, Grower, Phase 1, Phase 2, Laying Diet
+- **Turkey** (3): Starter, Grower, Finisher
+- **Sheep** (7): Lamb Starter, Lamb Finisher, Lamb Finishing, Ewe Gestating, Ewe Lactating, Ewe Lactation, Ewe Late Gestation
+- **Goat** (6): Kid Starter (×2), Doe Gestating, Doe Lactating, Dairy Doe Early Lactation, Meat Goat Grower
+- **Duck** (3): Starter, Grower, Breeder
+- **Honey Bee** (5): Spring Build-Up, Brood Rearing, Pollen Substitute Patty, Fall Feeding, Winter Fondant
+- **Horse** (3): Maintenance, Performance, Breeding Mare
+- **Cat** (2): Kitten Diet, Adult Maintenance Diet
+- **Dog** (2): Puppy Diet, Adult Maintenance Diet
+- **Aquatic** (10): Trout Starter/Grower, Catfish Fingerling/Production, Rainbow Trout Starter/Fingerling/Production, Salmon Starter/Grower, Carp Fingerling/Grower, Pangasius, Tilapia, Seabass, Shrimp
+- **Rabbit** (2): Grower Diet, Lactating Doe Diet
+- **Alpaca** (2): Maintenance, Lactating
+- **Llama** (2): Maintenance, Lactating
+- **Deer** (2): Finishing, Velvet Antler
+- **Elk** (2): Maintenance, Velvet Antler
+- **Bison** (1): Finishing
+- **Water Buffalo** (1): Growing
 
 ---
 
@@ -124,16 +135,19 @@ Bot: 📊 Formula Cost Analysis - Nursery Diet 1 (Swine)
 
 **Description**: Query real-time prices for feed commodities.
 
-**Available Commodities** (20+ items):
+**Available Commodities** (69 feed ingredients):
 
 | Category | Commodities |
 |----------|-------------|
-| Grains | Corn, Wheat, Barley, Oats, Sorghum, Rice |
-| Protein Meals | Soybean Meal, Canola Meal, Cottonseed Meal, Sunflower Meal, Peanut Meal |
-| By-products | DDGS, Wheat Midds, Rice Bran, Corn Gluten Meal |
-| Fats/Oils | Soybean Oil, Palm Oil, Fish Oil, Lard |
-| Minerals | Limestone, Dicalcium Phosphate, Salt, Magnesium Oxide |
-| Additives | Premix, Vitamins, Amino Acids (Lysine, Methionine, Threonine) |
+| Grains | Corn (#2 Yellow CBOT), Wheat (SRW CBOT), Oats (#2 White CBOT), Rice bran, Rice polishings |
+| Protein Meals | Soybean meal (48%, 47.5%), Canola meal (36%), Corn gluten meal (60%), Fish meal (65%), Meat & bone meal (ruminant), Poultry by-product meal, Blood meal (porcine), Feather meal (80%), Shrimp meal, Squid meal |
+| By-products | DDGS (10% fat), Wheat middlings, Beet pulp (dried), Brewer's yeast (dried), Molasses (cane), Whey (dried), Wheat gluten, Soy flour (defatted) |
+| Forages | Alfalfa hay (early bloom), Corn silage, Grass hay (early bloom), Timothy hay |
+| Fats/Oils | Soybean oil (crude), Fish oil, Lecithin |
+| Minerals | Limestone (ag), Dicalcium phosphate, Salt (white), Urea |
+| Amino Acids | L-Lysine HCl, DL-Methionine, Threonine (98%), Taurine, Choline chloride (60%) |
+| Premixes (16) | Swine, Sow, Broiler, Layer, Turkey, Duck, Duck breeder, Beef, Dairy, Calf, Heifer, Sheep, Ewe, Goat, Doe, Trout, Catfish, Cat, Dog |
+| Specialty | Sugar (white granulated), Vinegar (acidifier), Milk replacer (calf), Pollen (bee collected), Water, Vitamin/mineral premix |
 
 **Example Conversation**:
 
@@ -384,10 +398,15 @@ Just type your question naturally!
 
 SPECIES SUPPORTED:
 Swine, Beef Cattle, Dairy Cattle, Broiler, 
-Layer, Turkey, Sheep, Goat, Duck
+Layer, Turkey, Sheep, Goat, Duck,
+Horse, Cat, Dog, Rabbit,
+Alpaca, Llama, Deer, Elk, Bison,
+Water Buffalo, Honey Bee,
+Rainbow Trout, Catfish, Salmon, Carp,
+Tilapia, Pangasius, Seabass, Shrimp
 
-FORMULAS: 38 NRC standards
-COMMODITIES: 20+ feed ingredients
+FORMULAS: 87 NRC standards
+COMMODITIES: 69 feed ingredients
 
 📍 Need more help? Type "support"
 ```
@@ -547,13 +566,22 @@ FeedSales AI understands natural language. You don't need to use exact commands�
 
 ### Q3: Can I create custom formulas?
 
-**Answer**: Currently, FeedSales AI supports 38 NRC-standard formulas. Custom formula creation is planned for v2.0. For now, you can modify standard formulas by adjusting ingredient percentages in your calculations.
+**Answer**: Currently, FeedSales AI supports 87 NRC-standard formulas across 30 species. Custom formula creation is planned for v2.0. For now, you can modify standard formulas by adjusting ingredient percentages in your calculations.
 
 ---
 
 ### Q4: Which species are supported?
 
-**Answer**: We support 9 species: **Swine, Beef Cattle, Dairy Cattle, Broiler (chicken), Layer (egg-producing hens), Turkey, Sheep, Goat, and Duck**. Each species has multiple phase-specific formulas (starter, grower, finisher, etc.).
+**Answer**: We support **30 species** across livestock, poultry, aquatic, companion, and specialty animals:
+
+- **Livestock**: Swine, Beef Cattle, Dairy Cattle, Sheep, Goat, Water Buffalo, Bison
+- **Poultry**: Broiler, Layer, Turkey, Duck
+- **Equine**: Horse
+- **Companion**: Cat, Dog
+- **Aquatic**: Rainbow Trout, Catfish, Tilapia, Salmon, Carp, Pangasius, Seabass, Shrimp
+- **Specialty**: Alpaca, Llama, Deer, Elk, Honey Bee, Rabbit
+
+Each species has multiple phase-specific formulas (starter, grower, finisher, lactating, etc.).
 
 ---
 
@@ -957,116 +985,214 @@ Planned features for upcoming versions:
 
 ## Appendix
 
-### A. Complete Formula List
+### A. Complete Formula List (87 Formulas, 30 Species)
 
-**Swine (8 formulas)**:
-1. Nursery Diet 1
-2. Nursery Diet 2
-3. Grower Diet 1
-4. Grower Diet 2
-5. Finisher Diet 1
-6. Finisher Diet 2
-7. Gestation Diet
-8. Lactation Diet
+**Swine (9)**:
+1. Nursery Diet 1 (5-10 kg)
+2. Nursery Diet 2 (10-20 kg)
+3. Nursery Diet 3 (20-30 kg)
+4. Grower Diet 1 (30-60 kg)
+5. Grower Diet 2 (60-90 kg)
+6. Finisher Diet (90+ kg)
+7. Gestating Sow Diet
+8. Lactating Sow Diet
+9. Swine Weaner Diet (5-10 kg)
 
-**Beef Cattle (3 formulas)**:
-1. Growing Calf
-2. Finishing Steer
-3. Breeding Bull
+**Beef Cattle (4)**:
+1. Beef Cattle Starter (150-250 kg)
+2. Beef Cattle Grower (250-400 kg)
+3. Beef Cattle Finisher (400+ kg)
+4. Beef Feedlot High Energy (400-600 kg)
 
-**Dairy Cattle (4 formulas)**:
-1. Lactating Cow High Production
-2. Lactating Cow Medium Production
-3. Dry Cow
-4. Heifer Development
+**Dairy Cattle (4)**:
+1. Dairy Calf Starter (0-3 months)
+2. Dairy Heifer Grower (3-12 months)
+3. Lactating Cow Diet
+4. Dairy Cow High Production (600-700 kg)
 
-**Broiler (3 formulas)**:
-1. Broiler Starter
-2. Broiler Grower
-3. Broiler Finisher
+**Broiler (4)**:
+1. Broiler Pre-Starter Diet (0-0.25 kg)
+2. Broiler Starter (0-10 days)
+3. Broiler Grower (11-24 days)
+4. Broiler Finisher (25+ days)
 
-**Layer (3 formulas)**:
-1. Layer Starter
-2. Layer Developer
-3. Layer Production
+**Layer (5)**:
+1. Layer Starter (0-6 weeks)
+2. Layer Grower (7-18 weeks)
+3. Layer Phase 1 Diet (18-40 weeks)
+4. Layer Phase 2 Diet (40-60 weeks)
+5. Layer Diet (19+ weeks)
 
-**Turkey (3 formulas)**:
-1. Turkey Starter
-2. Turkey Grower
-3. Turkey Finisher
+**Turkey (3)**:
+1. Turkey Starter (0-4 weeks)
+2. Turkey Grower (5-12 weeks)
+3. Turkey Finisher (13-20 weeks)
 
-**Sheep (3 formulas)**:
-1. Lamb Starter
-2. Lamb Grower
-3. Breeding Ewe
+**Sheep (7)**:
+1. Lamb Starter (15-30 kg)
+2. Lamb Finisher (30+ kg)
+3. Lamb Finishing (30-50 kg)
+4. Ewe Gestating
+5. Ewe Lactating
+6. Ewe Lactation (60-80 kg)
+7. Ewe Late Gestation (60-80 kg)
 
-**Goat (3 formulas)**:
-1. Kid Starter
-2. Dairy Goat Lactating
-3. Meat Goat Finisher
+**Goat (6)**:
+1. Goat Kid Starter (10-20 kg)
+2. Kid Starter (5-15 kg)
+3. Goat Doe Gestating
+4. Goat Doe Lactating
+5. Dairy Doe Early Lactation (50-70 kg)
+6. Meat Goat Grower (20-40 kg)
 
-**Duck (2 formulas)**:
-1. Duck Starter
-2. Duck Finisher
+**Duck (3)**:
+1. Duck Starter (0-3 weeks)
+2. Duck Grower (4-7 weeks)
+3. Duck Breeder
 
-**Total**: 38 NRC-standard formulas
+**Honey Bee (5)**:
+1. Spring Build-Up
+2. Brood Rearing (Pollen Patty)
+3. Pollen Substitute Patty
+4. Fall Feeding
+5. Winter Fondant
+
+**Horse (3)**:
+1. Horse Maintenance Diet (400-600 kg)
+2. Horse Performance Diet (400-600 kg)
+3. Horse Breeding Mare Diet (400-600 kg)
+
+**Cat (2)**:
+1. Cat Kitten Diet (0-4 kg)
+2. Cat Maintenance Diet (3-6 kg)
+
+**Dog (2)**:
+1. Dog Puppy Diet (0-25 kg)
+2. Dog Maintenance Diet (10-30 kg)
+
+**Pet (2)**:
+1. Cat Food Adult (AAFCO 2026)
+2. Dog Food Adult (AAFCO 2026)
+
+**Aquatic (16)**:
+1. Trout Starter (Fry, 0-5 g)
+2. Trout Grower (Fingerling, 5-50 g)
+3. Rainbow Trout Starter (0-5 g)
+4. Rainbow Trout Fingerling (5-50 g)
+5. Rainbow Trout Production (50-250 g)
+6. Catfish Grower (50-500 g)
+7. Channel Catfish Fingerling (5-50 g)
+8. Channel Catfish Production (50-500 g)
+9. Atlantic Salmon Starter (0-10 g)
+10. Atlantic Salmon Grower (10-500 g)
+11. Common Carp Fingerling (5-50 g)
+12. Common Carp Grower (50-250 g)
+13. Pangasius Fingerling (5-50 g)
+14. Tilapia Grower Diet (50-200 g)
+15. Asian Seabass Grower (50-500 g)
+16. Shrimp Grower Diet (5-20 g)
+
+**Rabbit (2)**:
+1. Rabbit Grower Diet (0.5-2 kg)
+2. Rabbit Lactating Doe Diet (3-5 kg)
+
+**Alpaca (2)**:
+1. Alpaca Maintenance (50-80 kg)
+2. Alpaca Lactating (60-90 kg)
+
+**Llama (2)**:
+1. Llama Maintenance (120-180 kg)
+2. Llama Lactating (130-200 kg)
+
+**Deer (2)**:
+1. Deer Finishing (50-80 kg)
+2. Deer Velvet Antler (80-120 kg)
+
+**Elk (2)**:
+1. Elk Maintenance (250-350 kg)
+2. Elk Velvet Antler (280-400 kg)
+
+**Bison (1)**:
+1. Bison Finishing (350-500 kg)
+
+**Water Buffalo (1)**:
+1. Water Buffalo Growing (200-350 kg)
+
+**Total**: 87 NRC-standard formulas
 
 ---
 
-### B. Complete Commodity List
+### B. Complete Ingredient List (69 Ingredients)
 
-**Grains**:
-- Corn (Yellow Corn, #2 Grade)
-- Wheat (Hard Red, Soft Red)
-- Barley
-- Oats
-- Sorghum (Milo)
-- Rice (Rice Bran, Rice Polish)
+**Energy Feeds**:
+- Corn, grain
+- Corn, #2 Yellow CBOT
+- Wheat, SRW CBOT
+- Oats, #2 White CBOT
+- Rice bran
+- Rice polishings
+- Wheat middlings
 
-**Protein Meals**:
-- Soybean Meal (48% CP, 44% CP)
-- Canola Meal (Rapeseed Meal)
-- Cottonseed Meal
-- Sunflower Meal
-- Peanut Meal
-- Fish Meal
+**Protein Feeds**:
+- Soybean meal, 48%
+- Soybean meal, 47.5%
+- Canola meal, 36%
+- Corn gluten meal, 60%
+- Fish meal, 65%
+- Blood meal, porcine
+- Feather meal, 80%
+- Meat and bone meal, ruminant
+- Poultry by-product meal
+- Shrimp meal
+- Squid meal
 
 **By-products**:
-- DDGS (Distillers Dried Grains with Solubles)
-- Wheat Midds (Wheat Middlings)
-- Corn Gluten Meal
-- Corn Gluten Feed
-- Brewers Grains
+- DDGS, 10% fat
+- Beet pulp, dried
+- Brewer's yeast, dried
+- Molasses, cane
+- Whey, dried
+- Wheat gluten
+- Soy flour, defatted
+
+**Forages**:
+- Alfalfa hay, early bloom
+- Corn silage
+- Grass hay, early bloom
+- Timothy hay
 
 **Fats & Oils**:
-- Soybean Oil
-- Palm Oil
-- Fish Oil
-- Lard
-- Tallow
+- Soybean oil, crude
+- Fish oil
+- Lecithin
 
 **Minerals**:
-- Limestone (Calcium Carbonate)
-- Dicalcium Phosphate
-- Monocalcium Phosphate
-- Salt (Sodium Chloride)
-- Magnesium Oxide
-- Potassium Chloride
+- Limestone, ag
+- Dicalcium phosphate
+- Salt, white
+- Urea
 
 **Amino Acids**:
-- L-Lysine HCl (98%)
+- L-Lysine HCl
 - DL-Methionine
-- L-Threonine
-- L-Valine
-- L-Isoleucine
+- Threonine, 98%
+- Taurine
+- Choline chloride, 60%
 
-**Additives**:
-- Premix (Vitamin-Mineral Premix)
-- Vitamins (A, D, E, K, B-complex)
-- Enzymes (Phytase, Xylanase)
-- Antioxidants
+**Premixes (16 species-specific)**:
+- Premix, swine / sow / broiler / layer / turkey / duck / duck breeder
+- Premix, beef / dairy / calf / heifer / sheep / ewe / goat / doe
+- Premix, trout / catfish / cat / dog
 
-**Total**: 20+ commodities tracked
+**Specialty**:
+- Sugar, white granulated
+- Vinegar (acidifier)
+- Milk replacer, calf
+- Pollen, bee collected
+- Water
+- Vitamin/mineral premix
+
+**Total**: 69 feed ingredients
 
 ---
 
@@ -1087,12 +1213,12 @@ Planned features for upcoming versions:
 ║ /customer  - Manage records                ║
 ║ /nutrition - NRC analysis                  ║
 ╠════════════════════════════════════════════╣
-║ Species: Swine, Beef, Dairy,              ║
-║          Broiler, Layer, Turkey,          ║
-║          Sheep, Goat, Duck                ║
+║ Species: 30 (Swine, Cattle, Poultry,      ║
+║          Equine, Aquatic, Companion,      ║
+║          Small Ruminant, Apiculture)      ║
 ╠════════════════════════════════════════════╣
-║ Formulas: 38 NRC standards                 ║
-║ Commodities: 20+ ingredients               ║
+║ Formulas: 87 NRC standards                 ║
+║ Ingredients: 69 feed commodities           ║
 ║ Prices: USD/ton                            ║
 ╚════════════════════════════════════════════╝
 ```
