@@ -1,0 +1,162 @@
+[
+  {
+    "name": "Corn, No.2 Yellow",
+    "price": 180.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "CBOT",
+    "trend": "stable"
+  },
+  {
+    "name": "Soybean meal, 48%",
+    "price": 350.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "CBOT",
+    "trend": "up"
+  },
+  {
+    "name": "Fish meal, 65%",
+    "price": 1800.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, swine",
+    "price": 450.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Dicalcium phosphate",
+    "price": 650.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "down"
+  },
+  {
+    "name": "Limestone, ag",
+    "price": 120.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Salt, white",
+    "price": 150.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "L-Lysine HCl",
+    "price": 1200.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "up"
+  },
+  {
+    "name": "DL-Methionine",
+    "price": 2500.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Alfalfa hay, early bloom",
+    "price": 220.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Corn silage",
+    "price": 80.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Wheat middlings",
+    "price": 190.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Milk replacer, calf",
+    "price": 2800.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "up"
+  },
+  {
+    "name": "Premix, beef",
+    "price": 400.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, dairy",
+    "price": 480.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, broiler",
+    "price": 520.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, layer",
+    "price": 550.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, sow",
+    "price": 460.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, calf",
+    "price": 500.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  },
+  {
+    "name": "Premix, heifer",
+    "price": 420.00,
+    "unit": "USD/ton",
+    "date": "2026-03-28",
+    "market": "US",
+    "trend": "stable"
+  }
+]

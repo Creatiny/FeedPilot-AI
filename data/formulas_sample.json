@@ -1,0 +1,230 @@
+[
+  {
+    "name": "保育料 1 号",
+    "animal_type": "猪",
+    "stage": "保育",
+    "weight_range": "5-10kg",
+    "ingredients": [
+      {"name": "玉米", "ratio": 60.0},
+      {"name": "豆粕", "ratio": 25.0},
+      {"name": "鱼粉", "ratio": 3.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 18.0,
+      "lysine": 1.2,
+      "methionine": 0.35,
+      "calcium": 0.8,
+      "phosphorus": 0.6
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "保育料 2 号",
+    "animal_type": "猪",
+    "stage": "保育",
+    "weight_range": "10-20kg",
+    "ingredients": [
+      {"name": "玉米", "ratio": 62.0},
+      {"name": "豆粕", "ratio": 23.0},
+      {"name": "鱼粉", "ratio": 2.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "lysine": 1.1,
+      "methionine": 0.32,
+      "calcium": 0.75,
+      "phosphorus": 0.55
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "保育料 3 号",
+    "animal_type": "猪",
+    "stage": "保育",
+    "weight_range": "20-30kg",
+    "ingredients": [
+      {"name": "玉米", "ratio": 65.0},
+      {"name": "豆粕", "ratio": 21.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 16.0,
+      "lysine": 1.0,
+      "methionine": 0.3,
+      "calcium": 0.7,
+      "phosphorus": 0.5
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "育肥料 1 号",
+    "animal_type": "猪",
+    "stage": "育肥",
+    "weight_range": "30-60kg",
+    "ingredients": [
+      {"name": "玉米", "ratio": 68.0},
+      {"name": "豆粕", "ratio": 18.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 15.0,
+      "lysine": 0.9,
+      "methionine": 0.28,
+      "calcium": 0.65,
+      "phosphorus": 0.45
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "育肥料 2 号",
+    "animal_type": "猪",
+    "stage": "育肥",
+    "weight_range": "60-90kg",
+    "ingredients": [
+      {"name": "玉米", "ratio": 70.0},
+      {"name": "豆粕", "ratio": 16.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 14.0,
+      "lysine": 0.8,
+      "methionine": 0.25,
+      "calcium": 0.6,
+      "phosphorus": 0.4
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "育肥料 3 号",
+    "animal_type": "猪",
+    "stage": "育肥",
+    "weight_range": "90kg+",
+    "ingredients": [
+      {"name": "玉米", "ratio": 72.0},
+      {"name": "豆粕", "ratio": 14.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 13.0,
+      "lysine": 0.7,
+      "methionine": 0.22,
+      "calcium": 0.55,
+      "phosphorus": 0.35
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "空怀母猪料",
+    "animal_type": "猪",
+    "stage": "母猪",
+    "weight_range": "空怀期",
+    "ingredients": [
+      {"name": "玉米", "ratio": 65.0},
+      {"name": "豆粕", "ratio": 15.0},
+      {"name": "麸皮", "ratio": 10.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 14.0,
+      "lysine": 0.75,
+      "calcium": 0.7,
+      "phosphorus": 0.5
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "妊娠母猪料前期",
+    "animal_type": "猪",
+    "stage": "母猪",
+    "weight_range": "妊娠 1-84 天",
+    "ingredients": [
+      {"name": "玉米", "ratio": 68.0},
+      {"name": "豆粕", "ratio": 13.0},
+      {"name": "麸皮", "ratio": 10.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 13.0,
+      "lysine": 0.65,
+      "calcium": 0.65,
+      "phosphorus": 0.45
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "妊娠母猪料后期",
+    "animal_type": "猪",
+    "stage": "母猪",
+    "weight_range": "妊娠 85-114 天",
+    "ingredients": [
+      {"name": "玉米", "ratio": 66.0},
+      {"name": "豆粕", "ratio": 16.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3}
+    ],
+    "nutrition": {
+      "crude_protein": 15.0,
+      "lysine": 0.75,
+      "calcium": 0.75,
+      "phosphorus": 0.55
+    },
+    "source": "中国饲料工业标准"
+  },
+  {
+    "name": "哺乳母猪料",
+    "animal_type": "猪",
+    "stage": "母猪",
+    "weight_range": "哺乳期",
+    "ingredients": [
+      {"name": "玉米", "ratio": 60.0},
+      {"name": "豆粕", "ratio": 22.0},
+      {"name": "鱼粉", "ratio": 3.0},
+      {"name": "预混料", "ratio": 5.0},
+      {"name": "磷酸氢钙", "ratio": 1.5},
+      {"name": "石粉", "ratio": 1.0},
+      {"name": "食盐", "ratio": 0.3},
+      {"name": "赖氨酸", "ratio": 0.2}
+    ],
+    "nutrition": {
+      "crude_protein": 17.0,
+      "lysine": 1.0,
+      "calcium": 0.85,
+      "phosphorus": 0.6
+    },
+    "source": "中国饲料工业标准"
+  }
+]

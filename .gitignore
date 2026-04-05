@@ -39,11 +39,9 @@ env/
 htmlcov/
 .tox/
 
-# Database (keep schema, ignore data)
-*.db
+# Database (WAL/SHM files, keep main db)
 *.db-wal
 *.db-shm
-data/*.db
 
 # Logs
 logs/

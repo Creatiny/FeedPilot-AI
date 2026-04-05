@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FeedSales AI - AI-powered feed sales assistant for North American feed industry. Calculate feed costs instantly, track ingredient prices, and manage customers with our Telegram bot.">
+    <meta name="keywords" content="feed sales, feed cost calculator, livestock nutrition, feed mill management, NRC formulas, ingredient prices">
+    <title>FeedSales AI - Stop Guessing Feed Costs. Start Selling Smarter.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1a3a5c;
+            --primary-green: #2d5a3d;
+            --accent-blue: #3b7bb0;
+            --accent-green: #4a8c5f;
+            --light-bg: #f5f7fa;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--white);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .logo span {
+            color: var(--accent-green);
+        }
+
+        .nav-cta {
+            background: var(--accent-green);
+            color: var(--white);
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-green);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            color: var(--white);
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            opacity: 0.85;
+        }
+
+        .cta-button {
+            background: var(--accent-green);
+            color: var(--white);
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s, background 0.3s;
+            box-shadow: 0 4px 15px rgba(74, 140, 95, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            background: var(--primary-green);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: var(--light-bg);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--white);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .feature-card ul {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .feature-card li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 5rem 2rem;
+            background: var(--white);
+        }
+
+        .steps-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: var(--text-light);
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 5rem 2rem;
+            background: var(--light-bg);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 3px solid var(--accent-green);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: "Most Popular";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: var(--white);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            padding: 0;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            border-bottom: 1px solid #eee;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-cta {
+            background: var(--accent-blue);
+            color: var(--white);
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .pricing-cta:hover {
+            background: var(--primary-blue);
+        }
+
+        .pricing-card.featured .pricing-cta {
+            background: var(--accent-green);
+        }
+
+        .pricing-card.featured .pricing-cta:hover {
+            background: var(--primary-green);
+        }
+
+        /* Social Proof */
+        .social-proof {
+            padding: 5rem 2rem;
+            background: var(--white);
+            text-align: center;
+        }
+
+        .social-proof-placeholder {
+            background: var(--light-bg);
+            padding: 4rem 2rem;
+            border-radius: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            color: var(--text-light);
+        }
+
+        .social-proof-placeholder p {
+            font-size: 1.1rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-blue) 100%);
+            padding: 5rem 2rem;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+        }
+
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            nav {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .nav-cta {
+                padding: 0.4rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                min-height: 70vh;
+                padding-top: 5rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+
+            .steps-container {
+                flex-direction: column;
+            }
+
+            .step {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">FeedSales<span>AI</span></div>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="nav-cta">Join Beta</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Stop Guessing Feed Costs.<br>Start Selling Smarter.</h1>
+            <p class="hero-subtitle">The AI-powered assistant for North American feed sales professionals</p>
+            <p>Calculate formula costs instantly. Track ingredient prices in real-time. Manage customers securely. All from your Telegram bot.</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="cta-button">Join Beta — 30 Days Free</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title">Built for Feed Sales Professionals</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Formula Cost Calculator</h3>
+                <p>Instantly calculate feed formula costs with precision.</p>
+                <ul>
+                    <li>87 NRC standard formulas</li>
+                    <li>30 animal species supported</li>
+                    <li>Real-time ingredient pricing</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Ingredient Price Lookup</h3>
+                <p>Stay updated on commodity prices that matter.</p>
+                <ul>
+                    <li>69 feed ingredients tracked</li>
+                    <li>Real-time Barchart data</li>
+                    <li>Historical price trends</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔬</div>
+                <h3>Nutrition Analysis</h3>
+                <p>Compare formulas against NRC standards instantly.</p>
+                <ul>
+                    <li>NRC nutritional benchmarks</li>
+                    <li>Gap analysis reports</li>
+                    <li>Species-specific profiles</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Customer Management</h3>
+                <p>Organize and manage your feed sales customers.</p>
+                <ul>
+                    <li>Multi-tenant architecture</li>
+                    <li>Secure data storage</li>
+                    <li>Customer history tracking</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Message</h3>
+                <p>Send a message to our Telegram bot with your formula requirements or ingredient queries.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Calculate</h3>
+                <p>Our AI instantly calculates costs, analyzes nutrition, and retrieves current prices.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Quote</h3>
+                <p>Get accurate quotes ready to share with your customers — no app downloads needed.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <h2 class="section-title">Simple, Transparent Pricing</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>Starter</h3>
+                <div class="price">$29<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>5 formula calculations/day</li>
+                    <li>Basic ingredient lookup</li>
+                    <li>10 customer records</li>
+                    <li>Email support</li>
+                    <li>Single user</li>
+                </ul>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="pricing-cta">Start Free Trial</a>
+            </div>
+            <div class="pricing-card featured">
+                <h3>Professional</h3>
+                <div class="price">$79<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Unlimited calculations</li>
+                    <li>Full ingredient database</li>
+                    <li>100 customer records</li>
+                    <li>Priority support</li>
+                    <li>Nutrition analysis</li>
+                    <li>Price alerts</li>
+                </ul>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="pricing-cta">Start Free Trial</a>
+            </div>
+            <div class="pricing-card">
+                <h3>Enterprise</h3>
+                <div class="price">$199<span>/month</span></div>
+                <ul class="pricing-features">
+                    <li>Everything in Professional</li>
+                    <li>Unlimited customers</li>
+                    <li>Custom formulas</li>
+                    <li>API access</li>
+                    <li>Dedicated support</li>
+                    <li>Team collaboration</li>
+                </ul>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="pricing-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="social-proof">
+        <h2 class="section-title">Trusted by Feed Industry Professionals</h2>
+        <div class="social-proof-placeholder">
+            <p>Testimonials and case studies coming soon from our beta users.</p>
+            <p style="margin-top: 1rem; font-size: 0.95rem;">Join the beta and be among the first to experience FeedSales AI.</p>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Join the Beta — 30 Days Free</h2>
+        <p>No credit card required. Experience the future of feed sales today.</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfl6jXStyoZRFl7-9o71Zxkx4dss0dNAkv_X6CJ_hcdoNut0w/viewform" class="cta-button">Join Beta Now</a>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FeedSales AI. Built for North American feed industry professionals.</p>
+        <p style="margin-top: 0.5rem;">Questions? Contact us at <a href="mailto:hello@feedsales.ai">hello@feedsales.ai</a></p>
+    </footer>
+</body>
+</html>
