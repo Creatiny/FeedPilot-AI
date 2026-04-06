@@ -169,13 +169,14 @@ class TestIngredientMapping:
     
     def test_normalize_ingredient(self):
         """应该能标准化原料名称"""
-        sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-        from reminder_service import normalize_ingredient
+        from skills.reminder_skill.scripts.reminder_cli import normalize_ingredient
         
         result = normalize_ingredient("豆粕")
+        assert result is not None
         assert result["code"] == "ING_SBM_48"
         
         result = normalize_ingredient("corn")
+        assert result is not None
         assert result["code"] == "ING_CORN"
 
 

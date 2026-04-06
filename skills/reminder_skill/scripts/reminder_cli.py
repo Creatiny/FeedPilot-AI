@@ -3,35 +3,76 @@
 Reminder CLI - 提醒命令行工具
 
 用于创建、查看、删除提醒。
+使用统一的 ReminderService (src/services/reminder_service.py)
 """
 import argparse
 import json
 import sys
 from pathlib import Path
 
-# 添加 scripts 目录到路径
-sys.path.insert(0, str(Path(__file__).parent))
+# 添加项目根目录到路径
+_project_root = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(_project_root))
 
-from reminder_service import ReminderService, normalize_ingredient, normalize_formula
+from src.database.pool import DatabasePool
+from src.services.reminder_service import ReminderService
 
 
-# 数据库路径 - 使用绝对路径
-DB_PATH = Path("/home/kenny/.openclaw/workspace-feedsales/data/feed_sales.db")
+# 数据库路径
+DB_PATH = _project_root / "data" / "feed_sales.db"
+
+
+def normalize_ingredient(name: str) -> dict:
+    """标准化原料名称"""
+    mapping_path = Path(__file__).parent.parent / "reference" / "ingredient_codes.json"
+    if mapping_path.exists():
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            mapping = json.load(f)
+        
+        name_lower = name.lower().strip()
+        for key, info in mapping.items():
+            if key.lower() == name_lower or info.get("name", "").lower() == name_lower:
+                return info
+            # 检查别名
+            aliases = info.get("aliases", [])
+            if name_lower in [a.lower() for a in aliases]:
+                return info
+    
+    return None
+
+
+def normalize_formula(name: str) -> dict:
+    """标准化配方名称"""
+    formula_mapping = {
+        "保育料": {"name": "Nursery Diet 1", "id": "FORMULA_NURSERY_1"},
+        "育肥料": {"name": "Finishing Diet", "id": "FORMULA_FINISHING"},
+        "生长料": {"name": "Grower Diet 1", "id": "FORMULA_GROWER_1"},
+        "肉鸡料": {"name": "Broiler Starter", "id": "FORMULA_BROILER_STARTER"},
+        "蛋鸡料": {"name": "Layer Diet", "id": "FORMULA_LAYER"},
+        "肉牛育肥料": {"name": "Beef Cattle Finisher", "id": "FORMULA_BEEF_FINISHING"},
+    }
+    
+    name_lower = name.lower().strip()
+    for key, info in formula_mapping.items():
+        if key in name or info["name"].lower() in name_lower:
+            return info
+    
+    return None
 
 
 def create_reminder(args):
     """创建提醒"""
-    service = ReminderService(str(DB_PATH))
+    db_pool = DatabasePool(str(DB_PATH))
+    service = ReminderService(db_pool)
     
     if args.type == "price":
-        # 标准化原料名称
         ingredient_info = normalize_ingredient(args.ingredient)
         if not ingredient_info:
             print(f"❌ 无法识别原料: {args.ingredient}")
             print("支持的原料: 豆粕, 玉米, 鱼粉, DDGS, 小麦, 麸皮, 豆油, 磷酸氢钙, 石粉, 盐, 赖氨酸, 蛋氨酸, 苜蓿草粉")
             return 1
         
-        reminder = service.create_reminder(
+        result = service.create_reminder(
             user_id=args.user_id,
             reminder_type="price",
             threshold=args.threshold,
@@ -40,20 +81,22 @@ def create_reminder(args):
             ingredient_code=ingredient_info["code"]
         )
         
-        print(f"✅ 已创建价格提醒！")
-        print(f"   原料: {ingredient_info['name']}")
-        print(f"   条件: {'超过' if args.condition == 'above' else '低于'} ${args.threshold}/吨")
-        print(f"   提醒 ID: {reminder['id']}")
+        if result.success:
+            print(f"✅ 已创建价格提醒！")
+            print(f"   原料: {ingredient_info['name']}")
+            print(f"   条件: {'超过' if args.condition == 'above' else '低于'} ${args.threshold}/吨")
+            print(f"   提醒 ID: {result.data['id']}")
+        else:
+            print(f"❌ 创建失败: {result.error_message}")
         
     elif args.type == "formula_cost":
-        # 标准化配方名称
         formula_info = normalize_formula(args.formula)
         if not formula_info:
             print(f"❌ 无法识别配方: {args.formula}")
             print("支持的配方: 保育料, 育肥料, 生长料, 肉鸡料, 蛋鸡料, 肉牛育肥料")
             return 1
         
-        reminder = service.create_reminder(
+        result = service.create_reminder(
             user_id=args.user_id,
             reminder_type="formula_cost",
             threshold=args.threshold,
@@ -62,23 +105,28 @@ def create_reminder(args):
             formula_id=formula_info["id"]
         )
         
-        print(f"✅ 已创建成本提醒！")
-        print(f"   配方: {formula_info['name']}")
-        print(f"   条件: {'超过' if args.condition == 'above' else '低于'} ${args.threshold}/吨")
-        print(f"   提醒 ID: {reminder['id']}")
+        if result.success:
+            print(f"✅ 已创建成本提醒！")
+            print(f"   配方: {formula_info['name']}")
+            print(f"   条件: {'超过' if args.condition == 'above' else '低于'} ${args.threshold}/吨")
+            print(f"   提醒 ID: {result.data['id']}")
+        else:
+            print(f"❌ 创建失败: {result.error_message}")
     
     return 0
 
 
 def list_reminders(args):
     """查看提醒"""
-    service = ReminderService(str(DB_PATH))
-    reminders = service.list_reminders(args.user_id)
+    db_pool = DatabasePool(str(DB_PATH))
+    service = ReminderService(db_pool)
+    result = service.list_reminders(args.user_id)
     
-    if not reminders:
+    if not result.success or not result.data["reminders"]:
         print("📋 你还没有设置任何提醒")
         return 0
     
+    reminders = result.data["reminders"]
     print(f"📋 你的提醒列表 ({len(reminders)} 个)：\n")
     
     for i, r in enumerate(reminders, 1):
@@ -99,15 +147,16 @@ def list_reminders(args):
 
 def delete_reminder(args):
     """删除提醒"""
-    service = ReminderService(str(DB_PATH))
+    db_pool = DatabasePool(str(DB_PATH))
+    service = ReminderService(db_pool)
     
     # 先查看提醒
-    reminder = service.get_reminder(args.reminder_id, args.user_id)
-    if not reminder:
+    result = service.get_reminder(args.reminder_id, args.user_id)
+    if not result.success:
         print("❌ 未找到该提醒或无权限删除")
         return 1
     
-    # 确认删除
+    reminder = result.data
     if reminder["type"] == "price":
         target = reminder["ingredient"]
     else:
@@ -125,27 +174,27 @@ def delete_reminder(args):
             return 0
     
     # 执行删除
-    success = service.delete_reminder(args.reminder_id, args.user_id)
-    if success:
+    result = service.delete_reminder(args.reminder_id, args.user_id)
+    if result.success:
         print(f"✅ 已删除")
         return 0
     else:
-        print("❌ 删除失败")
+        print(f"❌ 删除失败: {result.error_message}")
         return 1
 
 
 def check_reminders(args):
     """检查所有提醒（用于 cron 任务）"""
-    service = ReminderService(str(DB_PATH))
-    reminders = service.get_all_enabled_reminders()
+    db_pool = DatabasePool(str(DB_PATH))
+    service = ReminderService(db_pool)
+    result = service.get_all_enabled_reminders()
     
+    if not result.success:
+        print(f"❌ 查询失败: {result.error_message}")
+        return 1
+    
+    reminders = result.data["reminders"]
     print(f"检查 {len(reminders)} 个启用的提醒...")
-    
-    # TODO: 实现价格检查和通知逻辑
-    # 这里需要：
-    # 1. 查询最新价格
-    # 2. 检查每个提醒的条件
-    # 3. 触发时发送通知
     
     for r in reminders:
         print(f"  - {r['user_id']}: {r.get('ingredient') or r.get('formula')}")

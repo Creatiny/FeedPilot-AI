@@ -116,16 +116,26 @@ if result.success:
 ## 文件结构
 
 ```
-skills/reminder_skill/
-├── SKILL.md                    # 本文件
-├── scripts/
-│   ├── reminder_service.py     # 核心服务
-│   ├── reminder_cli.py         # 命令行工具
-│   └── check_reminders.py      # 检查脚本（cron 调用）
-├── tests/
-│   └── test_reminders.py       # 测试
-└── reference/
-    └── ingredient_codes.json   # 原料名称映射
+~/.openclaw/workspace-feedsales/
+├── src/
+│   ├── database/
+│   │   └── pool.py          # DatabasePool (WAL 模式)
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── price_service.py
+│   │   ├── formula_service.py
+│   │   ├── customer_service.py
+│   │   ├── calculation_service.py
+│   │   └── reminder_service.py  # ReminderService
+│   └── types.py             # ServiceResult
+└── skills/reminder_skill/
+    ├── SKILL.md             # 本文件
+    ├── scripts/
+    │   └── reminder_cli.py  # CLI 工具
+    ├── tests/
+    │   └── test_reminders.py
+    └── reference/
+        └── ingredient_codes.json
 ```
 
 ## 统一检查任务
