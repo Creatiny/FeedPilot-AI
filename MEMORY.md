@@ -107,12 +107,67 @@
 
 ## 📝 Cron 任务
 
-| 任务 ID | 名称 | 时间 |
-|---------|------|------|
-| d73fe845-... | Check All User Reminders | 每日 8:00 AM Chicago |
+| 任务 ID | 名称 | 时间 | 状态 |
+|---------|------|------|------|
+| d73fe845-... | Check All User Reminders | 每日 8:00 AM Chicago | ✅ 运行正常 |
+
+## 🏗️ 架构设计
+
+### 服务层架构
+
+所有服务统一使用以下模式：
+
+```python
+from src.database.pool import DatabasePool
+from src.services import ReminderService
+from src.types import ServiceResult
+
+# 初始化
+db_pool = DatabasePool("data/feed_sales.db")
+service = ReminderService(db_pool)
+
+# 调用
+result = service.create_reminder(...)
+if result.success:
+    print(result.data)
+else:
+    print(result.error_message)
+```
+
+### 文件结构
+
+```
+src/
+├── database/
+│   └── pool.py          # DatabasePool (WAL 模式, 单例)
+├── services/
+│   ├── __init__.py
+│   ├── price_service.py
+│   ├── formula_service.py
+│   ├── customer_service.py
+│   ├── calculation_service.py
+│   └── reminder_service.py
+├── types.py             # ServiceResult
+└── utils/
+```
+
+## 📅 开发日志
+
+### 2026-04-06
+- ✅ 重构 reminder_skill 对齐服务层架构
+- ✅ 删除旧的硬编码 cron 任务 (8个)
+- ✅ 统一使用 reminders 表 + 动态检查
+- ✅ 修复 DatabasePool 单例导致的测试隔离问题
+- ✅ 核心服务测试 24/24 通过
+
+### 2026-04-05
+- ✅ 创建 reminders 表
+- ✅ 实现 ReminderService (用户隔离)
+- ✅ 原料名称映射 (中英文支持)
+- ✅ 推送代码到 Gitee
 
 ---
 
-**最后更新**: 2026-04-05  
+**最后更新**: 2026-04-08  
 **身份**: FeedPilot AI  
-**版本**: v1.0
+**版本**: v1.1
