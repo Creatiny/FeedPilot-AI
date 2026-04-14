@@ -2,13 +2,17 @@
 FeedSales AI - PriceService
 
 原料价格管理服务，支持多租户隔离和私有优先查询
+import sys as _sys
+from pathlib import _Path
+if _Path(__file__).parent.parent not in _sys.path:
+    _sys.path.insert(0, str(_Path(__file__).parent.parent))
 """
 
 import logging
 from typing import Dict, List, Optional
 from datetime import date
 from ..database.pool import DatabasePool
-from ..types import ServiceResult
+from ..result_types import ServiceResult
 
 logger = logging.getLogger(__name__)
 
@@ -212,60 +216,57 @@ class PriceService:
                 return dict(row)
             return None
     
-    def _batch_get_private_prices(self, user_id: str, ingredient_names: List[str]) -> Dict:
+    def _batch_get_private_prices(self, user_id: str, ingredient_codes: List[str]) -> Dict:
         """批量获取私有价格（优化 N+1 查询）"""
-        if not ingredient_names:
+        if not ingredient_codes:
             return {}
         
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
-            # 构建查询条件
-            placeholders = ' OR '.join(['ingredient_name LIKE ?' for _ in ingredient_names])
-            params = [f'%{name}%' for name in ingredient_names]
-            params.insert(0, user_id)
+            # 使用 ingredient_code 精确匹配
+            placeholders = ','.join(['?' for _ in ingredient_codes])
+            params = [user_id] + ingredient_codes
             
             cursor.execute(f'''
-                SELECT ingredient_name, price, price_date
+                SELECT ingredient_code, price, price_date
                 FROM ingredient_prices
-                WHERE owner_open_id = ? AND ({placeholders})
+                WHERE owner_open_id = ? AND ingredient_code IN ({placeholders})
                 ORDER BY price_date DESC
             ''', params)
             
             results = {}
             for row in cursor.fetchall():
-                # 取每个原料的最新价格
-                name = row['ingredient_name']
-                if name not in results:
-                    results[name] = {'price': row['price']}
+                code = row['ingredient_code']
+                if code not in results:
+                    results[code] = {'price': row['price']}
             
             return results
     
-    def _batch_get_public_prices(self, ingredient_names: List[str]) -> Dict:
+    def _batch_get_public_prices(self, ingredient_codes: List[str]) -> Dict:
         """批量获取公共价格（优化 N+1 查询）"""
-        if not ingredient_names:
+        if not ingredient_codes:
             return {}
         
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
-            # 构建查询条件
-            placeholders = ' OR '.join(['ingredient_name LIKE ?' for _ in ingredient_names])
-            params = [f'%{name}%' for name in ingredient_names]
-            params.insert(0, 'system_public')
+            # 使用 ingredient_code 精确匹配
+            placeholders = ','.join(['?' for _ in ingredient_codes])
+            params = ['system_public'] + ingredient_codes
             
             cursor.execute(f'''
-                SELECT ingredient_name, price, price_date
+                SELECT ingredient_code, price, price_date
                 FROM ingredient_prices
-                WHERE owner_open_id = ? AND ({placeholders})
+                WHERE owner_open_id = ? AND ingredient_code IN ({placeholders})
                 ORDER BY price_date DESC
             ''', params)
             
             results = {}
             for row in cursor.fetchall():
-                name = row['ingredient_name']
-                if name not in results:
-                    results[name] = {'price': row['price']}
+                code = row['ingredient_code']
+                if code not in results:
+                    results[code] = {'price': row['price']}
             
             return results
     

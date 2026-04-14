@@ -2,13 +2,17 @@
 FeedSales AI - FormulaService
 
 配方管理服务，支持多租户隔离和私有优先查询
+import sys as _sys
+from pathlib import _Path
+if _Path(__file__).parent.parent not in _sys.path:
+    _sys.path.insert(0, str(_Path(__file__).parent.parent))
 """
 
 import logging
 from typing import Dict, List, Optional
 from ..database.pool import DatabasePool
 from ..database.repository import FormulaRepository
-from ..types import ServiceResult
+from ..result_types import ServiceResult
 
 logger = logging.getLogger(__name__)
 

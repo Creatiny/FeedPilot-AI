@@ -2,6 +2,10 @@
 FeedSales AI - CalculationService
 
 配方成本计算服务，整合配方和价格，支持私有优先
+import sys as _sys
+from pathlib import _Path
+if _Path(__file__).parent.parent not in _sys.path:
+    _sys.path.insert(0, str(_Path(__file__).parent.parent))
 """
 
 import logging
@@ -9,7 +13,7 @@ from typing import Dict, List, Optional
 from ..database.pool import DatabasePool
 from .formula_service import FormulaService
 from .price_service import PriceService
-from ..types import ServiceResult
+from ..result_types import ServiceResult
 
 logger = logging.getLogger(__name__)
 
@@ -62,10 +66,10 @@ class CalculationService:
         
         # 2. 批量获取价格（优化 N+1 问题）
         ingredients = formula.get('ingredients', [])
-        ingredient_names = [ing['name'] for ing in ingredients]
+        ingredient_codes = [ing['ingredient_code'] for ing in ingredients]
         
         # 批量查询价格
-        prices = self._batch_get_prices(user_id, ingredient_names)
+        prices = self._batch_get_prices(user_id, ingredient_codes)
         
         # 3. 计算成本
         details = []
@@ -75,10 +79,11 @@ class CalculationService:
         
         for ingredient in ingredients:
             name = ingredient['name']
+            code = ingredient['ingredient_code']
             ratio = ingredient['ratio']  # 百分比
             
             # 从批量结果中获取价格
-            price_info = prices.get(name)
+            price_info = prices.get(code)
             
             if price_info:
                 price = price_info['price']
@@ -95,13 +100,14 @@ class CalculationService:
             
             details.append({
                 'name': name,
+                'ingredient_code': code,
                 'ratio': ratio,
                 'price': price,
                 'cost': round(cost, 2),
                 'price_source': price_source
             })
             
-            price_sources[name] = price_source
+            price_sources[code] = price_source
         
         return ServiceResult(
             success=True,
@@ -119,36 +125,36 @@ class CalculationService:
             }
         )
     
-    def _batch_get_prices(self, user_id: str, ingredient_names: List[str]) -> Dict:
+    def _batch_get_prices(self, user_id: str, ingredient_codes: List[str]) -> Dict:
         """
         批量获取原料价格（优化 N+1 查询）
         
         Args:
             user_id: 用户 ID
-            ingredient_names: 原料名称列表
+            ingredient_codes: 原料代码列表
             
         Returns:
-            Dict: {ingredient_name: {price, source}}
+            Dict: {ingredient_code: {price, source}}
         """
         results = {}
         
         # 批量查询私有价格
-        private_prices = self.price_service._batch_get_private_prices(user_id, ingredient_names)
+        private_prices = self.price_service._batch_get_private_prices(user_id, ingredient_codes)
         
         # 批量查询公共价格（仅查询私有价格未覆盖的）
-        missing_names = [name for name in ingredient_names if name not in private_prices]
-        public_prices = self.price_service._batch_get_public_prices(missing_names)
+        missing_codes = [code for code in ingredient_codes if code not in private_prices]
+        public_prices = self.price_service._batch_get_public_prices(missing_codes)
         
         # 合并结果（私有优先）
-        for name in ingredient_names:
-            if name in private_prices:
-                results[name] = {
-                    'price': private_prices[name]['price'],
+        for code in ingredient_codes:
+            if code in private_prices:
+                results[code] = {
+                    'price': private_prices[code]['price'],
                     'source': 'private'
                 }
-            elif name in public_prices:
-                results[name] = {
-                    'price': public_prices[name]['price'],
+            elif code in public_prices:
+                results[code] = {
+                    'price': public_prices[code]['price'],
                     'source': 'public'
                 }
         

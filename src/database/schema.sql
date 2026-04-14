@@ -68,10 +68,12 @@ CREATE INDEX IF NOT EXISTS idx_formulas_stage ON formulas(stage_type);
 CREATE TABLE IF NOT EXISTS formula_ingredients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     formula_id INTEGER NOT NULL,
-    ingredient_name TEXT NOT NULL,         -- 原料名称
+    ingredient_name TEXT NOT NULL,         -- 原料名称（展示用）
+    ingredient_code TEXT NOT NULL,        -- 原料代码（精确查找键，与 ingredient_prices.ingredient_code 对应）
     ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
+    FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_code) REFERENCES ingredient_prices(ingredient_code)
 );
 
 -- 索引优化

@@ -2,6 +2,10 @@
 FeedSales AI - ReminderService
 
 提醒服务，支持价格提醒和配方成本提醒
+import sys as _sys
+from pathlib import _Path
+if _Path(__file__).parent.parent not in _sys.path:
+    _sys.path.insert(0, str(_Path(__file__).parent.parent))
 """
 
 import logging
@@ -9,7 +13,7 @@ import uuid
 from typing import Dict, List, Optional
 from datetime import datetime
 from ..database.pool import DatabasePool
-from ..types import ServiceResult
+from ..result_types import ServiceResult
 
 logger = logging.getLogger(__name__)
 

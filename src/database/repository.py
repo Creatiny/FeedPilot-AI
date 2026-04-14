@@ -45,7 +45,7 @@ class FormulaRepository:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT f.id, f.name, f.animal_type, f.stage_type, f.notes,
-                       fi.ingredient_name, fi.ratio_percent
+                       fi.ingredient_name, fi.ingredient_code, fi.ratio_percent
                 FROM formulas f
                 LEFT JOIN formula_ingredients fi ON f.id = fi.formula_id
                 WHERE f.owner_open_id = ? AND f.name = ?
@@ -69,6 +69,7 @@ class FormulaRepository:
                 if row['ingredient_name']:
                     formula['ingredients'].append({
                         'name': row['ingredient_name'],
+                        'ingredient_code': row['ingredient_code'],
                         'ratio': row['ratio_percent']
                     })
             return formula
@@ -79,7 +80,7 @@ class FormulaRepository:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT f.id, f.name, f.stage_type, f.notes, f.owner_open_id,
-                       fi.ingredient_name, fi.ratio_percent
+                       fi.ingredient_name, fi.ingredient_code, fi.ratio_percent
                 FROM formulas f
                 LEFT JOIN formula_ingredients fi ON f.id = fi.formula_id
                 WHERE f.id = ?
@@ -101,6 +102,7 @@ class FormulaRepository:
                 if row['ingredient_name']:
                     formula['ingredients'].append({
                         'name': row['ingredient_name'],
+                        'ingredient_code': row['ingredient_code'],
                         'ratio': row['ratio_percent']
                     })
             return formula

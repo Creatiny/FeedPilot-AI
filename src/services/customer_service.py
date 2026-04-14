@@ -2,13 +2,17 @@
 FeedSales AI - CustomerService
 
 客户管理服务，支持多租户隔离
+import sys as _sys
+from pathlib import _Path
+if _Path(__file__).parent.parent not in _sys.path:
+    _sys.path.insert(0, str(_Path(__file__).parent.parent))
 字段与 schema.sql 一致：id, owner_open_id, name, phone, address, animal_type, scale, notes, version
 """
 
 import logging
 from typing import Dict, List, Optional
 from ..database.pool import DatabasePool
-from ..types import ServiceResult
+from ..result_types import ServiceResult
 
 logger = logging.getLogger(__name__)
 
