@@ -55,6 +55,7 @@ def setup_test_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             formula_id INTEGER NOT NULL,
             ingredient_name TEXT NOT NULL,
+            ingredient_code TEXT NOT NULL,
             ratio_percent REAL NOT NULL
         )
     ''')
@@ -84,17 +85,17 @@ def setup_test_db():
     formula_id = cursor.lastrowid
     
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Corn, grain', 60.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Corn, grain', 'ING_CORN', 60.0))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Soybean meal, 48%', 25.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Soybean meal, 48%', 'ING_SBM', 25.0))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Premix, swine', 15.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Premix, swine', 'ING_PREMIX', 15.0))
     
     cursor.execute('''
         INSERT INTO ingredient_prices (owner_open_id, ingredient_code, ingredient_name, price, price_date)

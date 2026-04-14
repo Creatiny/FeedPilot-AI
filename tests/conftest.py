@@ -106,6 +106,7 @@ def test_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             formula_id INTEGER NOT NULL,
             ingredient_name TEXT NOT NULL,
+            ingredient_code TEXT NOT NULL,
             ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
@@ -157,12 +158,12 @@ def test_db():
     formula_id = cursor.lastrowid
     
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, 'Corn', 60.0)
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, 'Corn', 'ING_CORN', 60.0)
     ''', (formula_id,))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, 'Soybean meal', 25.0)
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, 'Soybean meal', 'ING_SBM', 25.0)
     ''', (formula_id,))
     
     # Insert public prices

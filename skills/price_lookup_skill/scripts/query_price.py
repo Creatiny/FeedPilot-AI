@@ -30,7 +30,36 @@ def _init_services():
         class SimplePriceService:
             """简化版 PriceService，用于技能直接查询"""
             
+            def _generate_ingredient_code(self, ingredient_name: str) -> str:
+                code_map = {
+                    'Corn': 'ING_CORN',
+                    'Soybean meal': 'ING_SBM',
+                    'Soybean': 'ING_SBM',
+                    'Fish meal': 'ING_FISHM',
+                    'Wheat': 'ING_WHEAT',
+                    'Barley': 'ING_BARLEY',
+                    'Rice': 'ING_RICE',
+                    'DDGS': 'ING_DDGS',
+                    'Canola meal': 'ING_CANOLA',
+                    'Cottonseed meal': 'ING_COTTON',
+                    'Dicalcium phosphate': 'ING_DCP',
+                    'Limestone': 'ING_LIME',
+                    'Salt': 'ING_SALT',
+                    'L-Lysine': 'ING_LYS',
+                    'Lysine': 'ING_LYS',
+                    'DL-Methionine': 'ING_MET',
+                    'Methionine': 'ING_MET',
+                    'Premix': 'ING_PREMIX',
+                }
+                for key, code in code_map.items():
+                    if key.lower() in ingredient_name.lower():
+                        return code
+                return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+            
             def get_price(self, user_id: str, ingredient_name: str):
+                # 将 ingredient_name 转换为 ingredient_code（按设计文档：精确匹配）
+                ingredient_code = self._generate_ingredient_code(ingredient_name)
+                
                 conn = sqlite3.connect(db_path)
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
@@ -38,10 +67,10 @@ def _init_services():
                 cursor.execute('''
                     SELECT ingredient_code, ingredient_name, price, currency, unit, source, price_date
                     FROM ingredient_prices
-                    WHERE owner_open_id = ? AND ingredient_name LIKE ?
+                    WHERE owner_open_id = ? AND ingredient_code = ?
                     ORDER BY price_date DESC
                     LIMIT 1
-                ''', ('system_public', f'%{ingredient_name}%'))
+                ''', ('system_public', ingredient_code))
                 
                 row = cursor.fetchone()
                 conn.close()
@@ -56,7 +85,7 @@ def _init_services():
                     return _ServiceResult(
                         success=False,
                         error_code='E002',
-                        error_message=f"原料 '{ingredient_name}' 价格不存在"
+                        error_message=f"原料 '{ingredient_name}' ({ingredient_code}) 价格不存在"
                     )
             
             def list_public_prices(self):

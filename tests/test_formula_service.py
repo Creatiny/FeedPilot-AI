@@ -60,12 +60,13 @@ def setup_test_db():
         )
     ''')
     
-    # 创建成分表
+    # 创建成分表（含 ingredient_code）
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS formula_ingredients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             formula_id INTEGER NOT NULL,
             ingredient_name TEXT NOT NULL,
+            ingredient_code TEXT NOT NULL,
             ratio_percent REAL NOT NULL,
             FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
         )
@@ -84,13 +85,13 @@ def setup_test_db():
     formula_id = cursor.lastrowid
     
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Corn, grain', 60.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Corn, grain', 'ING_CORN', 60.0))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Soybean meal, 48%', 25.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Soybean meal, 48%', 'ING_SBM', 25.0))
     
     conn.commit()
     conn.close()

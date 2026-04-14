@@ -55,13 +55,15 @@ class PriceLookupSkill:
             ingredient = self._find_ingredient(message)
             
             if ingredient:
-                # Single ingredient query
-                result = self.price_service.get_price(user_id, ingredient)
+                # 将原料名称转换为 ingredient_code（按设计文档：价格查询使用精确的 ingredient_code）
+                ingredient_code = self._generate_ingredient_code(ingredient)
+                result = self.price_service.get_price(user_id, ingredient_code)
                 
                 if result.success:
                     data = result.data
                     return self._success({
                         'ingredient': data.get('ingredient_name', ingredient),
+                        'ingredient_code': ingredient_code,
                         'price': data.get('price'),
                         'currency': data.get('currency', 'USD'),
                         'unit': data.get('unit', 'ton'),
@@ -114,6 +116,37 @@ class PriceLookupSkill:
                 return name
         
         return None
+    
+    def _generate_ingredient_code(self, ingredient_name: str) -> str:
+        """将原料名称转换为 ingredient_code"""
+        code_map = {
+            'Corn': 'ING_CORN',
+            'Soybean meal': 'ING_SBM',
+            'Soybean': 'ING_SBM',
+            'Fish meal': 'ING_FISHM',
+            'Wheat': 'ING_WHEAT',
+            'Barley': 'ING_BARLEY',
+            'Rice': 'ING_RICE',
+            'DDGS': 'ING_DDGS',
+            'Canola meal': 'ING_CANOLA',
+            'Cottonseed meal': 'ING_COTTON',
+            'Dicalcium phosphate': 'ING_DCP',
+            'Limestone': 'ING_LIME',
+            'Salt': 'ING_SALT',
+            'L-Lysine': 'ING_LYS',
+            'Lysine': 'ING_LYS',
+            'DL-Methionine': 'ING_MET',
+            'Methionine': 'ING_MET',
+            'Premix': 'ING_PREMIX',
+            'Alfalfa': 'ING_ALFALFA',
+            'Corn silage': 'ING_SILAGE',
+            'Grass hay': 'ING_HAY',
+            'Molasses': 'ING_MOLASSES',
+        }
+        for key, code in code_map.items():
+            if key.lower() in ingredient_name.lower():
+                return code
+        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
     
     def _try_auto_add(self, ingredient: str) -> Dict:
         """Try to auto-add missing ingredient"""

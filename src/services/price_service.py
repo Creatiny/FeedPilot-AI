@@ -23,19 +23,19 @@ class PriceService:
     def __init__(self, db_pool: DatabasePool):
         self.db_pool = db_pool
     
-    def get_price(self, user_id: str, ingredient_name: str) -> ServiceResult:
+    def get_price(self, user_id: str, ingredient_code: str) -> ServiceResult:
         """
-        获取原料价格（私有优先）
+        获取原料价格（私有优先，按 ingredient_code 精确查找）
         
         Args:
             user_id: 用户 ID
-            ingredient_name: 原料名称
+            ingredient_code: 原料代码（如 ING_CORN）
             
         Returns:
             ServiceResult: 包含价格数据和来源
         """
-        # 1. 先查私有价格
-        price = self._get_price_by_owner(user_id, ingredient_name)
+        # 1. 先查私有价格（按 ingredient_code 精确查找）
+        price = self._get_price_by_owner(user_id, ingredient_code)
         if price:
             return ServiceResult(
                 success=True,
@@ -43,8 +43,8 @@ class PriceService:
                 source='private'
             )
         
-        # 2. 再查公共价格
-        price = self._get_price_by_owner('system_public', ingredient_name)
+        # 2. 再查公共价格（按 ingredient_code 精确查找）
+        price = self._get_price_by_owner('system_public', ingredient_code)
         if price:
             return ServiceResult(
                 success=True,
@@ -56,20 +56,20 @@ class PriceService:
         return ServiceResult(
             success=False,
             error_code='E002',
-            error_message=f"原料 '{ingredient_name}' 价格不存在"
+            error_message=f"原料 '{ingredient_code}' 价格不存在"
         )
     
-    def get_public_price(self, ingredient_name: str) -> ServiceResult:
+    def get_public_price(self, ingredient_code: str) -> ServiceResult:
         """
-        仅获取公共价格
+        仅获取公共价格（按 ingredient_code 精确查找）
         
         Args:
-            ingredient_name: 原料名称
+            ingredient_code: 原料代码（如 ING_CORN）
             
         Returns:
             ServiceResult: 包含价格数据
         """
-        price = self._get_price_by_owner('system_public', ingredient_name)
+        price = self._get_price_by_owner('system_public', ingredient_code)
         if price:
             return ServiceResult(
                 success=True,
@@ -80,7 +80,7 @@ class PriceService:
         return ServiceResult(
             success=False,
             error_code='E002',
-            error_message=f"公共价格 '{ingredient_name}' 不存在"
+            error_message=f"公共价格 '{ingredient_code}' 不存在"
         )
     
     def set_private_price(self, user_id: str, ingredient_name: str, 
@@ -197,19 +197,19 @@ class PriceService:
                 data={'prices': prices, 'total': len(prices)}
             )
     
-    def _get_price_by_owner(self, owner_id: str, ingredient_name: str) -> Optional[Dict]:
-        """获取指定所有者的价格"""
+    def _get_price_by_owner(self, owner_id: str, ingredient_code: str) -> Optional[Dict]:
+        """获取指定所有者的价格（按 ingredient_code 精确查找）"""
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
-            # 模糊匹配原料名称
+            # 精确匹配原料代码
             cursor.execute('''
                 SELECT ingredient_code, ingredient_name, price, currency, unit, source, price_date
                 FROM ingredient_prices
-                WHERE owner_open_id = ? AND ingredient_name LIKE ?
+                WHERE owner_open_id = ? AND ingredient_code = ?
                 ORDER BY price_date DESC
                 LIMIT 1
-            ''', (owner_id, f'%{ingredient_name}%'))
+            ''', (owner_id, ingredient_code))
             
             row = cursor.fetchone()
             if row:

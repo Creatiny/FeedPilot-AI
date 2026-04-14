@@ -113,7 +113,7 @@ def test_repository_mock():
     # 配置 Mock 返回值
     mock_cursor.fetchall.return_value = [
         {"id": 1, "name": "测试配方", "animal_type": "Swine", "stage_type": "保育", "notes": "", 
-         "ingredient_name": "玉米", "ratio_percent": 60.0}
+         "ingredient_name": "玉米", "ingredient_code": "ING_CORN", "ratio_percent": 60.0}
     ]
     mock_cursor.fetchone.return_value = mock_cursor.fetchall.return_value[0]
     mock_conn.cursor.return_value = mock_cursor

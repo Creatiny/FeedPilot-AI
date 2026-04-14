@@ -58,12 +58,13 @@ def setup_test_db():
         )
     ''')
     
-    # 创建成分表
+    # 创建成分表（含 ingredient_code）
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS formula_ingredients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             formula_id INTEGER NOT NULL,
             ingredient_name TEXT NOT NULL,
+            ingredient_code TEXT NOT NULL,
             ratio_percent REAL NOT NULL,
             FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
         )
@@ -100,17 +101,17 @@ def setup_test_db():
     formula_id = cursor.lastrowid
     
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Corn, grain', 60.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Corn, grain', 'ING_CORN', 60.0))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Soybean meal, 48%', 25.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Soybean meal, 48%', 'ING_SBM', 25.0))
     cursor.execute('''
-        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-        VALUES (?, ?, ?)
-    ''', (formula_id, 'Premix, swine', 15.0))
+        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+        VALUES (?, ?, ?, ?)
+    ''', (formula_id, 'Premix, swine', 'ING_PREMIX', 15.0))
     
     # 插入公共价格
     cursor.execute('''
@@ -206,9 +207,9 @@ def test_calculate_cost_missing_price():
         cursor.execute("SELECT id FROM formulas WHERE name = 'Nursery Diet 1'")
         formula_id = cursor.fetchone()[0]
         cursor.execute('''
-            INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-            VALUES (?, ?, ?)
-        ''', (formula_id, 'New Ingredient', 5.0))
+            INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+            VALUES (?, ?, ?, ?)
+        ''', (formula_id, 'New Ingredient', 'ING_NEW_ING', 5.0))
         conn.commit()
         conn.close()
         
@@ -266,9 +267,9 @@ def test_price_sources_summary():
         assert 'price_sources' in result.data, "应该有价格来源汇总"
         
         sources = result.data['price_sources']
-        assert 'Corn, grain' in sources, "应该有玉米价格来源"
-        assert sources['Corn, grain'] == 'private', f"玉米来源应该是 private，实际: {sources['Corn, grain']}"
-        assert sources['Soybean meal, 48%'] == 'public', f"豆粕来源应该是 public，实际: {sources['Soybean meal, 48%']}"
+        assert 'ING_CORN' in sources, "应该有玉米价格来源"
+        assert sources['ING_CORN'] == 'private', f"玉米来源应该是 private，实际: {sources['ING_CORN']}"
+        assert sources['ING_SBM'] == 'public', f"豆粕来源应该是 public，实际: {sources['ING_SBM']}"
         
         print("  ✅ 价格来源汇总正确")
         print(f"  ✅ 来源: {sources}")

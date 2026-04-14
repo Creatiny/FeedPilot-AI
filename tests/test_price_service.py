@@ -92,7 +92,7 @@ def test_get_public_price():
     try:
         service = PriceService(pool)
         
-        result = service.get_price('user_a', 'Corn, grain')
+        result = service.get_price('user_a', 'ING_CORN')
         
         assert result.success, f"应该成功，但返回: {result.error_message}"
         assert result.data['price'] == 180.00, f"价格错误: {result.data['price']}"
@@ -113,9 +113,10 @@ def test_get_nonexistent_price():
     try:
         service = PriceService(pool)
         
-        result = service.get_price('user_a', 'Nonexistent Ingredient')
+        result = service.get_price('user_a', 'ING_NONEXISTENT')
         
         assert not result.success, "应该失败"
+        assert result.error_code == 'E002', f"错误码应该是 E002，实际: {result.error_code}"
         assert result.error_code == 'E002', f"错误码应该是 E002，实际: {result.error_code}"
         
         print("  ✅ 正确返回 E002 错误")
@@ -140,7 +141,7 @@ def test_set_private_price():
         print("  ✅ 私有价格设置成功")
         
         # 验证获取时优先返回私有价格
-        result2 = service.get_price('user_a', 'Corn, grain')
+        result2 = service.get_price('user_a', 'ING_CORN')
         assert result2.success, "获取应该成功"
         assert result2.data['price'] == 175.00, f"价格应该是 175.00，实际: {result2.data['price']}"
         assert result2.source == 'private', f"来源应该是 private，实际: {result2.source}"
@@ -164,7 +165,7 @@ def test_multi_tenant_price_isolation():
         assert result_a.success, "用户 A 设置应该成功"
         
         # 用户 B 获取价格时应该返回公共价格，不是用户 A 的私有价格
-        result_b = service.get_price('user_b', 'Corn, grain')
+        result_b = service.get_price('user_b', 'ING_CORN')
         assert result_b.success, "用户 B 获取应该成功"
         assert result_b.data['price'] == 180.00, f"用户 B 应该获取公共价格，实际: {result_b.data['price']}"
         assert result_b.source == 'public', f"用户 B 来源应该是 public，实际: {result_b.source}"

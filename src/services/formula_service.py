@@ -227,7 +227,7 @@ class FormulaService:
                     error_message='数据已被其他用户修改，请刷新后重试'
                 )
             
-            # 更新成分
+            # 更新成分（带 ingredient_code）
             if 'ingredients' in data:
                 cursor.execute(
                     "DELETE FROM formula_ingredients WHERE formula_id = ?",
@@ -235,10 +235,12 @@ class FormulaService:
                 )
                 
                 for ing in data['ingredients']:
+                    ing_name = ing['name']
+                    ing_code = ing.get('ingredient_code') or self.repo._generate_ingredient_code(ing_name)
                     cursor.execute('''
-                        INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-                        VALUES (?, ?, ?)
-                    ''', (formula_id, ing['name'], ing['ratio']))
+                        INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+                        VALUES (?, ?, ?, ?)
+                    ''', (formula_id, ing_name, ing_code, ing['ratio']))
             
             conn.commit()
             

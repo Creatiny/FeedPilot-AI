@@ -267,7 +267,7 @@ class PriceRepository:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (owner_open_id, price_data['ingredient_code'],
                   price_data['ingredient_name'], price_data['price'],
-                  price_data.get('currency', 'CNY'),
+                  price_data.get('currency', 'USD'),
                   price_data.get('unit', 'ton'),
                   price_data.get('source', 'barchart'),
                   price_data['price_date']))
