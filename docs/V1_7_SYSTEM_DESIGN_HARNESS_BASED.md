@@ -141,10 +141,11 @@ class FormulaService:
     def delete_formula(self, user_id: str, formula_id: int) -> bool
     
 class PriceService:
-    def get_price(self, user_id: str, ingredient: str) -> Price  # 私有优先
-    def get_public_price(self, ingredient: str) -> Price  # 仅公共
-    def set_private_price(self, user_id: str, ingredient: str, price: float)
+    def get_price(self, user_id: str, ingredient_code: str) -> Price  # 私有优先，按 ingredient_code 查询
+    def get_public_price(self, ingredient_code: str) -> Price  # 仅公共，按 ingredient_code 查询
+    def set_private_price(self, user_id: str, ingredient_code: str, price: float)
     def list_private_prices(self, user_id: str) -> List[Price]
+    def batch_get_prices(self, user_id: str, ingredient_codes: List[str]) -> Dict[str, Price]  # 批量查询
 
 class CustomerService:
     def get_customer(self, user_id: str, name: str) -> Customer
@@ -154,7 +155,7 @@ class CustomerService:
     def delete_customer(self, user_id: str, customer_id: int) -> bool
 
 class CalculationService:
-    def calculate_cost(self, user_id: str, formula_name: str) -> CostResult
+    def calculate_cost(self, user_id: str, formula_name: str) -> CostResult  # 内部通过 ingredient_code 批量查价格
     def compare_formulas(self, user_id: str, names: List[str]) -> CompareResult
     def generate_quote(self, user_id: str, formula_name: str, customer_name: str) -> Quote
 ```
@@ -177,17 +178,53 @@ class CalculationService:
 | 表 | owner 字段 | 说明 |
 |---|-----------|------|
 | `formulas` | owner_open_id | 私有配方 |
-| `formula_ingredients` | (继承 formula) | 配方成分 |
-| `ingredient_prices` | owner_open_id | 私有价格 |
+| `formula_ingredients` | (继承 formula) | 配方成分（含 ingredient_code） |
+| `ingredient_prices` | owner_open_id | 私有价格（含 ingredient_code） |
 | `customers` | owner_open_id | 客户信息 |
 | `customer_interactions` | owner_open_id | 客户跟进 |
 | `quotes` | owner_open_id | 报价记录 |
 
 **公共数据**：`owner_open_id = 'system_public'`
 
-**注意**：`formulas` 表包含 `animal_type` 字段（Swine, Beef Cattle, Broiler 等），已在 v1.6.4 修复中添加。
+**ingredient_code（原料代码）**：所有涉及原料的表（`ingredient_prices`、`formula_ingredients`）必须包含 `ingredient_code` 字段，作为精确查找键。
+
+| 方面 | ingredient_name | ingredient_code |
+|------|----------------|----------------|
+| 用途 | 人类可读的显示名称 | 系统内部精确匹配键 |
+| 唯一性 | 不同数据源可能使用不同名称 | 同一原料唯一代码 |
+| 查询方式 | LIKE 模糊匹配（有歧义风险） | IN 精确匹配（无歧义） |
+| 索引 | LIKE 无法利用索引 | exact match 可用索引 |
+
+**为什么 ingredient_code 与 owner_open_id 正交且互补**：
+- `owner_open_id` 解决**用户间隔离**：不同用户的私有数据互不可见
+- `ingredient_code` 解决**同用户下多数据源共存**：同一原料来自 CBOT（"Corn, #2 Yellow CBOT"）、USDA AMS（"Corn, No.2 Yellow"）、配方用名（"Corn, grain"）等不同命名，但共享同一 `ingredient_code = ING_CORN`
+- 两者缺一不可：没有 `ingredient_code`，多数据源插入时无法精确去重和查找
+
+**注意**：`formulas` 表包含 `animal_type` 字段（Swine, Beef Cattle, Broiler 等），已在 v1.6.4 修复中添加。`formula_ingredients` 表包含 `ingredient_code` 字段，已在 v1.6 迁移中添加。
 
 ### 3.2 新增表
+
+#### ingredient_prices（原料价格表，含 ingredient_code）
+```sql
+CREATE TABLE ingredient_prices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT NOT NULL,
+    ingredient_code TEXT NOT NULL,         -- 原料代码（精确查找键）
+    ingredient_name TEXT NOT NULL,         -- 原料名称（显示用）
+    price REAL NOT NULL,
+    price_date DATE NOT NULL,
+    source TEXT,                           -- 数据来源（CBOT, USDA AMS 等）
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(ingredient_code, price_date, owner_open_id)
+);
+CREATE INDEX idx_prices_code ON ingredient_prices(ingredient_code);
+```
+
+#### formula_ingredients（配方成分表，含 ingredient_code）
+```sql
+-- formula_ingredients 属于 formulas，ingredient_code 用于关联价格查询
+-- ingredient_code 无 FK 约束，由应用层保证引用有效性
+```
 
 #### quotes（报价记录）
 ```sql
@@ -234,21 +271,26 @@ def get_formula(user_id, name):
     return None, source="not_found"
 ```
 
-### 4.2 价格查询
+### 4.2 价格查询（基于 ingredient_code 精确匹配）
 ```python
-def get_price(user_id, ingredient):
-    # 1. 私有价格
-    price = repo.get_private_price(user_id, ingredient)
+def get_price(user_id, ingredient_code):
+    # 1. 私有价格（按 ingredient_code 精确查找）
+    price = repo.get_private_price(user_id, ingredient_code)
     if price:
         return price, source="private"
     
-    # 2. 公共价格
-    price = repo.get_public_price(ingredient)
+    # 2. 公共价格（按 ingredient_code 精确查找）
+    price = repo.get_public_price(ingredient_code)
     if price:
         return price, source="public"
     
     return None, source="not_found"
 ```
+
+**关键设计**：价格查询使用 `ingredient_code` 而非 `ingredient_name`，原因：
+- 不同数据源对同一原料使用不同命名（如 CBOT 的 "Corn, #2 Yellow CBOT" vs USDA AMS 的 "Corn, No.2 Yellow"）
+- `ingredient_code`（如 `ING_CORN`）是跨数据源的统一标识，确保精确匹配
+- 批量查询使用 `IN(ingredient_code)` 而非 `LIKE '%name%'`，避免歧义和性能问题
 
 ### 4.3 成本计算时的来源追踪
 结果必须包含：
@@ -256,13 +298,15 @@ def get_price(user_id, ingredient):
 {
   "total_cost": 285.50,
   "price_sources": {
-    "Corn": "private",
-    "Soybean meal": "public",
-    "Premix": "default"
+    "ING_CORN": "private",
+    "ING_SBM": "public",
+    "ING_PREMIX": "default"
   },
   "missing_prices": []
 }
 ```
+
+**注意**：`price_sources` 的键使用 `ingredient_code` 而非 `ingredient_name`，确保跨数据源一致性。
 
 ---
 
@@ -598,6 +642,7 @@ cursor.execute(
 
 ### Phase 1：数据层重构
 - [ ] Schema 升级：添加 owner_open_id 到所有核心表
+- [ ] Schema 确认：ingredient_prices 和 formula_ingredients 包含 ingredient_code（v1.6 已完成）
 - [ ] 数据迁移：公共数据标记为 system_public
 - [ ] 新增表：quotes, session_states
 
