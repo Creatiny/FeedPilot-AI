@@ -78,21 +78,28 @@ class FormulaCostSkill:
             name = match.group(1).strip()
             if len(name) < 50:
                 return name
-        
+
         # Match: xxx多少钱
         match = re.search(r'(.+?)(多少钱|多少钱一吨)', message)
         if match:
             name = match.group(1).strip()
             if len(name) < 50:
                 return name
-        
+
         # Match: calculate xxx cost
         match = re.search(r'(?:calculate\s+)?(.+?)\s+(?:cost|price)', message, re.IGNORECASE)
         if match:
             name = match.group(1).strip()
             if len(name) < 50:
                 return name
-        
+
+        # Match: cost for xxx
+        match = re.search(r'(?:cost|price)\s+for\s+(.+)', message, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            if len(name) < 50:
+                return name
+
         return None
     
     def _success(self, data: Dict) -> Dict:

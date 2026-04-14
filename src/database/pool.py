@@ -60,11 +60,12 @@ class DatabasePool:
     
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
-        """获取数据库连接（线程安全）"""
+        """获取数据库连接（线程安全，自动提交）"""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         try:
             yield conn
+            conn.commit()  # 自动提交未提交的更改
         finally:
             conn.close()
     

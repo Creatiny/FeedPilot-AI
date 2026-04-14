@@ -85,28 +85,28 @@ for fd in formulas_data:
             (fid, ing["name"], ing["ratio"])
         )
 
-# Seed prices
+# Seed prices (使用 ingredient_codes.py 标准格式 ING_XXX)
 SAMPLE_PRICES = [
-    ("CORN", "Corn", 185.50, "2026-03-28", "barchart"),
-    ("SOYBEAN_MEAL", "Soybean meal", 342.00, "2026-03-28", "barchart"),
-    ("WHEAT", "Wheat", 210.00, "2026-03-28", "barchart"),
-    ("BARLEY", "Barley", 175.00, "2026-03-28", "barchart"),
-    ("DDGS", "DDGS", 195.00, "2026-03-28", "barchart"),
-    ("FISH_MEAL", "Fish meal", 1850.00, "2026-03-28", "barchart"),
-    ("CANOLA_MEAL", "Canola meal", 310.00, "2026-03-28", "barchart"),
-    ("COTTONSEED_MEAL", "Cottonseed meal", 290.00, "2026-03-28", "barchart"),
-    ("LIMESTONE", "Limestone", 115.00, "2026-03-28", "barchart"),
-    ("DCP", "Dicalcium phosphate", 680.00, "2026-03-28", "barchart"),
-    ("SALT", "Salt", 145.00, "2026-03-28", "barchart"),
-    ("LYSINE", "L-Lysine", 1250.00, "2026-03-28", "barchart"),
-    ("METHIONINE", "DL-Methionine", 2550.00, "2026-03-28", "barchart"),
-    ("PREMIX", "Premix", 480.00, "2026-03-28", "barchart"),
-    ("ALFALFA", "Alfalfa", 220.00, "2026-03-28", "barchart"),
-    ("RICE", "Rice", 320.00, "2026-03-28", "barchart"),
-    ("SORGHUM", "Sorghum", 178.00, "2026-03-28", "barchart"),
-    ("MOLASSES", "Molasses", 160.00, "2026-03-28", "barchart"),
-    ("CORN_SILAGE", "Corn silage", 55.00, "2026-03-28", "barchart"),
-    ("GRASS_HAY", "Grass hay", 180.00, "2026-03-28", "barchart"),
+    ("ING_CORN", "Corn", 185.50, "2026-03-28", "barchart"),
+    ("ING_SBM", "Soybean meal", 342.00, "2026-03-28", "barchart"),
+    ("ING_WHEAT", "Wheat", 210.00, "2026-03-28", "barchart"),
+    ("ING_BARLEY", "Barley", 175.00, "2026-03-28", "barchart"),
+    ("ING_DDGS", "DDGS", 195.00, "2026-03-28", "barchart"),
+    ("ING_FISHM", "Fish meal", 1850.00, "2026-03-28", "barchart"),
+    ("ING_CANOLA", "Canola meal", 310.00, "2026-03-28", "barchart"),
+    ("ING_COTTON", "Cottonseed meal", 290.00, "2026-03-28", "barchart"),
+    ("ING_LIME", "Limestone", 115.00, "2026-03-28", "barchart"),
+    ("ING_DCP", "Dicalcium phosphate", 680.00, "2026-03-28", "barchart"),
+    ("ING_SALT", "Salt", 145.00, "2026-03-28", "barchart"),
+    ("ING_LYS", "L-Lysine", 1250.00, "2026-03-28", "barchart"),
+    ("ING_MET", "DL-Methionine", 2550.00, "2026-03-28", "barchart"),
+    ("ING_PREMIX", "Premix", 480.00, "2026-03-28", "barchart"),
+    ("ING_ALFALFA", "Alfalfa", 220.00, "2026-03-28", "barchart"),
+    ("ING_RICE", "Rice", 320.00, "2026-03-28", "barchart"),
+    ("ING_SORGHUM", "Sorghum", 178.00, "2026-03-28", "barchart"),
+    ("ING_MOLASSES", "Molasses", 160.00, "2026-03-28", "barchart"),
+    ("ING_SILAGE", "Corn silage", 55.00, "2026-03-28", "barchart"),
+    ("ING_HAY", "Grass hay", 180.00, "2026-03-28", "barchart"),
 ]
 for code, name, price, date, source in SAMPLE_PRICES:
     conn.execute(
@@ -179,17 +179,17 @@ for code, name, expected_price, _, _ in SAMPLE_PRICES:
     else:
         test(f"Price: {name}", False, result.error_message)
 
-# Private price override test
+# Private price override test (使用标准 ING_CORN 格式)
 with pool.get_connection() as c:
     c.execute(
         "INSERT INTO ingredient_prices (owner_open_id, ingredient_code, ingredient_name, price, price_date, source) VALUES (?, ?, ?, ?, ?, ?)",
-        ("test_user_001", "CORN_PRIVATE", "Corn", 170.00, "2026-03-29", "private")
+        ("test_user_001", "ING_CORN", "Corn", 170.00, "2026-03-29", "private")
     )
 
 result = price_service.get_price("test_user_001", "Corn")
 test("Private price priority (Corn, private source)",
-     result.success and result.data.get("source") == "private",
-     f"Got source={result.data.get('source')}, price={result.data.get('price')}" if result.success else result.error_message)
+     result.success and result.source == "private",
+     f"Got source={result.source}, price={result.data.get('price')}" if result.success else result.error_message)
 
 # List private prices
 result = price_service.list_private_prices("test_user_001")
@@ -360,9 +360,9 @@ result = formula_service.create_formula("test_user_001", {
 })
 test("Create private formula 'Custom Premium Swine Mix'", result.success)
 
-# Private formula priority
+# Private formula priority (source 在 result.source, 不在 result.data)
 result = formula_service.get_formula("test_user_001", "Custom Premium Swine Mix")
-test("Get private formula", result.success and result.data.get("source") == "private")
+test("Get private formula", result.success and result.source == "private")
 
 # Cost calculation with private formula
 result = calc_service.calculate_cost("test_user_001", "Custom Premium Swine Mix")
