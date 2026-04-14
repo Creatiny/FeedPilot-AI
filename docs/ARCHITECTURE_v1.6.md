@@ -702,16 +702,37 @@ class FormulaRepository:
             
             formula_id = cursor.lastrowid
             
-            # 插入成分
+            # 插入成分（带 ingredient_code）
             for ingredient in formula_data['ingredients']:
+                ing_name = ingredient['name']
+                ing_code = ingredient.get('ingredient_code') or self._generate_ingredient_code(ing_name)
                 cursor.execute("""
-                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-                    VALUES (?, ?, ?)
-                """, (formula_id, ingredient['name'], ingredient['ratio']))
+                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+                    VALUES (?, ?, ?, ?)
+                """, (formula_id, ing_name, ing_code, ingredient['ratio']))
             
             conn.commit()
             return formula_id
-    
+
+    def _generate_ingredient_code(self, ingredient_name: str) -> str:
+        """根据原料名称生成标准代码（新建配方时使用）"""
+        code_map = {
+            'Corn': 'ING_CORN',
+            'Soybean': 'ING_SBM',
+            'Fish meal': 'ING_FISHM',
+            'Wheat': 'ING_WHEAT',
+            'Limestone': 'ING_LIME',
+            'Premix': 'ING_PREMIX',
+            'Dicalcium': 'ING_DCP',
+            'Salt': 'ING_SALT',
+            'Lysine': 'ING_LYS',
+            'Methionine': 'ING_MET',
+        }
+        for key, code in code_map.items():
+            if key.lower() in ingredient_name.lower():
+                return code
+        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+
     def update_formula(self, owner_open_id: str, formula_id: int, 
                       formula_data: Dict) -> bool:
         """更新配方"""
@@ -735,12 +756,14 @@ class FormulaRepository:
                 DELETE FROM formula_ingredients WHERE formula_id = ?
             """, (formula_id,))
             
-            # 插入新成分
+            # 插入新成分（带 ingredient_code）
             for ingredient in formula_data['ingredients']:
+                ing_name = ingredient['name']
+                ing_code = ingredient.get('ingredient_code') or self._generate_ingredient_code(ing_name)
                 cursor.execute("""
-                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-                    VALUES (?, ?, ?)
-                """, (formula_id, ingredient['name'], ingredient['ratio']))
+                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+                    VALUES (?, ?, ?, ?)
+                """, (formula_id, ing_name, ing_code, ingredient['ratio']))
             
             conn.commit()
             return cursor.rowcount > 0
@@ -814,7 +837,204 @@ class PriceRepository:
             
             conn.commit()
             return cursor.lastrowid
-```
+
+
+class CalculationService:
+    """配方成本计算服务（核心服务）"""
+
+    def __init__(self, db_pool: DatabasePool):
+        self.db_pool = db_pool
+        self.price_service = PriceService(db_pool)
+
+    def calculate_cost(self, user_id: str, formula_name: str) -> ServiceResult:
+        """
+        计算配方成本（核心业务逻辑）
+
+        Args:
+            user_id: 用户 ID
+            formula_name: 配方名称
+
+        Returns:
+            ServiceResult {
+                success: bool,
+                data: {
+                    'formula_name': str,
+                    'total_cost': float,    -- 总成本（元/吨）
+                    'details': [{
+                        'name': str,          -- 原料名称
+                        'ingredient_code': str,  -- 原料代码（精确查找键）
+                        'ratio': float,       -- 配比（%）
+                        'price': float,       -- 单价（元/吨）
+                        'cost': float,        -- 成本贡献（元/吨）
+                        'price_source': str   -- 价格来源（private/public/default）
+                    }],
+                    'price_sources': Dict  -- 各原料价格来源
+                }
+            }
+        """
+        # 1. 获取配方（私有配方优先，失败则降级到公共配方）
+        formula_service = FormulaService(self.db_pool)
+        formula_result = formula_service.get_formula(user_id, formula_name)
+        if not formula_result.success:
+            return ServiceResult(success=False, error_message=formula_result.error_message)
+
+        formula = formula_result.data
+
+        # 2. 批量获取价格（使用 ingredient_code 精确查找）
+        ingredients = formula.get('ingredients', [])
+        ingredient_codes = [ing['ingredient_code'] for ing in ingredients]
+        prices = self._batch_get_prices(user_id, ingredient_codes)
+
+        # 3. 计算成本
+        details = []
+        total_cost = 0.0
+        price_sources = {}
+        missing_prices = []
+
+        for ingredient in ingredients:
+            name = ingredient['name']
+            code = ingredient['ingredient_code']
+            ratio = ingredient['ratio']
+
+            price_info = prices.get(code)
+            if price_info:
+                price = price_info['price']
+                price_source = price_info['source']
+            else:
+                price = self._get_default_price(name)
+                price_source = 'default'
+                missing_prices.append(name)
+
+            cost = price * ratio / 100.0
+            total_cost += cost
+
+            details.append({
+                'name': name,
+                'ingredient_code': code,
+                'ratio': ratio,
+                'price': price,
+                'cost': round(cost, 2),
+                'price_source': price_source
+            })
+            price_sources[code] = price_source
+
+        return ServiceResult(success=True, data={
+            'formula_name': formula_name,
+            'total_cost': round(total_cost, 2),
+            'details': details,
+            'price_sources': price_sources
+        })
+
+    def _batch_get_prices(self, user_id: str, ingredient_codes: List[str]) -> Dict:
+        """
+        批量获取原料价格（私有优先，精确代码匹配）
+
+        Args:
+            user_id: 用户 ID
+            ingredient_codes: 原料代码列表
+
+        Returns:
+            Dict: {ingredient_code: {price, source}}
+        """
+        results = {}
+
+        # 批量查询私有价格
+        private_prices = self.price_service._batch_get_private_prices(user_id, ingredient_codes)
+
+        # 批量查询公共价格（仅查询私有价格未覆盖的）
+        missing_codes = [code for code in ingredient_codes if code not in private_prices]
+        public_prices = self.price_service._batch_get_public_prices(missing_codes)
+
+        # 合并结果（私有优先）
+        for code in ingredient_codes:
+            if code in private_prices:
+                results[code] = {'price': private_prices[code]['price'], 'source': 'private'}
+            elif code in public_prices:
+                results[code] = {'price': public_prices[code]['price'], 'source': 'public'}
+
+        return results
+
+    def _get_default_price(self, ingredient_name: str) -> float:
+        """获取默认价格（价格缺失时的 fallback）"""
+        defaults = {
+            'Corn': 200.0,
+            'Soybean meal': 350.0,
+            'Fish meal': 1200.0,
+            'Wheat': 220.0,
+            'Limestone': 30.0,
+            'Premix': 800.0,
+            'Dicalcium phosphate': 400.0,
+            'Salt': 20.0,
+        }
+        for key, price in defaults.items():
+            if key.lower() in ingredient_name.lower():
+                return price
+        return 100.0  -- 通用默认价
+
+
+class PriceService:
+    """价格查询服务"""
+
+    def __init__(self, db_pool: DatabasePool):
+        self.db_pool = db_pool
+        self.price_repo = PriceRepository(db_pool)
+
+    def get_public_price(self, ingredient_code: str) -> ServiceResult:
+        """获取公共价格（ingredient_code 精确查找）"""
+        price = self.price_repo.get_latest_price('system_public', ingredient_code)
+        if price:
+            return ServiceResult(success=True, data=price)
+        return ServiceResult(success=False, error_message=f'公共价格不存在: {ingredient_code}')
+
+    def get_private_price(self, user_id: str, ingredient_code: str) -> ServiceResult:
+        """获取私有价格（优先），不存在则降级到公共价格"""
+        private = self.price_repo.get_latest_price(user_id, ingredient_code)
+        if private:
+            return ServiceResult(success=True, data=private)
+        return self.get_public_price(ingredient_code)
+
+    def _batch_get_public_prices(self, ingredient_codes: List[str]) -> Dict:
+        """批量获取公共价格（精确 IN 查询）"""
+        if not ingredient_codes:
+            return {}
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            placeholders = ','.join(['?' for _ in ingredient_codes])
+            params = ['system_public'] + ingredient_codes
+            cursor.execute(f'''
+                SELECT ingredient_code, price, price_date
+                FROM ingredient_prices
+                WHERE owner_open_id = ? AND ingredient_code IN ({placeholders})
+                ORDER BY price_date DESC
+            ''', params)
+            results = {}
+            for row in cursor.fetchall():
+                code = row['ingredient_code']
+                if code not in results:
+                    results[code] = {'price': row['price']}
+            return results
+
+    def _batch_get_private_prices(self, user_id: str, ingredient_codes: List[str]) -> Dict:
+        """批量获取私有价格（精确 IN 查询）"""
+        if not ingredient_codes:
+            return {}
+        with self.db_pool.get_connection() as conn:
+            cursor = conn.cursor()
+            placeholders = ','.join(['?' for _ in ingredient_codes])
+            params = [user_id] + ingredient_codes
+            cursor.execute(f'''
+                SELECT ingredient_code, price, price_date
+                FROM ingredient_prices
+                WHERE owner_open_id = ? AND ingredient_code IN ({placeholders})
+                ORDER BY price_date DESC
+            ''', params)
+            results = {}
+            for row in cursor.fetchall():
+                code = row['ingredient_code']
+                if code not in results:
+                    results[code] = {'price': row['price']}
+            return results
+
 
 ---
 
