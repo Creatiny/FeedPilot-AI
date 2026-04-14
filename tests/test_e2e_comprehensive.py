@@ -58,7 +58,7 @@ if os.path.exists(TEST_DB):
 # Create schema manually
 conn = sqlite3.connect(TEST_DB)
 conn.execute("PRAGMA journal_mode=WAL")
-conn.execute("PRAGMA foreign_keys=ON")
+conn.execute("PRAGMA foreign_keys=OFF")  # Disable during setup (ingredient_code test data is placeholder)
 with open("src/database/schema.sql") as f:
     conn.executescript(f.read())
 
@@ -79,8 +79,9 @@ for fd in formulas_data:
     )
     fid = cursor.lastrowid
     for ing in fd.get("ingredients", []):
+        # ingredient_code: test uses placeholder (''); real data uses valid codes
         conn.execute(
-            "INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent) VALUES (?, ?, ?)",
+            "INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent) VALUES (?, ?, '', ?)",
             (fid, ing["name"], ing["ratio"])
         )
 

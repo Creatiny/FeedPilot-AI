@@ -139,15 +139,36 @@ class FormulaRepository:
             formula_id = cursor.lastrowid
             logger.info(f"创建配方成功 (ID: {formula_id}, 用户：{owner_open_id})")
             
-            # 插入成分
+            # 插入成分（带 ingredient_code）
             for ingredient in formula_data['ingredients']:
+                ing_name = ingredient['name']
+                ing_code = ingredient.get('ingredient_code') or self._generate_ingredient_code(ing_name)
                 cursor.execute("""
-                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-                    VALUES (?, ?, ?)
-                """, (formula_id, ingredient['name'], ingredient['ratio']))
+                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+                    VALUES (?, ?, ?, ?)
+                """, (formula_id, ing_name, ing_code, ingredient['ratio']))
             
             conn.commit()
             return formula_id
+
+    def _generate_ingredient_code(self, ingredient_name: str) -> str:
+        """Generate ingredient code from name (for new formula ingredients)"""
+        code_map = {
+            'Corn': 'ING_CORN',
+            'Soybean': 'ING_SBM',
+            'Fish meal': 'ING_FISHM',
+            'Wheat': 'ING_WHEAT',
+            'Limestone': 'ING_LIME',
+            'Premix': 'ING_PREMIX',
+            'Dicalcium': 'ING_DCP',
+            'Salt': 'ING_SALT',
+            'Lysine': 'ING_LYS',
+            'Methionine': 'ING_MET',
+        }
+        for key, code in code_map.items():
+            if key.lower() in ingredient_name.lower():
+                return code
+        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
     
     def update_formula(self, owner_open_id: str, formula_id: int, 
                       formula_data: Dict) -> bool:
@@ -172,12 +193,14 @@ class FormulaRepository:
                 DELETE FROM formula_ingredients WHERE formula_id = ?
             """, (formula_id,))
             
-            # 插入新成分
+            # 插入新成分（带 ingredient_code）
             for ingredient in formula_data['ingredients']:
+                ing_name = ingredient['name']
+                ing_code = ingredient.get('ingredient_code') or self._generate_ingredient_code(ing_name)
                 cursor.execute("""
-                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ratio_percent)
-                    VALUES (?, ?, ?)
-                """, (formula_id, ingredient['name'], ingredient['ratio']))
+                    INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
+                    VALUES (?, ?, ?, ?)
+                """, (formula_id, ing_name, ing_code, ingredient['ratio']))
             
             conn.commit()
             return cursor.rowcount > 0
@@ -200,7 +223,7 @@ class PriceRepository:
     
     def __init__(self, db_pool: DatabasePool):
         self.db_pool = db_pool
-    
+
     def get_latest_price(self, owner_open_id: str, 
                         ingredient_code: str) -> Optional[Dict]:
         """获取最新价格"""
