@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 # Test results tracker
 results = {"passed": 0, "failed": 0, "errors": []}
 
-def test(name, condition, detail=""):
+def record_result(name, condition, detail=""):
     """Record a test result."""
     if condition:
         results["passed"] += 1
@@ -125,7 +125,7 @@ with pool.get_connection() as c:
     r = c.execute("SELECT COUNT(*) FROM formulas").fetchone()[0]
     p = c.execute("SELECT COUNT(*) FROM ingredient_prices").fetchone()[0]
 
-test(f"Database initialized: {r} formulas, {p} prices", r == 38 and p == 20)
+record_result(f"Database initialized: {r} formulas, {p} prices", r == 38 and p == 20)
 
 # Initialize services
 formula_service = FormulaService(pool)
@@ -136,7 +136,7 @@ customer_service = CustomerService(pool)
 with open("data/nrc_formulas_full.json") as f:
     formulas_data = json.load(f)
 
-test("All services initialized", True)
+record_result("All services initialized", True)
 
 # ============================================================
 # SECTION 1: FORMULA SERVICE — All Animal Types
@@ -149,17 +149,17 @@ ANIMAL_TYPES = ["Swine", "Beef Cattle", "Dairy Cattle", "Broiler", "Layer",
 for animal in ANIMAL_TYPES:
     animal_formulas = [f for f in formulas_data if f["animal_type"] == animal]
     count = len(animal_formulas)
-    test(f"{animal} formulas exist ({count})", count > 0)
+    record_result(f"{animal} formulas exist ({count})", count > 0)
 
     # Test retrieval of first formula
     if animal_formulas:
         fname = animal_formulas[0]["name"]
         result = formula_service.get_formula("test_user_001", fname)
-        test(f"  Get '{fname}'", result.success, result.error_message if not result.success else "")
+        record_result(f"  Get '{fname}'", result.success, result.error_message if not result.success else "")
 
 # Total formula count
 all_result = formula_service.list_formulas("test_user_001")
-test(f"List all public formulas ({all_result.data.get('total', 0)} total)",
+record_result(f"List all public formulas ({all_result.data.get('total', 0)} total)",
      all_result.success and all_result.data.get("total", 0) >= 38)
 
 # ============================================================
@@ -173,11 +173,11 @@ for code, name, expected_price, _, _ in SAMPLE_PRICES:
         actual = result.data.get("price", 0)
         # Note: LIKE-based fuzzy matching may return different results for "Corn" vs "Corn silage"
         # This is a known limitation — exact match would be more reliable
-        test(f"Price: {name} = ${actual:.2f}/ton",
+        record_result(f"Price: {name} = ${actual:.2f}/ton",
              actual > 0,
              f"Expected {expected_price}, got {actual} (fuzzy match)")
     else:
-        test(f"Price: {name}", False, result.error_message)
+        record_result(f"Price: {name}", False, result.error_message)
 
 # Private price override test (使用标准 ING_CORN 格式)
 with pool.get_connection() as c:
@@ -187,18 +187,18 @@ with pool.get_connection() as c:
     )
 
 result = price_service.get_price("test_user_001", "Corn")
-test("Private price priority (Corn, private source)",
+record_result("Private price priority (Corn, private source)",
      result.success and result.source == "private",
      f"Got source={result.source}, price={result.data.get('price')}" if result.success else result.error_message)
 
 # List private prices
 result = price_service.list_private_prices("test_user_001")
-test(f"List private prices ({result.data.get('total', 0)} entries)",
+record_result(f"List private prices ({result.data.get('total', 0)} entries)",
      result.success and result.data.get("total", 0) >= 1)
 
 # Multi-tenant isolation
 result2 = price_service.get_price("test_user_002", "Corn")
-test("Multi-tenant: user_002 does not see user_001's private price",
+record_result("Multi-tenant: user_002 does not see user_001's private price",
      result2.success and result2.data.get("source") != "private")
 
 # ============================================================
@@ -218,14 +218,14 @@ for animal in ANIMAL_TYPES:
         stage = result.data.get("stage_type", "?")
         details = result.data.get("details", [])
         sources = result.data.get("price_sources", {})
-        test(f"{animal} '{fname}' (${cost:.2f}/ton, {len(details)} ingredients)",
+        record_result(f"{animal} '{fname}' (${cost:.2f}/ton, {len(details)} ingredients)",
              cost > 0 and len(details) > 0)
     else:
-        test(f"{animal} '{fname}' cost", False, result.error_message)
+        record_result(f"{animal} '{fname}' cost", False, result.error_message)
 
 # Compare formulas
 result = calc_service.compare_formulas("test_user_001", ["Nursery Diet 1", "Grower Diet 1", "Finisher Diet"])
-test("Compare Swine formulas (3 diets)",
+record_result("Compare Swine formulas (3 diets)",
      result.success and len(result.data.get("formulas", [])) == 3)
 
 # ============================================================
@@ -252,12 +252,12 @@ NRC_CASES = [
 ]
 
 for animal, stage, formula_name in NRC_CASES:
-    test(f"NRC: {animal} / {stage} — '{formula_name}'", True)
+    record_result(f"NRC: {animal} / {stage} — '{formula_name}'", True)
 
 # Verify NRC coverage
 from skills.nutrition_analysis_skill.skill import NRC_STANDARDS
 total_nrc = sum(len(stages) for stages in NRC_STANDARDS.values())
-test(f"NRC standards: {len(NRC_STANDARDS)} animals, {total_nrc} stages", total_nrc >= 10)
+record_result(f"NRC standards: {len(NRC_STANDARDS)} animals, {total_nrc} stages", total_nrc >= 10)
 
 # ============================================================
 # SECTION 5: CUSTOMER SERVICE — Full CRUD
@@ -273,7 +273,7 @@ result = customer_service.create_customer("test_user_001", {
     "scale": 5000,
     "notes": "Premium swine operation, buys quarterly"
 })
-test("Create customer 'John Smith'", result.success, result.error_message if not result.success else "")
+record_result("Create customer 'John Smith'", result.success, result.error_message if not result.success else "")
 john_id = result.data.get("id") if result.success else None
 
 result = customer_service.create_customer("test_user_001", {
@@ -284,7 +284,7 @@ result = customer_service.create_customer("test_user_001", {
     "scale": 12000,
     "notes": "Large feedlot, monthly orders"
 })
-test("Create customer 'Maria Garcia'", result.success)
+record_result("Create customer 'Maria Garcia'", result.success)
 maria_id = result.data.get("id") if result.success else None
 
 result = customer_service.create_customer("test_user_001", {
@@ -294,22 +294,22 @@ result = customer_service.create_customer("test_user_001", {
     "scale": 50000,
     "notes": "Broiler integrator, weekly deliveries"
 })
-test("Create customer 'Bob Johnson'", result.success)
+record_result("Create customer 'Bob Johnson'", result.success)
 
 # Read
 result = customer_service.get_customer("test_user_001", "John Smith")
-test("Get customer 'John Smith'",
+record_result("Get customer 'John Smith'",
      result.success and result.data.get("phone") == "+1-555-0101")
 
 # List
 result = customer_service.list_customers("test_user_001")
-test(f"List customers ({result.data.get('total', 0)} total)",
+record_result(f"List customers ({result.data.get('total', 0)} total)",
      result.success and result.data.get("total", 0) == 3)
 
 # Update
 if john_id:
     result = customer_service.update_customer("test_user_001", john_id, {"scale": 6000, "notes": "Expanded operation"})
-    test("Update John Smith scale to 6000", result.success)
+    record_result("Update John Smith scale to 6000", result.success)
 
 # Multi-tenant isolation
 result = customer_service.create_customer("test_user_002", {
@@ -317,23 +317,23 @@ result = customer_service.create_customer("test_user_002", {
     "animal_type": "Layer",
     "scale": 30000
 })
-test("Create customer for user_002", result.success)
+record_result("Create customer for user_002", result.success)
 
 result = customer_service.list_customers("test_user_002")
-test("user_002 sees only their customers (1)",
+record_result("user_002 sees only their customers (1)",
      result.success and result.data.get("total", 0) == 1)
 
 result = customer_service.list_customers("test_user_001")
-test("user_001 still sees only their customers (3)",
+record_result("user_001 still sees only their customers (3)",
      result.success and result.data.get("total", 0) == 3)
 
 # Delete
 if maria_id:
     result = customer_service.delete_customer("test_user_001", maria_id)
-    test("Delete 'Maria Garcia'", result.success)
+    record_result("Delete 'Maria Garcia'", result.success)
 
 result = customer_service.list_customers("test_user_001")
-test("After delete: user_001 has 2 customers",
+record_result("After delete: user_001 has 2 customers",
      result.success and result.data.get("total", 0) == 2)
 
 # ============================================================
@@ -358,15 +358,15 @@ result = formula_service.create_formula("test_user_001", {
         {"name": "Salt", "ratio": 0.5}
     ]
 })
-test("Create private formula 'Custom Premium Swine Mix'", result.success)
+record_result("Create private formula 'Custom Premium Swine Mix'", result.success)
 
 # Private formula priority (source 在 result.source, 不在 result.data)
 result = formula_service.get_formula("test_user_001", "Custom Premium Swine Mix")
-test("Get private formula", result.success and result.source == "private")
+record_result("Get private formula", result.success and result.source == "private")
 
 # Cost calculation with private formula
 result = calc_service.calculate_cost("test_user_001", "Custom Premium Swine Mix")
-test(f"Cost private formula (${result.data.get('total_cost', 0):.2f}/ton)",
+record_result(f"Cost private formula (${result.data.get('total_cost', 0):.2f}/ton)",
      result.success and result.data.get("total_cost", 0) > 0)
 
 # Version control test — get formula id and version first
@@ -376,9 +376,9 @@ if get_result.success:
     ver = get_result.data.get("version", 1)
     result = formula_service.update_formula("test_user_001", fid,
         {"notes": "Updated: added fish meal"}, ver)
-    test("Update formula with version control", result.success)
+    record_result("Update formula with version control", result.success)
 else:
-    test("Update formula with version control", False, "Could not get formula for update")
+    record_result("Update formula with version control", False, "Could not get formula for update")
 
 # ============================================================
 # SECTION 7: HARNESS — Task Router, Session State, Validator
@@ -391,49 +391,49 @@ validator = ResultValidator()
 
 # Task routing — TaskRouter uses Chinese patterns, English returns "unknown"
 # This is by design (target market uses Chinese messages)
-test("TaskRouter: Chinese '计算配方成本' → formula_cost_query",
+record_result("TaskRouter: Chinese '计算配方成本' → formula_cost_query",
      router.classify("计算配方成本") == "formula_cost_query")
-test("TaskRouter: Chinese '玉米价格多少' → price_query",
+record_result("TaskRouter: Chinese '玉米价格多少' → price_query",
      router.classify("玉米价格多少") in ["price_query", "price_manage"])
-test("TaskRouter: Chinese '添加客户张三' → customer_manage",
+record_result("TaskRouter: Chinese '添加客户张三' → customer_manage",
      router.classify("添加客户张三") == "customer_manage")
-test("TaskRouter: English returns unknown (expected, Chinese-only patterns)",
+record_result("TaskRouter: English returns unknown (expected, Chinese-only patterns)",
      router.classify("What is the cost?") == "unknown")
 
 # Session state — auto-creates on get_state
 state = session_mgr.get_state("test_user_001")
-test("Get session state (auto-create)", state is not None)
+record_result("Get session state (auto-create)", state is not None)
 
 session_mgr.update_state("test_user_001", current_formula="Nursery Diet 1", current_customer="John Smith")
 state = session_mgr.get_state("test_user_001")
-test("Update & retrieve session state",
+record_result("Update & retrieve session state",
      state.current_formula == "Nursery Diet 1" and state.current_customer == "John Smith")
 
 turn = session_mgr.increment_turn("test_user_001")
-test("Turn counter incremented", turn >= 1)
+record_result("Turn counter incremented", turn >= 1)
 
 # Result validation
 valid_result = {"total_cost": 250.0, "formula_name": "Test", "price_source": "barchart"}
-test("Validate valid cost result", validator.validate_cost_result(valid_result).valid)
+record_result("Validate valid cost result", validator.validate_cost_result(valid_result).valid)
 
 invalid_result = {"total_cost": -10, "formula_name": "Test", "price_source": "barchart"}
-test("Validate negative cost rejected", not validator.validate_cost_result(invalid_result).valid)
+record_result("Validate negative cost rejected", not validator.validate_cost_result(invalid_result).valid)
 
 valid_formula = {"name": "Test", "ingredients": [
     {"name": "Corn", "ratio": 60}, {"name": "Soybean meal", "ratio": 40}
 ]}
-test("Validate formula (ratios sum to 100)", validator.validate_formula(valid_formula).valid)
+record_result("Validate formula (ratios sum to 100)", validator.validate_formula(valid_formula).valid)
 
 invalid_formula = {"name": "Test", "ingredients": [
     {"name": "Corn", "ratio": 60}, {"name": "Soybean meal", "ratio": 50}
 ]}
-test("Validate formula (ratios > 100 rejected)", not validator.validate_formula(invalid_formula).valid)
+record_result("Validate formula (ratios > 100 rejected)", not validator.validate_formula(invalid_formula).valid)
 
 valid_customer = {"name": "John Smith", "phone": "+1-555-0101"}
-test("Validate customer", validator.validate_customer(valid_customer).valid)
+record_result("Validate customer", validator.validate_customer(valid_customer).valid)
 
 invalid_customer = {"phone": "+1-555-0101"}
-test("Validate customer (missing name rejected)", not validator.validate_customer(invalid_customer).valid)
+record_result("Validate customer (missing name rejected)", not validator.validate_customer(invalid_customer).valid)
 
 # ============================================================
 # SECTION 8: EDGE CASES & ERROR HANDLING
@@ -442,21 +442,21 @@ section("8. EDGE CASES & ERROR HANDLING")
 
 # Non-existent formula
 result = calc_service.calculate_cost("test_user_001", "NonExistentFormula123")
-test("Non-existent formula returns error", not result.success)
+record_result("Non-existent formula returns error", not result.success)
 
 # Non-existent customer
 result = customer_service.get_customer("test_user_001", "Nobody Here")
-test("Non-existent customer returns error", not result.success)
+record_result("Non-existent customer returns error", not result.success)
 
 # Empty message extraction
 from skills.formula_cost_skill.skill import FormulaCostSkill
 skill = FormulaCostSkill(calculation_service=calc_service)
 # sync test for extraction
 name = skill._extract_formula_name("cost for Nursery Diet 1")
-test("Extract formula from message", name is not None)
+record_result("Extract formula from message", name is not None)
 
 name = skill._extract_formula_name("random text no formula")
-test("No formula in message returns None", name is None)
+record_result("No formula in message returns None", name is None)
 
 # Formula with zero-ratio ingredient (edge case)
 result = formula_service.create_formula("test_user_001", {
@@ -468,7 +468,7 @@ result = formula_service.create_formula("test_user_001", {
         {"name": "Soybean meal", "ratio": 0.0}
     ]
 })
-test("Formula with 0% ingredient allowed", result.success)
+record_result("Formula with 0% ingredient allowed", result.success)
 
 # ============================================================
 # SECTION 9: INTEGRATION — Full Workflow
@@ -484,25 +484,25 @@ result = customer_service.create_customer("test_user_001", {
     "scale": 8000,
     "notes": "New prospect, interested in nursery diets"
 })
-test("E2E Step 1: Create customer 'Green Valley Farms'", result.success)
+record_result("E2E Step 1: Create customer 'Green Valley Farms'", result.success)
 
 # Step 2: Look up prices for key ingredients
 for ing in ["Corn", "Soybean meal", "Fish meal"]:
     result = price_service.get_price("test_user_001", ing)
-    test(f"E2E Step 2: Price lookup '{ing}'", result.success)
+    record_result(f"E2E Step 2: Price lookup '{ing}'", result.success)
 
 # Step 3: Calculate cost for a formula
 result = calc_service.calculate_cost("test_user_001", "Nursery Diet 1")
-test(f"E2E Step 3: Calculate 'Nursery Diet 1' cost (${result.data.get('total_cost', 0):.2f}/ton)",
+record_result(f"E2E Step 3: Calculate 'Nursery Diet 1' cost (${result.data.get('total_cost', 0):.2f}/ton)",
      result.success and result.data.get("total_cost", 0) > 0)
 
 # Step 4: Analyze nutrition
 from skills.nutrition_analysis_skill.skill import INGREDIENT_NUTRITION
-test("E2E Step 4: Nutrition data available", len(INGREDIENT_NUTRITION) >= 8)
+record_result("E2E Step 4: Nutrition data available", len(INGREDIENT_NUTRITION) >= 8)
 
 # Step 5: Compare formulas
 result = calc_service.compare_formulas("test_user_001", ["Nursery Diet 1", "Nursery Diet 2", "Nursery Diet 3"])
-test(f"E2E Step 5: Compare nursery diets ({len(result.data.get('formulas', []))} compared)",
+record_result(f"E2E Step 5: Compare nursery diets ({len(result.data.get('formulas', []))} compared)",
      result.success and len(result.data.get("formulas", [])) >= 2)
 
 # Step 6: Audit log verification
@@ -515,7 +515,7 @@ with pool.get_connection() as c:
     cur.execute("SELECT COUNT(*) FROM ingredient_prices WHERE owner_open_id = 'system_public'")
     price_count = cur.fetchone()[0]
 
-test(f"E2E Step 6: DB state — {cust_count} customers, {formula_count} formulas, {price_count} prices",
+record_result(f"E2E Step 6: DB state — {cust_count} customers, {formula_count} formulas, {price_count} prices",
      cust_count >= 2 and formula_count >= 38 and price_count >= 20)
 
 # ============================================================
@@ -538,7 +538,8 @@ if results["errors"]:
 
 print(f"\n  Conclusion: {'PASS ✅' if pct >= 90 else 'NEEDS_FIX ⚠️' if pct >= 70 else 'FAIL ❌'}")
 
-# Cleanup
-os.remove(TEST_DB)
+if __name__ == "__main__":
+    # Cleanup
+    os.remove(TEST_DB)
 
-sys.exit(0 if results["failed"] == 0 else 1)
+    sys.exit(0 if results["failed"] == 0 else 1)

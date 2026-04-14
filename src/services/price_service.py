@@ -37,7 +37,11 @@ class PriceService:
             ServiceResult: 包含价格数据和来源
         """
         # 自动将名称转换为 code（支持传入 name 或 code）
-        ingredient_code = generate_ingredient_code(ingredient_identifier)
+        # 如果已经是标准格式（ING_开头），直接使用
+        if ingredient_identifier.startswith('ING_'):
+            ingredient_code = ingredient_identifier
+        else:
+            ingredient_code = generate_ingredient_code(ingredient_identifier)
 
         # 1. 先查私有价格（按 ingredient_code 精确查找）
         price = self._get_price_by_owner(user_id, ingredient_code)
