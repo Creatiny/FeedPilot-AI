@@ -212,9 +212,13 @@ CREATE TABLE ingredient_prices (
     ingredient_code TEXT NOT NULL,         -- 原料代码（精确查找键）
     ingredient_name TEXT NOT NULL,         -- 原料名称（显示用）
     price REAL NOT NULL,
-    price_date DATE NOT NULL,
+    currency TEXT DEFAULT 'USD',           -- 货币（北美市场统一 USD）
+    unit TEXT DEFAULT 'ton',               -- 单位
     source TEXT,                           -- 数据来源（CBOT, USDA AMS 等）
+    price_date DATE NOT NULL,
+    version INTEGER DEFAULT 1,             -- 乐观锁版本号
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(ingredient_code, price_date, owner_open_id)
 );
 CREATE INDEX idx_prices_code ON ingredient_prices(ingredient_code);
@@ -222,8 +226,15 @@ CREATE INDEX idx_prices_code ON ingredient_prices(ingredient_code);
 
 #### formula_ingredients（配方成分表，含 ingredient_code）
 ```sql
--- formula_ingredients 属于 formulas，ingredient_code 用于关联价格查询
--- ingredient_code 无 FK 约束，由应用层保证引用有效性
+CREATE TABLE formula_ingredients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    formula_id INTEGER NOT NULL,
+    ingredient_name TEXT NOT NULL,         -- 原料名称（展示用）
+    ingredient_code TEXT NOT NULL,         -- 原料代码（精确查找键，由应用层保证引用有效性）
+    ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
+);
 ```
 
 #### quotes（报价记录）
