@@ -141,45 +141,48 @@ SELECT f.id, f.name, f.stage_type, f.notes,
 
 ## 修复进度
 
-### ✅ 已完成
+### ✅ 设计文档已同步（commit 856ee33）
 
-| 问题 | 状态 | 提交 |
+| 问题 | 状态 | 说明 |
 |------|------|------|
-| ingredient_code 缺失 | ✅ 已修复 | 323d23c |
-| FK 约束设计错误 | ✅ 已移除 FK | f5cd734 |
-| LIKE 误匹配 | ✅ 改为精确 IN 查询 | 323d23c |
-| Repository 迁移 | ✅ 988 行数据完成 | 323d23c |
+| formulas 表定义不完整 | ✅ 已修复 | 添加 animal_type, weight_range, version |
+| formula_ingredients INSERT 缺 ingredient_code | ✅ 已修复 | 两处 INSERT 均已更新 |
+| get_formula SQL 示例 | ✅ 已修复 | SELECT 含 ingredient_code |
+| _generate_ingredient_code 方法 | ✅ 已添加 | FormulaRepository 新增方法 |
+| CalculationService 类 | ✅ 已添加 | 完整 calculate_cost + 批量查询 |
+| PriceService 批量方法 | ✅ 已添加 | _batch_get_public/private_prices |
+| 批量查询精确匹配 | ✅ 已文档化 | IN(ingredient_code) 替代 LIKE |
+| 多租户隔离 | ⚠️ 代码问题 | 设计文档中 T06 已标注为 P1 待开发 |
 
-### ⚠️ 待修复
+### ⚠️ 待修复（代码实现，非设计文档）
 
-| 问题 | 优先级 | 预计工时 |
-|------|--------|----------|
-| 多租户隔离失败 | P1 | 2-3h |
-| 文档 formulas 定义 | P1 | 15min |
-| SQL 示例更新 | P2 | 10min |
+| 问题 | 优先级 | 类型 | 说明 |
+|------|--------|------|------|
+| 多租户隔离失败（4测试） | P1 | 代码 | owner_open_id 过滤逻辑问题 |
 
 ---
 
 ## 设计亮点 ✅
 
-1. **ingredient_code 迁移方案正确** — 应用层保证引用有效性，不依赖 DB 层 FK（SQLite FK 限制）
+1. **ingredient_code 迁移方案** — 应用层保证引用有效性，不依赖 DB 层 FK
 2. **批量查询优化** — `batch_get_prices` 避免 N+1 查询问题
 3. **默认价格 fallback** — 价格缺失时不会导致计算失败
 4. **ServiceResult 统一返回** — 错误处理一致
+5. **设计文档为单一信号源** — 所有服务契约已在文档中完整定义
 
 ---
 
 ## 结论
 
-**工程就绪状态**: ⚠️ Needs Work — 核心迁移完成，但多租户隔离缺陷阻断生产部署。
+**工程就绪状态**: ⚠️ Needs Work
 
-**下一步**:
-1. 修复多租户隔离问题（P1）
-2. 同步架构文档与实际 Schema（P1）
-3. 重新运行完整测试套件验证
+- ✅ 设计文档已完整同步代码实现（ARC-001 迁移完成）
+- ⚠️ 多租户隔离（P1）阻止生产部署，需代码修复
+
+**设计文档先行原则确认**: 所有设计变更已记录在 ARCHITECTURE_v1.6.md，代码实现待评审通过后执行。
 
 ---
 
 **审查日期**: 2026-04-14  
 **审查者**: AI Assistant  
-**下次审查**: P1 问题修复后
+**最终修复提交**: 856ee33 (design doc) | 待修复: multi-tenant isolation (code)
