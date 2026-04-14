@@ -495,8 +495,11 @@ CREATE TABLE IF NOT EXISTS formulas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     owner_open_id TEXT NOT NULL,           -- 所有者 ID
     name TEXT NOT NULL,                    -- 配方名称
+    animal_type TEXT,                      -- 动物类型（Swine, Beef Cattle, Broiler 等）
     stage_type TEXT NOT NULL,              -- 饲养阶段
+    weight_range TEXT,                    -- 体重范围
     notes TEXT,                            -- 备注
+    version INTEGER DEFAULT 1,             -- 乐观锁版本号
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
@@ -645,8 +648,8 @@ class FormulaRepository:
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT f.id, f.name, f.stage_type, f.notes,
-                       fi.ingredient_name, fi.ratio_percent
+                SELECT f.id, f.name, f.animal_type, f.stage_type, f.notes,
+                       fi.ingredient_name, fi.ingredient_code, fi.ratio_percent
                 FROM formulas f
                 LEFT JOIN formula_ingredients fi ON f.id = fi.formula_id
                 WHERE f.owner_open_id = ? AND f.name = ?
