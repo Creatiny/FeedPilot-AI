@@ -295,7 +295,7 @@ def test_update_formula_with_version():
         update_data = {
             'animal_type': 'Beef Cattle',
             'stage_type': 'Growing',
-            'ingredients': [{'name': 'Corn, grain', 'ratio': 65.0}]
+            'ingredients': [{'name': 'Corn, grain', 'ingredient_code': 'ING_CORN', 'ratio': 65.0}]
         }
         result_update = service.update_formula('user_a', formula_id, update_data, version)
         assert result_update.success, f"更新应该成功: {result_update.error_message}"

@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 from datetime import date
 from ..database.pool import DatabasePool
 from ..result_types import ServiceResult
+from ..utils.ingredient_codes import generate_ingredient_code
 
 logger = logging.getLogger(__name__)
 
@@ -106,8 +107,8 @@ class PriceService:
                 error_message='价格必须大于 0'
             )
         
-        # 生成 ingredient_code
-        ingredient_code = self._generate_ingredient_code(ingredient_name)
+        # 生成 ingredient_code（使用共享映射表）
+        ingredient_code = generate_ingredient_code(ingredient_name)
         today = date.today().isoformat()
         
         with self.db_pool.get_connection() as conn:
@@ -271,24 +272,5 @@ class PriceService:
             return results
     
     def _generate_ingredient_code(self, ingredient_name: str) -> str:
-        """生成原料代码"""
-        # 从原料名称生成代码
-        code_map = {
-            'Corn': 'ING_CORN',
-            'Soybean': 'ING_SBM',
-            'Fish meal': 'ING_FISHM',
-            'Wheat': 'ING_WHEAT',
-            'Limestone': 'ING_LIME',
-            'Premix': 'ING_PREMIX',
-            'Dicalcium': 'ING_DCP',
-            'Salt': 'ING_SALT',
-            'Lysine': 'ING_LYS',
-            'Methionine': 'ING_MET',
-        }
-        
-        for key, code in code_map.items():
-            if key.lower() in ingredient_name.lower():
-                return code
-        
-        # 默认：取第一个单词
-        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+        """废弃：使用 utils.ingredient_codes.generate_ingredient_code 替代"""
+        return generate_ingredient_code(ingredient_name)

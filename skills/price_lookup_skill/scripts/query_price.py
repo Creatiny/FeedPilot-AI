@@ -22,8 +22,13 @@ def _init_services():
         # workspace-feedsales 目录 (scripts -> skill -> skills -> workspace-feedsales)
         workspace = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         
+        # 添加项目根目录到 sys.path 以便导入 utils
+        if workspace not in sys.path:
+            sys.path.insert(0, workspace)
+        
         # 直接用 sqlite3 连接，避免相对导入问题
         import sqlite3
+        from src.utils.ingredient_codes import generate_ingredient_code
         
         db_path = os.path.join(workspace, 'data', 'feed_sales.db')
         
@@ -31,34 +36,12 @@ def _init_services():
             """简化版 PriceService，用于技能直接查询"""
             
             def _generate_ingredient_code(self, ingredient_name: str) -> str:
-                code_map = {
-                    'Corn': 'ING_CORN',
-                    'Soybean meal': 'ING_SBM',
-                    'Soybean': 'ING_SBM',
-                    'Fish meal': 'ING_FISHM',
-                    'Wheat': 'ING_WHEAT',
-                    'Barley': 'ING_BARLEY',
-                    'Rice': 'ING_RICE',
-                    'DDGS': 'ING_DDGS',
-                    'Canola meal': 'ING_CANOLA',
-                    'Cottonseed meal': 'ING_COTTON',
-                    'Dicalcium phosphate': 'ING_DCP',
-                    'Limestone': 'ING_LIME',
-                    'Salt': 'ING_SALT',
-                    'L-Lysine': 'ING_LYS',
-                    'Lysine': 'ING_LYS',
-                    'DL-Methionine': 'ING_MET',
-                    'Methionine': 'ING_MET',
-                    'Premix': 'ING_PREMIX',
-                }
-                for key, code in code_map.items():
-                    if key.lower() in ingredient_name.lower():
-                        return code
-                return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+                """废弃：使用共享的 generate_ingredient_code 函数"""
+                return generate_ingredient_code(ingredient_name)
             
             def get_price(self, user_id: str, ingredient_name: str):
                 # 将 ingredient_name 转换为 ingredient_code（按设计文档：精确匹配）
-                ingredient_code = self._generate_ingredient_code(ingredient_name)
+                ingredient_code = generate_ingredient_code(ingredient_name)
                 
                 conn = sqlite3.connect(db_path)
                 conn.row_factory = sqlite3.Row

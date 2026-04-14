@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 from ..database.pool import DatabasePool
 from ..database.repository import FormulaRepository
 from ..result_types import ServiceResult
+from ..utils.ingredient_codes import generate_ingredient_code
 
 logger = logging.getLogger(__name__)
 
@@ -227,7 +228,7 @@ class FormulaService:
                     error_message='数据已被其他用户修改，请刷新后重试'
                 )
             
-            # 更新成分（带 ingredient_code）
+            # 更新成分（带 ingredient_code，显式校验）
             if 'ingredients' in data:
                 cursor.execute(
                     "DELETE FROM formula_ingredients WHERE formula_id = ?",
@@ -235,8 +236,14 @@ class FormulaService:
                 )
                 
                 for ing in data['ingredients']:
+                    if not ing.get('ingredient_code'):
+                        return ServiceResult(
+                            success=False,
+                            error_code='E001',
+                            error_message=f"ingredient['ingredient_code'] required for '{ing['name']}'"
+                        )
                     ing_name = ing['name']
-                    ing_code = ing.get('ingredient_code') or self.repo._generate_ingredient_code(ing_name)
+                    ing_code = ing['ingredient_code']  # 显式使用已有 code，不再 fallback
                     cursor.execute('''
                         INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent)
                         VALUES (?, ?, ?, ?)

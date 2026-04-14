@@ -10,6 +10,8 @@ from datetime import date
 from .pool import DatabasePool
 
 
+from ..utils.ingredient_codes import generate_ingredient_code
+
 logger = logging.getLogger(__name__)
 
 
@@ -152,23 +154,8 @@ class FormulaRepository:
             return formula_id
 
     def _generate_ingredient_code(self, ingredient_name: str) -> str:
-        """Generate ingredient code from name (for new formula ingredients)"""
-        code_map = {
-            'Corn': 'ING_CORN',
-            'Soybean': 'ING_SBM',
-            'Fish meal': 'ING_FISHM',
-            'Wheat': 'ING_WHEAT',
-            'Limestone': 'ING_LIME',
-            'Premix': 'ING_PREMIX',
-            'Dicalcium': 'ING_DCP',
-            'Salt': 'ING_SALT',
-            'Lysine': 'ING_LYS',
-            'Methionine': 'ING_MET',
-        }
-        for key, code in code_map.items():
-            if key.lower() in ingredient_name.lower():
-                return code
-        return 'ING_' + ingredient_name.split(',')[0].upper().replace(' ', '_')[:15]
+        """废弃：使用 utils.ingredient_codes.generate_ingredient_code 替代"""
+        return generate_ingredient_code(ingredient_name)
     
     def update_formula(self, owner_open_id: str, formula_id: int, 
                       formula_data: Dict) -> bool:
