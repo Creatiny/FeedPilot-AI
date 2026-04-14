@@ -26,6 +26,33 @@ sys.path.insert(0, os.path.join(WORKSPACE, 'skills'))
 
 DB_PATH = os.path.join(WORKSPACE, 'data', 'feed_sales.db')
 
+# 共享 ingredient_code 映射（与 src/utils/ingredient_codes.py 保持一致）
+_INGREDIENT_CODE_MAP = {
+    'Corn': 'ING_CORN', 'Corn, #2 Yellow': 'ING_CORN', 'Corn, grain': 'ING_CORN',
+    'Wheat': 'ING_WHEAT', 'Barley': 'ING_BARLEY', 'Rice': 'ING_RICE', 'Sorghum': 'ING_SORGHUM', 'Oats': 'ING_OATS',
+    'Soybean meal': 'ING_SBM', 'Soybean meal, 48%': 'ING_SBM', 'Soybean': 'ING_SBM',
+    'Canola meal': 'ING_CANOLA', 'Cottonseed meal': 'ING_COTTON', 'Fish meal': 'ING_FISHM', 'Fish meal, 60%': 'ING_FISHM',
+    'DDGS': 'ING_DDGS', "Distiller's grains": 'ING_DDGS',
+    'Limestone': 'ING_LIME', 'Dicalcium phosphate': 'ING_DCP', 'Dicalcium': 'ING_DCP',
+    'Salt': 'ING_SALT', 'L-Lysine': 'ING_LYS', 'Lysine': 'ING_LYS',
+    'DL-Methionine': 'ING_MET', 'Methionine': 'ING_MET',
+    'Premix': 'ING_PREMIX', 'Vitamin premix': 'ING_PREMIX',
+    'Alfalfa': 'ING_ALFALFA', 'Alfalfa meal': 'ING_ALFALFA',
+    'Corn silage': 'ING_SILAGE', 'Grass hay': 'ING_HAY', 'Hay': 'ING_HAY',
+    'Molasses': 'ING_MOLASSES', 'Water': 'ING_WATER',
+}
+
+def _generate_ingredient_code(name: str) -> str:
+    """将原料名称转换为 ingredient_code"""
+    if not name:
+        return 'ING_UNKNOWN'
+    name_lower = name.lower()
+    for key, code in _INGREDIENT_CODE_MAP.items():
+        if key.lower() in name_lower:
+            return code
+    first_word = name.split(',')[0].strip()
+    return 'ING_' + first_word.upper().replace(' ', '_')[:15]
+
 
 # ============== ServiceResult ==============
 class ServiceResult:
@@ -40,23 +67,38 @@ class ServiceResult:
 
 # ============== Simple Services ==============
 class SimplePriceService:
-    """简化版 PriceService"""
+    """简化版 PriceService（使用 ingredient_code 精确匹配）"""
     
     def get_price(self, user_id: str, ingredient_name: str):
+        # 将 name 转换为 ingredient_code
+        ingredient_code = _generate_ingredient_code(ingredient_name)
+        
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute('''
             SELECT ingredient_code, ingredient_name, price, currency, unit, source, price_date
             FROM ingredient_prices
-            WHERE owner_open_id = ? AND ingredient_name LIKE ?
+            WHERE owner_open_id = ? AND ingredient_code = ?
             ORDER BY price_date DESC LIMIT 1
-        ''', ('system_public', f'%{ingredient_name}%'))
+        ''', (user_id, ingredient_code))
         row = cursor.fetchone()
+        if not row:
+            # 降级查公共价格
+            cursor.execute('''
+                SELECT ingredient_code, ingredient_name, price, currency, unit, source, price_date
+                FROM ingredient_prices
+                WHERE owner_open_id = 'system_public' AND ingredient_code = ?
+                ORDER BY price_date DESC LIMIT 1
+            ''', (ingredient_code,))
+            row = cursor.fetchone()
+            if row:
+                conn.close()
+                return ServiceResult(success=True, data=dict(row), source='public')
+            conn.close()
+            return ServiceResult(success=False, error_message=f"Ingredient '{ingredient_name}' ({ingredient_code}) not found")
         conn.close()
-        if row:
-            return ServiceResult(success=True, data=dict(row), source='public')
-        return ServiceResult(success=False, error_message=f"Ingredient '{ingredient_name}' not found")
+        return ServiceResult(success=True, data=dict(row), source='private' if user_id != 'system_public' else 'public')
 
     def list_public_prices(self):
         conn = sqlite3.connect(DB_PATH)
@@ -78,11 +120,20 @@ class SimpleFormulaService:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        # 直接查询配方
+        # 优先精确匹配
         cursor.execute('''
-            SELECT * FROM formulas WHERE name LIKE ? OR name LIKE ?
-        ''', (f'%{formula_name}%', formula_name))
+            SELECT * FROM formulas WHERE owner_open_id = ? AND name = ?
+        ''', (user_id, formula_name))
         row = cursor.fetchone()
+        if not row:
+            # 降级到公共配方
+            cursor.execute('''
+                SELECT * FROM formulas WHERE owner_open_id = 'system_public' AND name = ?
+            ''', (formula_name,))
+            row = cursor.fetchone()
+            source = 'public'
+        else:
+            source = 'private'
         if not row:
             conn.close()
             return ServiceResult(success=False, error_message=f"Formula '{formula_name}' not found")
@@ -90,20 +141,22 @@ class SimpleFormulaService:
         formula = dict(row)
         formula_id = formula['id']
         
-        # 查询成分
+        # 查询成分（含 ingredient_code）
         cursor.execute('''
-            SELECT ingredient_name, ratio_percent FROM formula_ingredients WHERE formula_id = ?
+            SELECT ingredient_name, ingredient_code, ratio_percent
+            FROM formula_ingredients WHERE formula_id = ?
         ''', (formula_id,))
         ingredients = []
         for ing_row in cursor.fetchall():
             ingredients.append({
-                'name': ing_row['ingredient_name'], 
+                'name': ing_row['ingredient_name'],
+                'ingredient_code': ing_row['ingredient_code'],
                 'ratio': ing_row['ratio_percent']
             })
         conn.close()
         
         formula['ingredients'] = ingredients
-        return ServiceResult(success=True, data=formula, source='public')
+        return ServiceResult(success=True, data=formula, source=source)
 
     def list_formulas(self, user_id: str):
         conn = sqlite3.connect(DB_PATH)
@@ -137,19 +190,22 @@ class SimpleCalculationService:
         for ing in ingredients:
             name = ing.get('name', '')
             ratio = ing.get('ratio', 0)
-            
+            # 直接使用 ingredient_code 查询（精确匹配）
             price_result = self.price_service.get_price(user_id, name)
             if price_result.success:
                 price = price_result.data.get('price', 0)
                 cost = price * ratio / 100
                 total_cost += cost
+                # 使用 ingredient_code 作为 key
+                code = ing.get('ingredient_code', _generate_ingredient_code(name))
                 details.append({
                     'ingredient': name,
+                    'ingredient_code': code,
                     'percentage': ratio,
                     'price': price,
                     'cost': round(cost, 2)
                 })
-                price_sources[name] = price_result.source
+                price_sources[code] = price_result.source
         
         return ServiceResult(
             success=True,
