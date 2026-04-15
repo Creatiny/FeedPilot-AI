@@ -29,6 +29,7 @@ from src.services.formula_service import FormulaService
 from src.services.price_service import PriceService
 from src.services.customer_service import CustomerService
 from src.services.calculation_service import CalculationService
+from src.utils.ingredient_codes import generate_ingredient_code
 from skills.formula_cost_skill.skill import FormulaCostSkill
 from skills.price_lookup_skill.skill import PriceLookupSkill
 from skills.customer_record_skill.skill import CustomerRecordSkill
@@ -114,9 +115,10 @@ for fd in formulas_data:
     )
     fid = cur.lastrowid
     for ing in fd.get("ingredients", []):
+        ing_code = ing.get("code") or generate_ingredient_code(ing["name"]) or ""
         conn.execute(
             "INSERT INTO formula_ingredients (formula_id, ingredient_name, ingredient_code, ratio_percent) VALUES (?,?,?,?)",
-            (fid, ing["name"], ing.get("code",""), ing["ratio"])
+            (fid, ing["name"], ing_code, ing["ratio"])
         )
 
 # Seed prices

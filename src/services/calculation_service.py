@@ -186,7 +186,7 @@ class CalculationService:
             return ServiceResult(
                 success=False,
                 error_code='E002',
-                error_message='没有找到任何配方'
+                error_message='No formulas found'
             )
         
         # 排序（按成本）

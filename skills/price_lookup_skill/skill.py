@@ -103,29 +103,45 @@ class PriceLookupSkill:
             return self._error(f"Lookup failed: {str(e)}")
     
     def _find_ingredient(self, message: str) -> Optional[str]:
-        """Simple ingredient name matching"""
+        """Ingredient name matching with word boundary awareness.
+        
+        Uses word-boundary matching to avoid false positives like
+        'rice' matching inside 'price'.
+        """
         msg_lower = message.lower()
         
         # Skip if message is asking for "all prices" or list
         if 'all' in msg_lower or 'list' in msg_lower or 'show' in msg_lower:
             return None
         
-        # Match known ingredients
-        for keyword in self.INGREDIENT_KEYWORDS:
-            if keyword.lower() in msg_lower:
+        # Match known ingredients using word-boundary regex
+        # Sort by length descending so longer names match first
+        # (e.g. "Soybean meal" before "Soybean", "Fish meal" before "Fish")
+        sorted_keywords = sorted(self.INGREDIENT_KEYWORDS, key=len, reverse=True)
+        for keyword in sorted_keywords:
+            # Use word boundary: the keyword must appear as a whole word/phrase
+            # \b doesn't work well for multi-word, so check with boundaries manually
+            pattern = r'(?<![a-z])' + re.escape(keyword.lower()) + r'(?![a-z])'
+            if re.search(pattern, msg_lower):
                 return keyword
         
         # Pattern: xxx price / price of xxx
-        match = re.search(r'(?:price\s+(?:of\s+)?|(.+?)\s+price)', message, re.IGNORECASE)
+        match = re.search(r'price\s+of\s+(.+?)(?:\s*$|\s*\?)', message, re.IGNORECASE)
         if match:
-            name = match.group(1) if match.group(1) else match.group(0)
-            name = name.replace('price', '').replace('of', '').strip()
+            name = match.group(1).strip()
+            if name and len(name) < 30:
+                return name
+        
+        match = re.search(r'(.+?)\s+price', message, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            # Filter out common non-ingredient words
+            for skip in ['what', 'the', 'current', 'today', 'latest', 'show', 'all']:
+                name = re.sub(r'\b' + skip + r'\b', '', name, flags=re.IGNORECASE).strip()
             if name and len(name) < 30:
                 return name
         
         return None
-    
-        return generate_ingredient_code(ingredient_name)
     
     def _try_auto_add(self, ingredient: str) -> Dict:
         """Try to auto-add missing ingredient"""

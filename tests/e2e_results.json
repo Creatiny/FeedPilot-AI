@@ -1,5 +1,5 @@
 {
-  "run_time": "2026-04-15T14:39:47.052935",
+  "run_time": "2026-04-15T17:38:37.528090",
   "total": 55,
   "passed": 55,
   "failed": 0,
@@ -13,87 +13,95 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Nursery Diet 1 for Swine (Nursery stage) is $290.58/ton ($0.2906/kg).",
           "formula_name": "Nursery Diet 1",
           "animal_type": "Swine",
           "stage": "Nursery",
-          "cost_per_ton": 285.8,
-          "cost_per_kg": 0.2858,
+          "cost_per_ton": 290.58,
+          "cost_per_kg": 0.2906,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 60.0,
-              "price": 180.0,
-              "cost": 108.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 111.3,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 25.0,
-              "price": 350.0,
-              "cost": 87.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 85.5,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 3.0,
-              "price": 1800.0,
-              "cost": 54.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 55.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, swine",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$285.8/ton",
-      "timestamp": "2026-04-15T14:39:46.984838"
+      "detail": "cost=$290.58/ton",
+      "timestamp": "2026-04-15T17:38:37.479674"
     },
     {
       "test_id": "FC-02",
@@ -103,79 +111,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Grower Diet 1 for Swine (Growing stage) is $225.98/ton ($0.2260/kg).",
           "formula_name": "Grower Diet 1",
           "animal_type": "Swine",
           "stage": "Growing",
-          "cost_per_ton": 221.7,
-          "cost_per_kg": 0.2217,
+          "cost_per_ton": 225.98,
+          "cost_per_kg": 0.226,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 68.0,
-              "price": 180.0,
-              "cost": 122.4,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 126.14,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 18.0,
-              "price": 350.0,
-              "cost": 63.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 61.56,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Premix, swine",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$221.7/ton",
-      "timestamp": "2026-04-15T14:39:46.986831"
+      "detail": "cost=$225.98/ton",
+      "timestamp": "2026-04-15T17:38:37.480944"
     },
     {
       "test_id": "FC-03",
@@ -185,79 +200,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Finisher Diet for Swine (Finishing stage) is $219.72/ton ($0.2197/kg).",
           "formula_name": "Finisher Diet",
           "animal_type": "Swine",
           "stage": "Finishing",
-          "cost_per_ton": 214.9,
-          "cost_per_kg": 0.2149,
+          "cost_per_ton": 219.72,
+          "cost_per_kg": 0.2197,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 72.0,
-              "price": 180.0,
-              "cost": 129.6,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 133.56,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 14.0,
-              "price": 350.0,
-              "cost": 49.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 47.88,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Premix, swine",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$214.9/ton",
-      "timestamp": "2026-04-15T14:39:46.988804"
+      "detail": "cost=$219.72/ton",
+      "timestamp": "2026-04-15T17:38:37.482163"
     },
     {
       "test_id": "FC-04",
@@ -267,87 +289,95 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Broiler Starter for Broiler (Starter stage) is $336.68/ton ($0.3367/kg).",
           "formula_name": "Broiler Starter",
           "animal_type": "Broiler",
           "stage": "Starter",
-          "cost_per_ton": 331.9,
-          "cost_per_kg": 0.3319,
+          "cost_per_ton": 336.68,
+          "cost_per_kg": 0.3367,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 52.0,
-              "price": 180.0,
-              "cost": 93.6,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 96.46,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 32.0,
-              "price": 350.0,
-              "cost": 112.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 109.44,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 1800.0,
-              "cost": 90.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 92.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, broiler",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$331.9/ton",
-      "timestamp": "2026-04-15T14:39:46.990593"
+      "detail": "cost=$336.68/ton",
+      "timestamp": "2026-04-15T17:38:37.483426"
     },
     {
       "test_id": "FC-05",
@@ -357,71 +387,77 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Layer Diet for Layer (Laying stage) is $227.25/ton ($0.2273/kg).",
           "formula_name": "Layer Diet",
           "animal_type": "Layer",
           "stage": "Laying",
-          "cost_per_ton": 223.9,
-          "cost_per_kg": 0.2239,
+          "cost_per_ton": 227.25,
+          "cost_per_kg": 0.2273,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 62.0,
-              "price": 180.0,
-              "cost": 111.6,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 115.01,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 20.0,
-              "price": 350.0,
-              "cost": 70.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 68.4,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Premix, layer",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 8.0,
-              "price": 120.0,
-              "cost": 9.6,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 9.2,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$223.9/ton",
-      "timestamp": "2026-04-15T14:39:46.992400"
+      "detail": "cost=$227.25/ton",
+      "timestamp": "2026-04-15T17:38:37.484705"
     },
     {
       "test_id": "FC-06",
@@ -431,71 +467,76 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Lactating Cow Diet for Dairy Cattle (Lactating stage) is $234.94/ton ($0.2349/kg).",
           "formula_name": "Lactating Cow Diet",
           "animal_type": "Dairy Cattle",
           "stage": "Lactating",
-          "cost_per_ton": 239.0,
-          "cost_per_kg": 0.239,
+          "cost_per_ton": 234.94,
+          "cost_per_kg": 0.2349,
           "currency": "USD",
           "details": [
             {
               "name": "Corn silage",
-              "ingredient_code": "",
               "ratio": 35.0,
-              "price": 180.0,
-              "cost": 63.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 64.92,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 30.0,
-              "price": 180.0,
-              "cost": 54.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 55.65,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 18.0,
-              "price": 350.0,
-              "cost": 63.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 61.56,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Alfalfa hay, early bloom",
-              "ingredient_code": "",
               "ratio": 10.0,
-              "price": 300.0,
-              "cost": 30.0,
-              "price_source": "default"
+              "price": 220.0,
+              "cost": 22.0,
+              "ingredient_code": "ING_ALFALFA",
+              "price_source": "public"
             },
             {
               "name": "Premix, dairy",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 650.0,
-              "cost": 6.5,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 6.8,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_ALFALFA": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$239.0/ton",
-      "timestamp": "2026-04-15T14:39:46.994229"
+      "detail": "cost=$234.94/ton",
+      "timestamp": "2026-04-15T17:38:37.485916"
     },
     {
       "test_id": "FC-07",
@@ -505,79 +546,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Beef Cattle Finisher for Beef Cattle (Finishing stage) is $221.84/ton ($0.2218/kg).",
           "formula_name": "Beef Cattle Finisher",
           "animal_type": "Beef Cattle",
           "stage": "Finishing",
-          "cost_per_ton": 224.9,
-          "cost_per_kg": 0.2249,
+          "cost_per_ton": 221.84,
+          "cost_per_kg": 0.2218,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 70.0,
-              "price": 180.0,
-              "cost": 126.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 129.85,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 10.0,
-              "price": 350.0,
-              "cost": 35.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 34.2,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Alfalfa hay, early bloom",
-              "ingredient_code": "",
               "ratio": 10.0,
-              "price": 300.0,
-              "cost": 30.0,
-              "price_source": "default"
+              "price": 220.0,
+              "cost": 22.0,
+              "ingredient_code": "ING_ALFALFA",
+              "price_source": "public"
             },
             {
               "name": "Premix, beef",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_ALFALFA": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$224.9/ton",
-      "timestamp": "2026-04-15T14:39:46.996169"
+      "detail": "cost=$221.84/ton",
+      "timestamp": "2026-04-15T17:38:37.487254"
     },
     {
       "test_id": "FC-08",
@@ -587,79 +635,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Trout Starter for Aquatic (Fry stage) is $1144.68/ton ($1.1447/kg).",
           "formula_name": "Trout Starter",
           "animal_type": "Aquatic",
           "stage": "Fry",
-          "cost_per_ton": 1054.65,
-          "cost_per_kg": 1.0547,
+          "cost_per_ton": 1144.68,
+          "cost_per_kg": 1.1447,
           "currency": "USD",
           "details": [
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 50.0,
-              "price": 1800.0,
-              "cost": 900.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 925.0,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 25.0,
-              "price": 350.0,
-              "cost": 87.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 85.5,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish oil",
-              "ingredient_code": "",
               "ratio": 10.0,
-              "price": 300.0,
-              "cost": 30.0,
-              "price_source": "default"
+              "price": 950.0,
+              "cost": 95.0,
+              "ingredient_code": "ING_OIL",
+              "price_source": "public"
             },
             {
               "name": "Premix, trout",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 2.0,
-              "price": 650.0,
-              "cost": 13.0,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 13.6,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_FISHM": "public",
+            "ING_SBM": "public",
+            "ING_OIL": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$1054.65/ton",
-      "timestamp": "2026-04-15T14:39:46.998177"
+      "detail": "cost=$1144.68/ton",
+      "timestamp": "2026-04-15T17:38:37.488563"
     },
     {
       "test_id": "FC-09",
@@ -669,79 +724,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Catfish Grower for Aquatic (Grower stage) is $750.99/ton ($0.7510/kg).",
           "formula_name": "Catfish Grower",
           "animal_type": "Aquatic",
           "stage": "Grower",
-          "cost_per_ton": 735.65,
-          "cost_per_kg": 0.7357,
+          "cost_per_ton": 750.99,
+          "cost_per_kg": 0.751,
           "currency": "USD",
           "details": [
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 30.0,
-              "price": 1800.0,
-              "cost": 540.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 555.0,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 35.0,
-              "price": 350.0,
-              "cost": 122.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 119.7,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 20.0,
-              "price": 180.0,
-              "cost": 36.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 37.1,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Premix, catfish",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 2.0,
-              "price": 650.0,
-              "cost": 13.0,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 13.6,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_FISHM": "public",
+            "ING_SBM": "public",
+            "ING_CORN": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$735.65/ton",
-      "timestamp": "2026-04-15T14:39:46.999978"
+      "detail": "cost=$750.99/ton",
+      "timestamp": "2026-04-15T17:38:37.489795"
     },
     {
       "test_id": "FC-10",
@@ -751,87 +813,95 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Nursery Diet 1 for Swine (Nursery stage) is $290.58/ton ($0.2906/kg).",
           "formula_name": "Nursery Diet 1",
           "animal_type": "Swine",
           "stage": "Nursery",
-          "cost_per_ton": 285.8,
-          "cost_per_kg": 0.2858,
+          "cost_per_ton": 290.58,
+          "cost_per_kg": 0.2906,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 60.0,
-              "price": 180.0,
-              "cost": 108.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 111.3,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 25.0,
-              "price": 350.0,
-              "cost": 87.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 85.5,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 3.0,
-              "price": 1800.0,
-              "cost": 54.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 55.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, swine",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$285.8/ton",
-      "timestamp": "2026-04-15T14:39:47.001946"
+      "detail": "cost=$290.58/ton",
+      "timestamp": "2026-04-15T17:38:37.491146"
     },
     {
       "test_id": "FC-11",
@@ -841,87 +911,95 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Nursery Diet 1 for Swine (Nursery stage) is $290.58/ton ($0.2906/kg).",
           "formula_name": "Nursery Diet 1",
           "animal_type": "Swine",
           "stage": "Nursery",
-          "cost_per_ton": 285.8,
-          "cost_per_kg": 0.2858,
+          "cost_per_ton": 290.58,
+          "cost_per_kg": 0.2906,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 60.0,
-              "price": 180.0,
-              "cost": 108.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 111.3,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 25.0,
-              "price": 350.0,
-              "cost": 87.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 85.5,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 3.0,
-              "price": 1800.0,
-              "cost": 54.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 55.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, swine",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$285.8/ton",
-      "timestamp": "2026-04-15T14:39:47.003850"
+      "detail": "cost=$290.58/ton",
+      "timestamp": "2026-04-15T17:38:37.492413"
     },
     {
       "test_id": "FC-12",
@@ -931,79 +1009,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Gestating Sow Diet for Swine (Gestating stage) is $227.38/ton ($0.2274/kg).",
           "formula_name": "Gestating Sow Diet",
           "animal_type": "Swine",
           "stage": "Gestating",
-          "cost_per_ton": 221.8,
-          "cost_per_kg": 0.2218,
+          "cost_per_ton": 227.38,
+          "cost_per_kg": 0.2274,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 68.0,
-              "price": 180.0,
-              "cost": 122.4,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 126.14,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 13.0,
-              "price": 350.0,
-              "cost": 45.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 44.46,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Wheat middlings",
-              "ingredient_code": "",
               "ratio": 10.0,
-              "price": 200.0,
-              "cost": 20.0,
-              "price_source": "default"
+              "price": 210.0,
+              "cost": 21.0,
+              "ingredient_code": "ING_WHEAT",
+              "price_source": "public"
             },
             {
               "name": "Premix, sow",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_WHEAT": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$221.8/ton",
-      "timestamp": "2026-04-15T14:39:47.005627"
+      "detail": "cost=$227.38/ton",
+      "timestamp": "2026-04-15T17:38:37.493688"
     },
     {
       "test_id": "FC-13",
@@ -1013,87 +1098,95 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Lactating Sow Diet for Swine (Lactating stage) is $280.32/ton ($0.2803/kg).",
           "formula_name": "Lactating Sow Diet",
           "animal_type": "Swine",
           "stage": "Lactating",
-          "cost_per_ton": 275.3,
-          "cost_per_kg": 0.2753,
+          "cost_per_ton": 280.32,
+          "cost_per_kg": 0.2803,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 60.0,
-              "price": 180.0,
-              "cost": 108.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 111.3,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 22.0,
-              "price": 350.0,
-              "cost": 77.0,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 75.24,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 3.0,
-              "price": 1800.0,
-              "cost": 54.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 55.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, sow",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             },
             {
               "name": "L-Lysine HCl",
-              "ingredient_code": "",
               "ratio": 0.2,
-              "price": 1200.0,
-              "cost": 2.4,
-              "price_source": "default"
+              "price": 1250.0,
+              "cost": 2.5,
+              "ingredient_code": "ING_LYS",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public",
+            "ING_LYS": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$275.3/ton",
-      "timestamp": "2026-04-15T14:39:47.007420"
+      "detail": "cost=$280.32/ton",
+      "timestamp": "2026-04-15T17:38:37.495015"
     },
     {
       "test_id": "FC-14",
@@ -1103,79 +1196,86 @@
       "actual": {
         "success": true,
         "data": {
+          "summary": "The estimated cost for Turkey Starter for Turkey (Starter stage) is $340.73/ton ($0.3407/kg).",
           "formula_name": "Turkey Starter",
           "animal_type": "Turkey",
           "stage": "Starter",
-          "cost_per_ton": 336.4,
-          "cost_per_kg": 0.3364,
+          "cost_per_ton": 340.73,
+          "cost_per_kg": 0.3407,
           "currency": "USD",
           "details": [
             {
               "name": "Corn, grain",
-              "ingredient_code": "",
               "ratio": 50.0,
-              "price": 180.0,
-              "cost": 90.0,
-              "price_source": "default"
+              "price": 185.5,
+              "cost": 92.75,
+              "ingredient_code": "ING_CORN",
+              "price_source": "public"
             },
             {
               "name": "Soybean meal, 48%",
-              "ingredient_code": "",
               "ratio": 35.0,
-              "price": 350.0,
-              "cost": 122.5,
-              "price_source": "default"
+              "price": 342.0,
+              "cost": 119.7,
+              "ingredient_code": "ING_SBM",
+              "price_source": "public"
             },
             {
               "name": "Fish meal, 65%",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 1800.0,
-              "cost": 90.0,
-              "price_source": "default"
+              "price": 1850.0,
+              "cost": 92.5,
+              "ingredient_code": "ING_FISHM",
+              "price_source": "public"
             },
             {
               "name": "Premix, turkey",
-              "ingredient_code": "",
               "ratio": 5.0,
-              "price": 450.0,
-              "cost": 22.5,
-              "price_source": "default"
+              "price": 480.0,
+              "cost": 24.0,
+              "ingredient_code": "ING_PREMIX",
+              "price_source": "public"
             },
             {
               "name": "Dicalcium phosphate",
-              "ingredient_code": "",
               "ratio": 1.5,
-              "price": 650.0,
-              "cost": 9.75,
-              "price_source": "default"
+              "price": 680.0,
+              "cost": 10.2,
+              "ingredient_code": "ING_DCP",
+              "price_source": "public"
             },
             {
               "name": "Limestone, ag",
-              "ingredient_code": "",
               "ratio": 1.0,
-              "price": 120.0,
-              "cost": 1.2,
-              "price_source": "default"
+              "price": 115.0,
+              "cost": 1.15,
+              "ingredient_code": "ING_LIME",
+              "price_source": "public"
             },
             {
               "name": "Salt, white",
-              "ingredient_code": "",
               "ratio": 0.3,
-              "price": 150.0,
-              "cost": 0.45,
-              "price_source": "default"
+              "price": 145.0,
+              "cost": 0.43,
+              "ingredient_code": "ING_SALT",
+              "price_source": "public"
             }
           ],
           "price_sources": {
-            "": "default"
+            "ING_CORN": "public",
+            "ING_SBM": "public",
+            "ING_FISHM": "public",
+            "ING_PREMIX": "public",
+            "ING_DCP": "public",
+            "ING_LIME": "public",
+            "ING_SALT": "public"
           },
           "source": null
         }
       },
       "passed": true,
-      "detail": "cost=$336.4/ton",
-      "timestamp": "2026-04-15T14:39:47.009162"
+      "detail": "cost=$340.73/ton",
+      "timestamp": "2026-04-15T17:38:37.496285"
     },
     {
       "test_id": "FC-15",
@@ -1184,11 +1284,11 @@
       "expected": "Should return error",
       "actual": {
         "success": false,
-        "error": "\u914d\u65b9 'Nonexistent Formula' \u4e0d\u5b58\u5728"
+        "error": "I couldn't find a formula named 'Nonexistent Formula' in our database. Would you like me to list the available formulas, or add this as a private formula?"
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-15T14:39:47.010043"
+      "timestamp": "2026-04-15T17:38:37.496916"
     },
     {
       "test_id": "PL-01",
@@ -1209,7 +1309,7 @@
       },
       "passed": true,
       "detail": "price=$185.5/ton",
-      "timestamp": "2026-04-15T14:39:47.010944"
+      "timestamp": "2026-04-15T17:38:37.498191"
     },
     {
       "test_id": "PL-02",
@@ -1230,7 +1330,7 @@
       },
       "passed": true,
       "detail": "price=$342.0/ton",
-      "timestamp": "2026-04-15T14:39:47.011832"
+      "timestamp": "2026-04-15T17:38:37.498869"
     },
     {
       "test_id": "PL-03",
@@ -1240,9 +1340,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Fish meal",
+          "ingredient_code": "ING_FISHM",
+          "price": 1850.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1250,8 +1350,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.012718"
+      "detail": "price=$1850.0/ton",
+      "timestamp": "2026-04-15T17:38:37.499515"
     },
     {
       "test_id": "PL-04",
@@ -1272,7 +1372,7 @@
       },
       "passed": true,
       "detail": "price=$210.0/ton",
-      "timestamp": "2026-04-15T14:39:47.013582"
+      "timestamp": "2026-04-15T17:38:37.500152"
     },
     {
       "test_id": "PL-05",
@@ -1282,9 +1382,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Limestone",
+          "ingredient_code": "ING_LIME",
+          "price": 115.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1292,8 +1392,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.014451"
+      "detail": "price=$115.0/ton",
+      "timestamp": "2026-04-15T17:38:37.500814"
     },
     {
       "test_id": "PL-06",
@@ -1303,9 +1403,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Premix",
+          "ingredient_code": "ING_PREMIX",
+          "price": 480.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1313,8 +1413,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.015323"
+      "detail": "price=$480.0/ton",
+      "timestamp": "2026-04-15T17:38:37.501508"
     },
     {
       "test_id": "PL-07",
@@ -1324,9 +1424,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "DDGS",
+          "ingredient_code": "ING_DDGS",
+          "price": 195.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1334,8 +1434,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.016180"
+      "detail": "price=$195.0/ton",
+      "timestamp": "2026-04-15T17:38:37.502232"
     },
     {
       "test_id": "PL-08",
@@ -1356,7 +1456,7 @@
       },
       "passed": true,
       "detail": "price=$185.5/ton",
-      "timestamp": "2026-04-15T14:39:47.017074"
+      "timestamp": "2026-04-15T17:38:37.502889"
     },
     {
       "test_id": "PL-09",
@@ -1377,7 +1477,7 @@
       },
       "passed": true,
       "detail": "price=$342.0/ton",
-      "timestamp": "2026-04-15T14:39:47.017937"
+      "timestamp": "2026-04-15T17:38:37.503518"
     },
     {
       "test_id": "PL-10",
@@ -1387,9 +1487,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "L-Lysine",
+          "ingredient_code": "ING_LYS",
+          "price": 1250.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1397,8 +1497,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.018827"
+      "detail": "price=$1250.0/ton",
+      "timestamp": "2026-04-15T17:38:37.504146"
     },
     {
       "test_id": "PL-11",
@@ -1408,9 +1508,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "DL-Methionine",
+          "ingredient_code": "ING_MET",
+          "price": 2550.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1418,8 +1518,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.019736"
+      "detail": "price=$2550.0/ton",
+      "timestamp": "2026-04-15T17:38:37.504776"
     },
     {
       "test_id": "PL-12",
@@ -1429,9 +1529,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Dicalcium phosphate",
+          "ingredient_code": "ING_DCP",
+          "price": 680.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1439,8 +1539,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.020689"
+      "detail": "price=$680.0/ton",
+      "timestamp": "2026-04-15T17:38:37.505394"
     },
     {
       "test_id": "PL-13",
@@ -1450,9 +1550,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Salt",
+          "ingredient_code": "ING_SALT",
+          "price": 145.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1460,8 +1560,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.021628"
+      "detail": "price=$145.0/ton",
+      "timestamp": "2026-04-15T17:38:37.506076"
     },
     {
       "test_id": "PL-14",
@@ -1471,9 +1571,9 @@
       "actual": {
         "success": true,
         "data": {
-          "ingredient": "Rice",
-          "ingredient_code": "ING_RICE",
-          "price": 320.0,
+          "ingredient": "Alfalfa",
+          "ingredient_code": "ING_ALFALFA",
+          "price": 220.0,
           "currency": "USD",
           "unit": "ton",
           "date": "2026-04-15",
@@ -1481,8 +1581,8 @@
         }
       },
       "passed": true,
-      "detail": "price=$320.0/ton",
-      "timestamp": "2026-04-15T14:39:47.022534"
+      "detail": "price=$220.0/ton",
+      "timestamp": "2026-04-15T17:38:37.506741"
     },
     {
       "test_id": "PL-15",
@@ -1680,7 +1780,7 @@
       },
       "passed": true,
       "detail": "22 prices listed",
-      "timestamp": "2026-04-15T14:39:47.023055"
+      "timestamp": "2026-04-15T17:38:37.507107"
     },
     {
       "test_id": "CR-01",
@@ -1701,14 +1801,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-15 06:39:46"
+              "created_at": "2026-04-15 09:38:37"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customers",
-      "timestamp": "2026-04-15T14:39:47.023542"
+      "timestamp": "2026-04-15T17:38:37.507470"
     },
     {
       "test_id": "CR-02",
@@ -1729,14 +1829,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-15 06:39:46"
+              "created_at": "2026-04-15 09:38:37"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customers",
-      "timestamp": "2026-04-15T14:39:47.024006"
+      "timestamp": "2026-04-15T17:38:37.507810"
     },
     {
       "test_id": "CR-03",
@@ -1756,14 +1856,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-15 06:39:46"
+              "created_at": "2026-04-15 09:38:37"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Customer found",
-      "timestamp": "2026-04-15T14:39:47.025103"
+      "timestamp": "2026-04-15T17:38:37.508553"
     },
     {
       "test_id": "CR-04",
@@ -1783,14 +1883,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-15 06:39:46"
+              "created_at": "2026-04-15 09:38:37"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customer(s)",
-      "timestamp": "2026-04-15T14:39:47.026024"
+      "timestamp": "2026-04-15T17:38:37.509207"
     },
     {
       "test_id": "CR-05",
@@ -1814,7 +1914,7 @@
       },
       "passed": true,
       "detail": "Customer 'Johnson Farm' added",
-      "timestamp": "2026-04-15T14:39:47.029275"
+      "timestamp": "2026-04-15T17:38:37.511564"
     },
     {
       "test_id": "CR-06",
@@ -1838,7 +1938,7 @@
       },
       "passed": true,
       "detail": "Customer 'Brown Ranch swine' added",
-      "timestamp": "2026-04-15T14:39:47.032457"
+      "timestamp": "2026-04-15T17:38:37.513651"
     },
     {
       "test_id": "CR-07",
@@ -1858,14 +1958,14 @@
               "animal_type": null,
               "scale": null,
               "notes": "add customer Johnson Farm phone 555-0200",
-              "created_at": "2026-04-15 06:39:47"
+              "created_at": "2026-04-15 09:38:37"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Customer found",
-      "timestamp": "2026-04-15T14:39:47.033411"
+      "timestamp": "2026-04-15T17:38:37.513992"
     },
     {
       "test_id": "CR-08",
@@ -1881,7 +1981,7 @@
       },
       "passed": true,
       "detail": "You have 3 customer(s)",
-      "timestamp": "2026-04-15T14:39:47.033895"
+      "timestamp": "2026-04-15T17:38:37.514347"
     },
     {
       "test_id": "CR-09",
@@ -1897,7 +1997,7 @@
       },
       "passed": true,
       "detail": "You have 3 customer(s)",
-      "timestamp": "2026-04-15T14:39:47.034398"
+      "timestamp": "2026-04-15T17:38:37.514681"
     },
     {
       "test_id": "CR-10",
@@ -1912,7 +2012,7 @@
       },
       "passed": true,
       "detail": "Customer 'Johnson Farm' updated",
-      "timestamp": "2026-04-15T14:39:47.037361"
+      "timestamp": "2026-04-15T17:38:37.517015"
     },
     {
       "test_id": "CR-11",
@@ -1927,7 +2027,7 @@
       },
       "passed": true,
       "detail": "Customer 'Brown Ranch' deleted",
-      "timestamp": "2026-04-15T14:39:47.040743"
+      "timestamp": "2026-04-15T17:38:37.519685"
     },
     {
       "test_id": "CR-12",
@@ -1940,7 +2040,7 @@
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-15T14:39:47.040842"
+      "timestamp": "2026-04-15T17:38:37.519727"
     },
     {
       "test_id": "NA-01",
@@ -1987,7 +2087,7 @@
       },
       "passed": true,
       "detail": "protein=19.1%, Ca=1.89%",
-      "timestamp": "2026-04-15T14:39:47.042317"
+      "timestamp": "2026-04-15T17:38:37.520447"
     },
     {
       "test_id": "NA-02",
@@ -2034,7 +2134,7 @@
       },
       "passed": true,
       "detail": "protein=14.47%, Ca=1.72%",
-      "timestamp": "2026-04-15T14:39:47.043245"
+      "timestamp": "2026-04-15T17:38:37.521101"
     },
     {
       "test_id": "NA-03",
@@ -2081,7 +2181,7 @@
       },
       "passed": true,
       "detail": "protein=12.89%, Ca=1.71%",
-      "timestamp": "2026-04-15T14:39:47.044171"
+      "timestamp": "2026-04-15T17:38:37.521769"
     },
     {
       "test_id": "NA-04",
@@ -2128,7 +2228,7 @@
       },
       "passed": true,
       "detail": "protein=23.08%, Ca=2.01%",
-      "timestamp": "2026-04-15T14:39:47.045098"
+      "timestamp": "2026-04-15T17:38:37.522435"
     },
     {
       "test_id": "NA-05",
@@ -2175,7 +2275,7 @@
       },
       "passed": true,
       "detail": "protein=14.9%, Ca=4.38%",
-      "timestamp": "2026-04-15T14:39:47.046033"
+      "timestamp": "2026-04-15T17:38:37.523073"
     },
     {
       "test_id": "NA-06",
@@ -2201,7 +2301,7 @@
       },
       "passed": true,
       "detail": "protein=15.87%, Ca=1.39%",
-      "timestamp": "2026-04-15T14:39:47.047014"
+      "timestamp": "2026-04-15T17:38:37.523727"
     },
     {
       "test_id": "NA-07",
@@ -2248,7 +2348,7 @@
       },
       "passed": true,
       "detail": "protein=12.48%, Ca=1.83%",
-      "timestamp": "2026-04-15T14:39:47.047957"
+      "timestamp": "2026-04-15T17:38:37.524367"
     },
     {
       "test_id": "NA-08",
@@ -2274,7 +2374,7 @@
       },
       "passed": true,
       "detail": "protein=45.53%, Ca=4.33%",
-      "timestamp": "2026-04-15T14:39:47.048896"
+      "timestamp": "2026-04-15T17:38:37.525012"
     },
     {
       "test_id": "NA-09",
@@ -2300,7 +2400,7 @@
       },
       "passed": true,
       "detail": "protein=38.03%, Ca=3.35%",
-      "timestamp": "2026-04-15T14:39:47.049837"
+      "timestamp": "2026-04-15T17:38:37.525674"
     },
     {
       "test_id": "NA-10",
@@ -2347,7 +2447,7 @@
       },
       "passed": true,
       "detail": "protein=13.25%, Ca=1.71%",
-      "timestamp": "2026-04-15T14:39:47.050756"
+      "timestamp": "2026-04-15T17:38:37.526415"
     },
     {
       "test_id": "NA-11",
@@ -2394,7 +2494,7 @@
       },
       "passed": true,
       "detail": "protein=17.66%, Ca=1.88%",
-      "timestamp": "2026-04-15T14:39:47.051703"
+      "timestamp": "2026-04-15T17:38:37.527106"
     },
     {
       "test_id": "NA-12",
@@ -2601,7 +2701,7 @@
       },
       "passed": true,
       "detail": "protein=?%, Ca=?%",
-      "timestamp": "2026-04-15T14:39:47.052880"
+      "timestamp": "2026-04-15T17:38:37.528025"
     },
     {
       "test_id": "NA-13",
@@ -2614,7 +2714,7 @@
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-15T14:39:47.052929"
+      "timestamp": "2026-04-15T17:38:37.528077"
     }
   ]
 }

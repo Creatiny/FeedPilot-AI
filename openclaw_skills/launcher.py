@@ -13,7 +13,7 @@ import asyncio
 from pathlib import Path
 
 # Set up paths - import from base directory to maintain package structure
-BASE_DIR = Path('/root/.openclaw/workspace/feed-ai-assistant')
+BASE_DIR = Path('/home/kenny/.openclaw/workspace-feedsales')
 DB_PATH = BASE_DIR / 'data' / 'feed_sales.db'
 
 # Add base directory to Python path (not src)

@@ -40,7 +40,7 @@ class CustomerService:
             return ServiceResult(
                 success=False,
                 error_code='E002',
-                error_message=f"客户 '{name}' 不存在"
+                error_message=f"Customer '{name}' not found"
             )
     
     def list_customers(self, user_id: str) -> ServiceResult:
@@ -67,7 +67,7 @@ class CustomerService:
             return ServiceResult(
                 success=False,
                 error_code='E001',
-                error_message='客户名称不能为空'
+                error_message='Customer name cannot be empty'
             )
         
         with self.db_pool.get_connection() as conn:
@@ -82,7 +82,7 @@ class CustomerService:
                 return ServiceResult(
                     success=False,
                     error_code='E004',
-                    error_message=f"客户 '{data['name']}' 已存在"
+                    error_message=f"Customer '{data['name']}' already exists"
                 )
             
             # 插入客户（字段与 schema.sql 一致）
@@ -129,7 +129,7 @@ class CustomerService:
                 return ServiceResult(
                     success=False,
                     error_code='E003',
-                    error_message='无权修改此客户或客户不存在'
+                    error_message='No permission to update this customer or customer not found'
                 )
             
             # 构建更新语句（字段与 schema.sql 一致）
@@ -145,7 +145,7 @@ class CustomerService:
                 return ServiceResult(
                     success=False,
                     error_code='E001',
-                    error_message='没有要更新的字段'
+                    error_message='No fields to update'
                 )
             
             update_values.extend([customer_id, user_id])
@@ -181,7 +181,7 @@ class CustomerService:
                 return ServiceResult(
                     success=False,
                     error_code='E003',
-                    error_message='无权删除此客户或客户不存在'
+                    error_message='No permission to delete this customer or customer not found'
                 )
             
             cursor.execute("DELETE FROM customers WHERE id = ?", (customer_id,))
