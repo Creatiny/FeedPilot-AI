@@ -86,6 +86,13 @@ class FormulaCostSkill:
             if len(name) < 50:
                 return name
 
+        # Match: cost for xxx  (贪婪，匹配到字符串结尾)
+        match = re.search(r'cost\s+for\s+(.+)', message, re.IGNORECASE)
+        if match:
+            name = match.group(1).strip()
+            if len(name) < 50:
+                return name
+
         # Match: calculate xxx cost
         match = re.search(r'(?:calculate\s+)?(.+?)\s+(?:cost|price)', message, re.IGNORECASE)
         if match:

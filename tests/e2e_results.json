@@ -1,0 +1,2620 @@
+{
+  "run_time": "2026-04-15T14:39:47.052935",
+  "total": 55,
+  "passed": 55,
+  "failed": 0,
+  "pass_rate": "100.0%",
+  "results": [
+    {
+      "test_id": "FC-01",
+      "category": "formula_cost",
+      "query": "cost for Nursery Diet 1",
+      "expected": "Returns cost with formula details",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Nursery Diet 1",
+          "animal_type": "Swine",
+          "stage": "Nursery",
+          "cost_per_ton": 285.8,
+          "cost_per_kg": 0.2858,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 60.0,
+              "price": 180.0,
+              "cost": 108.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 25.0,
+              "price": 350.0,
+              "cost": 87.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 3.0,
+              "price": 1800.0,
+              "cost": 54.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, swine",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$285.8/ton",
+      "timestamp": "2026-04-15T14:39:46.984838"
+    },
+    {
+      "test_id": "FC-02",
+      "category": "formula_cost",
+      "query": "cost for Grower Diet 1",
+      "expected": "Returns cost for grower formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Grower Diet 1",
+          "animal_type": "Swine",
+          "stage": "Growing",
+          "cost_per_ton": 221.7,
+          "cost_per_kg": 0.2217,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 68.0,
+              "price": 180.0,
+              "cost": 122.4,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 18.0,
+              "price": 350.0,
+              "cost": 63.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, swine",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$221.7/ton",
+      "timestamp": "2026-04-15T14:39:46.986831"
+    },
+    {
+      "test_id": "FC-03",
+      "category": "formula_cost",
+      "query": "cost for Finisher Diet",
+      "expected": "Returns cost for finisher formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Finisher Diet",
+          "animal_type": "Swine",
+          "stage": "Finishing",
+          "cost_per_ton": 214.9,
+          "cost_per_kg": 0.2149,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 72.0,
+              "price": 180.0,
+              "cost": 129.6,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 14.0,
+              "price": 350.0,
+              "cost": 49.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, swine",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$214.9/ton",
+      "timestamp": "2026-04-15T14:39:46.988804"
+    },
+    {
+      "test_id": "FC-04",
+      "category": "formula_cost",
+      "query": "cost for Broiler Starter",
+      "expected": "Returns cost for broiler formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Broiler Starter",
+          "animal_type": "Broiler",
+          "stage": "Starter",
+          "cost_per_ton": 331.9,
+          "cost_per_kg": 0.3319,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 52.0,
+              "price": 180.0,
+              "cost": 93.6,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 32.0,
+              "price": 350.0,
+              "cost": 112.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 1800.0,
+              "cost": 90.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, broiler",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$331.9/ton",
+      "timestamp": "2026-04-15T14:39:46.990593"
+    },
+    {
+      "test_id": "FC-05",
+      "category": "formula_cost",
+      "query": "cost for Layer Diet",
+      "expected": "Returns cost for layer formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Layer Diet",
+          "animal_type": "Layer",
+          "stage": "Laying",
+          "cost_per_ton": 223.9,
+          "cost_per_kg": 0.2239,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 62.0,
+              "price": 180.0,
+              "cost": 111.6,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 20.0,
+              "price": 350.0,
+              "cost": 70.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, layer",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 8.0,
+              "price": 120.0,
+              "cost": 9.6,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$223.9/ton",
+      "timestamp": "2026-04-15T14:39:46.992400"
+    },
+    {
+      "test_id": "FC-06",
+      "category": "formula_cost",
+      "query": "cost for Lactating Cow Diet",
+      "expected": "Returns cost for dairy formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Lactating Cow Diet",
+          "animal_type": "Dairy Cattle",
+          "stage": "Lactating",
+          "cost_per_ton": 239.0,
+          "cost_per_kg": 0.239,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn silage",
+              "ingredient_code": "",
+              "ratio": 35.0,
+              "price": 180.0,
+              "cost": 63.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 30.0,
+              "price": 180.0,
+              "cost": 54.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 18.0,
+              "price": 350.0,
+              "cost": 63.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Alfalfa hay, early bloom",
+              "ingredient_code": "",
+              "ratio": 10.0,
+              "price": 300.0,
+              "cost": 30.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, dairy",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 650.0,
+              "cost": 6.5,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$239.0/ton",
+      "timestamp": "2026-04-15T14:39:46.994229"
+    },
+    {
+      "test_id": "FC-07",
+      "category": "formula_cost",
+      "query": "cost for Beef Cattle Finisher",
+      "expected": "Returns cost for beef formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Beef Cattle Finisher",
+          "animal_type": "Beef Cattle",
+          "stage": "Finishing",
+          "cost_per_ton": 224.9,
+          "cost_per_kg": 0.2249,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 70.0,
+              "price": 180.0,
+              "cost": 126.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 10.0,
+              "price": 350.0,
+              "cost": 35.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Alfalfa hay, early bloom",
+              "ingredient_code": "",
+              "ratio": 10.0,
+              "price": 300.0,
+              "cost": 30.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, beef",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$224.9/ton",
+      "timestamp": "2026-04-15T14:39:46.996169"
+    },
+    {
+      "test_id": "FC-08",
+      "category": "formula_cost",
+      "query": "cost for Trout Starter",
+      "expected": "Returns cost for aquatic formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Trout Starter",
+          "animal_type": "Aquatic",
+          "stage": "Fry",
+          "cost_per_ton": 1054.65,
+          "cost_per_kg": 1.0547,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 50.0,
+              "price": 1800.0,
+              "cost": 900.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 25.0,
+              "price": 350.0,
+              "cost": 87.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish oil",
+              "ingredient_code": "",
+              "ratio": 10.0,
+              "price": 300.0,
+              "cost": 30.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, trout",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 2.0,
+              "price": 650.0,
+              "cost": 13.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$1054.65/ton",
+      "timestamp": "2026-04-15T14:39:46.998177"
+    },
+    {
+      "test_id": "FC-09",
+      "category": "formula_cost",
+      "query": "cost for Catfish Grower",
+      "expected": "Returns cost for catfish formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Catfish Grower",
+          "animal_type": "Aquatic",
+          "stage": "Grower",
+          "cost_per_ton": 735.65,
+          "cost_per_kg": 0.7357,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 30.0,
+              "price": 1800.0,
+              "cost": 540.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 35.0,
+              "price": 350.0,
+              "cost": 122.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 20.0,
+              "price": 180.0,
+              "cost": 36.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, catfish",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 2.0,
+              "price": 650.0,
+              "cost": 13.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$735.65/ton",
+      "timestamp": "2026-04-15T14:39:46.999978"
+    },
+    {
+      "test_id": "FC-10",
+      "category": "formula_cost",
+      "query": "calculate Nursery Diet 1 cost",
+      "expected": "Alternate English phrasing",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Nursery Diet 1",
+          "animal_type": "Swine",
+          "stage": "Nursery",
+          "cost_per_ton": 285.8,
+          "cost_per_kg": 0.2858,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 60.0,
+              "price": 180.0,
+              "cost": 108.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 25.0,
+              "price": 350.0,
+              "cost": 87.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 3.0,
+              "price": 1800.0,
+              "cost": 54.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, swine",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$285.8/ton",
+      "timestamp": "2026-04-15T14:39:47.001946"
+    },
+    {
+      "test_id": "FC-11",
+      "category": "formula_cost",
+      "query": "Nursery Diet 1 price",
+      "expected": "Price phrasing variant",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Nursery Diet 1",
+          "animal_type": "Swine",
+          "stage": "Nursery",
+          "cost_per_ton": 285.8,
+          "cost_per_kg": 0.2858,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 60.0,
+              "price": 180.0,
+              "cost": 108.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 25.0,
+              "price": 350.0,
+              "cost": 87.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 3.0,
+              "price": 1800.0,
+              "cost": 54.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, swine",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$285.8/ton",
+      "timestamp": "2026-04-15T14:39:47.003850"
+    },
+    {
+      "test_id": "FC-12",
+      "category": "formula_cost",
+      "query": "cost for Gestating Sow Diet",
+      "expected": "Sow formula cost",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Gestating Sow Diet",
+          "animal_type": "Swine",
+          "stage": "Gestating",
+          "cost_per_ton": 221.8,
+          "cost_per_kg": 0.2218,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 68.0,
+              "price": 180.0,
+              "cost": 122.4,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 13.0,
+              "price": 350.0,
+              "cost": 45.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Wheat middlings",
+              "ingredient_code": "",
+              "ratio": 10.0,
+              "price": 200.0,
+              "cost": 20.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, sow",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$221.8/ton",
+      "timestamp": "2026-04-15T14:39:47.005627"
+    },
+    {
+      "test_id": "FC-13",
+      "category": "formula_cost",
+      "query": "cost for Lactating Sow Diet",
+      "expected": "Lactating sow formula",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Lactating Sow Diet",
+          "animal_type": "Swine",
+          "stage": "Lactating",
+          "cost_per_ton": 275.3,
+          "cost_per_kg": 0.2753,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 60.0,
+              "price": 180.0,
+              "cost": 108.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 22.0,
+              "price": 350.0,
+              "cost": 77.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 3.0,
+              "price": 1800.0,
+              "cost": 54.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, sow",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            },
+            {
+              "name": "L-Lysine HCl",
+              "ingredient_code": "",
+              "ratio": 0.2,
+              "price": 1200.0,
+              "cost": 2.4,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$275.3/ton",
+      "timestamp": "2026-04-15T14:39:47.007420"
+    },
+    {
+      "test_id": "FC-14",
+      "category": "formula_cost",
+      "query": "cost for Turkey Starter",
+      "expected": "Turkey formula cost",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula_name": "Turkey Starter",
+          "animal_type": "Turkey",
+          "stage": "Starter",
+          "cost_per_ton": 336.4,
+          "cost_per_kg": 0.3364,
+          "currency": "USD",
+          "details": [
+            {
+              "name": "Corn, grain",
+              "ingredient_code": "",
+              "ratio": 50.0,
+              "price": 180.0,
+              "cost": 90.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Soybean meal, 48%",
+              "ingredient_code": "",
+              "ratio": 35.0,
+              "price": 350.0,
+              "cost": 122.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Fish meal, 65%",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 1800.0,
+              "cost": 90.0,
+              "price_source": "default"
+            },
+            {
+              "name": "Premix, turkey",
+              "ingredient_code": "",
+              "ratio": 5.0,
+              "price": 450.0,
+              "cost": 22.5,
+              "price_source": "default"
+            },
+            {
+              "name": "Dicalcium phosphate",
+              "ingredient_code": "",
+              "ratio": 1.5,
+              "price": 650.0,
+              "cost": 9.75,
+              "price_source": "default"
+            },
+            {
+              "name": "Limestone, ag",
+              "ingredient_code": "",
+              "ratio": 1.0,
+              "price": 120.0,
+              "cost": 1.2,
+              "price_source": "default"
+            },
+            {
+              "name": "Salt, white",
+              "ingredient_code": "",
+              "ratio": 0.3,
+              "price": 150.0,
+              "cost": 0.45,
+              "price_source": "default"
+            }
+          ],
+          "price_sources": {
+            "": "default"
+          },
+          "source": null
+        }
+      },
+      "passed": true,
+      "detail": "cost=$336.4/ton",
+      "timestamp": "2026-04-15T14:39:47.009162"
+    },
+    {
+      "test_id": "FC-15",
+      "category": "formula_cost",
+      "query": "cost for Nonexistent Formula",
+      "expected": "Should return error",
+      "actual": {
+        "success": false,
+        "error": "\u914d\u65b9 'Nonexistent Formula' \u4e0d\u5b58\u5728"
+      },
+      "passed": true,
+      "detail": "Correctly rejected",
+      "timestamp": "2026-04-15T14:39:47.010043"
+    },
+    {
+      "test_id": "PL-01",
+      "category": "price_lookup",
+      "query": "price of Corn",
+      "expected": "Returns Corn price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Corn",
+          "ingredient_code": "ING_CORN",
+          "price": 185.5,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$185.5/ton",
+      "timestamp": "2026-04-15T14:39:47.010944"
+    },
+    {
+      "test_id": "PL-02",
+      "category": "price_lookup",
+      "query": "price of Soybean meal",
+      "expected": "Returns SBM price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Soybean meal",
+          "ingredient_code": "ING_SBM",
+          "price": 342.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$342.0/ton",
+      "timestamp": "2026-04-15T14:39:47.011832"
+    },
+    {
+      "test_id": "PL-03",
+      "category": "price_lookup",
+      "query": "price of Fish meal",
+      "expected": "Returns fish meal price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.012718"
+    },
+    {
+      "test_id": "PL-04",
+      "category": "price_lookup",
+      "query": "price of Wheat",
+      "expected": "Returns wheat price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Wheat",
+          "ingredient_code": "ING_WHEAT",
+          "price": 210.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$210.0/ton",
+      "timestamp": "2026-04-15T14:39:47.013582"
+    },
+    {
+      "test_id": "PL-05",
+      "category": "price_lookup",
+      "query": "price of Limestone",
+      "expected": "Returns limestone price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.014451"
+    },
+    {
+      "test_id": "PL-06",
+      "category": "price_lookup",
+      "query": "price of Premix",
+      "expected": "Returns premix price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.015323"
+    },
+    {
+      "test_id": "PL-07",
+      "category": "price_lookup",
+      "query": "price of DDGS",
+      "expected": "Returns DDGS price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.016180"
+    },
+    {
+      "test_id": "PL-08",
+      "category": "price_lookup",
+      "query": "Corn price",
+      "expected": "Short form query",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Corn",
+          "ingredient_code": "ING_CORN",
+          "price": 185.5,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$185.5/ton",
+      "timestamp": "2026-04-15T14:39:47.017074"
+    },
+    {
+      "test_id": "PL-09",
+      "category": "price_lookup",
+      "query": "Soybean meal price",
+      "expected": "Short form query",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Soybean meal",
+          "ingredient_code": "ING_SBM",
+          "price": 342.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$342.0/ton",
+      "timestamp": "2026-04-15T14:39:47.017937"
+    },
+    {
+      "test_id": "PL-10",
+      "category": "price_lookup",
+      "query": "L-Lysine price",
+      "expected": "Additive price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.018827"
+    },
+    {
+      "test_id": "PL-11",
+      "category": "price_lookup",
+      "query": "DL-Methionine price",
+      "expected": "Additive price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.019736"
+    },
+    {
+      "test_id": "PL-12",
+      "category": "price_lookup",
+      "query": "Dicalcium phosphate price",
+      "expected": "Mineral price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.020689"
+    },
+    {
+      "test_id": "PL-13",
+      "category": "price_lookup",
+      "query": "Salt price",
+      "expected": "Salt price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.021628"
+    },
+    {
+      "test_id": "PL-14",
+      "category": "price_lookup",
+      "query": "Alfalfa price",
+      "expected": "Fiber source price",
+      "actual": {
+        "success": true,
+        "data": {
+          "ingredient": "Rice",
+          "ingredient_code": "ING_RICE",
+          "price": 320.0,
+          "currency": "USD",
+          "unit": "ton",
+          "date": "2026-04-15",
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "price=$320.0/ton",
+      "timestamp": "2026-04-15T14:39:47.022534"
+    },
+    {
+      "test_id": "PL-15",
+      "category": "price_lookup",
+      "query": "show all prices",
+      "expected": "Returns all price list",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "All ingredient prices",
+          "count": 22,
+          "prices": [
+            {
+              "ingredient_code": "ING_ALFALFA",
+              "ingredient_name": "Alfalfa",
+              "price": 220.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_BARLEY",
+              "ingredient_name": "Barley",
+              "price": 175.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_CANOLA",
+              "ingredient_name": "Canola meal",
+              "price": 310.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_CORN",
+              "ingredient_name": "Corn",
+              "price": 185.5,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_SILAGE",
+              "ingredient_name": "Corn silage",
+              "price": 55.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_COTTON",
+              "ingredient_name": "Cottonseed meal",
+              "price": 290.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_DDGS",
+              "ingredient_name": "DDGS",
+              "price": 195.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_MET",
+              "ingredient_name": "DL-Methionine",
+              "price": 2550.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_DCP",
+              "ingredient_name": "Dicalcium phosphate",
+              "price": 680.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_FISHM",
+              "ingredient_name": "Fish meal",
+              "price": 1850.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_OIL",
+              "ingredient_name": "Fish oil",
+              "price": 950.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_HAY",
+              "ingredient_name": "Grass hay",
+              "price": 180.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_LYS",
+              "ingredient_name": "L-Lysine",
+              "price": 1250.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_LIME",
+              "ingredient_name": "Limestone",
+              "price": 115.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_MBM",
+              "ingredient_name": "Meat and bone meal",
+              "price": 450.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_MOLASSES",
+              "ingredient_name": "Molasses",
+              "price": 160.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_PREMIX",
+              "ingredient_name": "Premix",
+              "price": 480.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_RICE",
+              "ingredient_name": "Rice",
+              "price": 320.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_SALT",
+              "ingredient_name": "Salt",
+              "price": 145.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            },
+            {
+              "ingredient_code": "ING_SORGHUM",
+              "ingredient_name": "Sorghum",
+              "price": 178.0,
+              "currency": "USD",
+              "unit": "ton",
+              "source": "barchart",
+              "price_date": "2026-04-15"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "22 prices listed",
+      "timestamp": "2026-04-15T14:39:47.023055"
+    },
+    {
+      "test_id": "CR-01",
+      "category": "customer_record",
+      "query": "show all customers",
+      "expected": "Returns customer list",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Found 1 customers",
+          "count": 1,
+          "customers": [
+            {
+              "id": 1,
+              "name": "Smith Farm",
+              "phone": "555-0100",
+              "address": null,
+              "animal_type": "swine",
+              "scale": 500,
+              "notes": "Long-term customer",
+              "created_at": "2026-04-15 06:39:46"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "Found 1 customers",
+      "timestamp": "2026-04-15T14:39:47.023542"
+    },
+    {
+      "test_id": "CR-02",
+      "category": "customer_record",
+      "query": "list my customers",
+      "expected": "Returns customer list",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Found 1 customers",
+          "count": 1,
+          "customers": [
+            {
+              "id": 1,
+              "name": "Smith Farm",
+              "phone": "555-0100",
+              "address": null,
+              "animal_type": "swine",
+              "scale": 500,
+              "notes": "Long-term customer",
+              "created_at": "2026-04-15 06:39:46"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "Found 1 customers",
+      "timestamp": "2026-04-15T14:39:47.024006"
+    },
+    {
+      "test_id": "CR-03",
+      "category": "customer_record",
+      "query": "find customer Smith Farm",
+      "expected": "Finds existing customer",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer found",
+          "customers": [
+            {
+              "id": 1,
+              "name": "Smith Farm",
+              "phone": "555-0100",
+              "address": null,
+              "animal_type": "swine",
+              "scale": 500,
+              "notes": "Long-term customer",
+              "created_at": "2026-04-15 06:39:46"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "Customer found",
+      "timestamp": "2026-04-15T14:39:47.025103"
+    },
+    {
+      "test_id": "CR-04",
+      "category": "customer_record",
+      "query": "search customer Smith",
+      "expected": "Fuzzy search for Smith",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Found 1 customer(s)",
+          "customers": [
+            {
+              "id": 1,
+              "name": "Smith Farm",
+              "phone": "555-0100",
+              "address": null,
+              "animal_type": "swine",
+              "scale": 500,
+              "notes": "Long-term customer",
+              "created_at": "2026-04-15 06:39:46"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "Found 1 customer(s)",
+      "timestamp": "2026-04-15T14:39:47.026024"
+    },
+    {
+      "test_id": "CR-05",
+      "category": "customer_record",
+      "query": "add customer Johnson Farm phone 555-0200",
+      "expected": "Adds new customer",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer 'Johnson Farm' added",
+          "customer": {
+            "id": 2,
+            "name": "Johnson Farm",
+            "phone": "555-0200",
+            "address": null,
+            "animal_type": null,
+            "scale": null,
+            "notes": "add customer Johnson Farm phone 555-0200"
+          }
+        }
+      },
+      "passed": true,
+      "detail": "Customer 'Johnson Farm' added",
+      "timestamp": "2026-04-15T14:39:47.029275"
+    },
+    {
+      "test_id": "CR-06",
+      "category": "customer_record",
+      "query": "add customer Brown Ranch swine phone 555-0300",
+      "expected": "Adds with animal type",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer 'Brown Ranch swine' added",
+          "customer": {
+            "id": 3,
+            "name": "Brown Ranch swine",
+            "phone": "555-0300",
+            "address": null,
+            "animal_type": null,
+            "scale": null,
+            "notes": "add customer Brown Ranch swine phone 555-0300"
+          }
+        }
+      },
+      "passed": true,
+      "detail": "Customer 'Brown Ranch swine' added",
+      "timestamp": "2026-04-15T14:39:47.032457"
+    },
+    {
+      "test_id": "CR-07",
+      "category": "customer_record",
+      "query": "get customer Johnson Farm",
+      "expected": "Retrieves added customer",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer found",
+          "customers": [
+            {
+              "id": 2,
+              "name": "Johnson Farm",
+              "phone": "555-0200",
+              "address": null,
+              "animal_type": null,
+              "scale": null,
+              "notes": "add customer Johnson Farm phone 555-0200",
+              "created_at": "2026-04-15 06:39:47"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "Customer found",
+      "timestamp": "2026-04-15T14:39:47.033411"
+    },
+    {
+      "test_id": "CR-08",
+      "category": "customer_record",
+      "query": "how many customers do I have",
+      "expected": "Returns count",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "You have 3 customer(s)",
+          "count": 3
+        }
+      },
+      "passed": true,
+      "detail": "You have 3 customer(s)",
+      "timestamp": "2026-04-15T14:39:47.033895"
+    },
+    {
+      "test_id": "CR-09",
+      "category": "customer_record",
+      "query": "count customers",
+      "expected": "Returns count",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "You have 3 customer(s)",
+          "count": 3
+        }
+      },
+      "passed": true,
+      "detail": "You have 3 customer(s)",
+      "timestamp": "2026-04-15T14:39:47.034398"
+    },
+    {
+      "test_id": "CR-10",
+      "category": "customer_record",
+      "query": "update customer Johnson Farm phone 555-9999",
+      "expected": "Updates phone",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer 'Johnson Farm' updated"
+        }
+      },
+      "passed": true,
+      "detail": "Customer 'Johnson Farm' updated",
+      "timestamp": "2026-04-15T14:39:47.037361"
+    },
+    {
+      "test_id": "CR-11",
+      "category": "customer_record",
+      "query": "delete customer Brown Ranch",
+      "expected": "Deletes customer",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "Customer 'Brown Ranch' deleted"
+        }
+      },
+      "passed": true,
+      "detail": "Customer 'Brown Ranch' deleted",
+      "timestamp": "2026-04-15T14:39:47.040743"
+    },
+    {
+      "test_id": "CR-12",
+      "category": "customer_record",
+      "query": "add customer",
+      "expected": "Should fail: no name",
+      "actual": {
+        "success": false,
+        "error": "Customer name required"
+      },
+      "passed": true,
+      "detail": "Correctly rejected",
+      "timestamp": "2026-04-15T14:39:47.040842"
+    },
+    {
+      "test_id": "NA-01",
+      "category": "nutrition_analysis",
+      "query": "analyze Nursery Diet 1 nutrition",
+      "expected": "Returns nutrition analysis",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Nursery Diet 1",
+          "animal_type": "Swine",
+          "stage": "Nursery",
+          "nutrition": {
+            "protein": 19.1,
+            "calcium": 1.89,
+            "phosphorus": 1.23,
+            "lysine": 1.15
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 19.1,
+              "standard": 18.0,
+              "status": "\u2713 Meets"
+            },
+            "calcium": {
+              "actual": 1.89,
+              "standard": 0.7,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.23,
+              "standard": 0.55,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 1.15,
+              "standard": 1.2,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 8,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=19.1%, Ca=1.89%",
+      "timestamp": "2026-04-15T14:39:47.042317"
+    },
+    {
+      "test_id": "NA-02",
+      "category": "nutrition_analysis",
+      "query": "analyze Grower Diet 1 nutrition",
+      "expected": "Returns nutrition for grower",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Grower Diet 1",
+          "animal_type": "Swine",
+          "stage": "Growing",
+          "nutrition": {
+            "protein": 14.47,
+            "calcium": 1.72,
+            "phosphorus": 1.12,
+            "lysine": 0.81
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 14.47,
+              "standard": 16.0,
+              "status": "\u26a0 Below"
+            },
+            "calcium": {
+              "actual": 1.72,
+              "standard": 0.6,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.12,
+              "standard": 0.5,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 0.81,
+              "standard": 0.9,
+              "status": "\u26a0 Below"
+            }
+          },
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=14.47%, Ca=1.72%",
+      "timestamp": "2026-04-15T14:39:47.043245"
+    },
+    {
+      "test_id": "NA-03",
+      "category": "nutrition_analysis",
+      "query": "analyze Finisher Diet nutrition",
+      "expected": "Returns nutrition for finisher",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Finisher Diet",
+          "animal_type": "Swine",
+          "stage": "Finishing",
+          "nutrition": {
+            "protein": 12.89,
+            "calcium": 1.71,
+            "phosphorus": 1.11,
+            "lysine": 0.7
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 12.89,
+              "standard": 14.0,
+              "status": "\u26a0 Below"
+            },
+            "calcium": {
+              "actual": 1.71,
+              "standard": 0.5,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.11,
+              "standard": 0.4,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 0.7,
+              "standard": 0.7,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=12.89%, Ca=1.71%",
+      "timestamp": "2026-04-15T14:39:47.044171"
+    },
+    {
+      "test_id": "NA-04",
+      "category": "nutrition_analysis",
+      "query": "analyze Broiler Starter nutrition",
+      "expected": "Returns broiler nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Broiler Starter",
+          "animal_type": "Broiler",
+          "stage": "Starter",
+          "nutrition": {
+            "protein": 23.08,
+            "calcium": 2.01,
+            "phosphorus": 1.31,
+            "lysine": 1.44
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 23.08,
+              "standard": 22.0,
+              "status": "\u2713 Meets"
+            },
+            "calcium": {
+              "actual": 2.01,
+              "standard": 1.0,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.31,
+              "standard": 0.45,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 1.44,
+              "standard": 1.3,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 8,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=23.08%, Ca=2.01%",
+      "timestamp": "2026-04-15T14:39:47.045098"
+    },
+    {
+      "test_id": "NA-05",
+      "category": "nutrition_analysis",
+      "query": "analyze Layer Diet nutrition",
+      "expected": "Returns layer nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Layer Diet",
+          "animal_type": "Layer",
+          "stage": "Laying",
+          "nutrition": {
+            "protein": 14.9,
+            "calcium": 4.38,
+            "phosphorus": 1.12,
+            "lysine": 0.86
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 14.9,
+              "standard": 17.0,
+              "status": "\u26a0 Below"
+            },
+            "calcium": {
+              "actual": 4.38,
+              "standard": 3.5,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.12,
+              "standard": 0.35,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 0.86,
+              "standard": 0.8,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 6,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=14.9%, Ca=4.38%",
+      "timestamp": "2026-04-15T14:39:47.046033"
+    },
+    {
+      "test_id": "NA-06",
+      "category": "nutrition_analysis",
+      "query": "analyze Lactating Cow Diet nutrition",
+      "expected": "Returns dairy nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Lactating Cow Diet",
+          "animal_type": "Dairy Cattle",
+          "stage": "Lactating",
+          "nutrition": {
+            "protein": 15.87,
+            "calcium": 1.39,
+            "phosphorus": 1.03,
+            "lysine": 0.88
+          },
+          "nrc_comparison": {},
+          "ingredients_count": 6,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=15.87%, Ca=1.39%",
+      "timestamp": "2026-04-15T14:39:47.047014"
+    },
+    {
+      "test_id": "NA-07",
+      "category": "nutrition_analysis",
+      "query": "analyze Beef Cattle Finisher nutrition",
+      "expected": "Returns beef nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Beef Cattle Finisher",
+          "animal_type": "Beef Cattle",
+          "stage": "Finishing",
+          "nutrition": {
+            "protein": 12.48,
+            "calcium": 1.83,
+            "phosphorus": 1.1,
+            "lysine": 0.66
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 12.48,
+              "standard": 12.0,
+              "status": "\u2713 Meets"
+            },
+            "calcium": {
+              "actual": 1.83,
+              "standard": 0.4,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.1,
+              "standard": 0.3,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 0.66,
+              "standard": 0.5,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=12.48%, Ca=1.83%",
+      "timestamp": "2026-04-15T14:39:47.047957"
+    },
+    {
+      "test_id": "NA-08",
+      "category": "nutrition_analysis",
+      "query": "analyze Trout Starter nutrition",
+      "expected": "Returns trout nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Trout Starter",
+          "animal_type": "Aquatic",
+          "stage": "Fry",
+          "nutrition": {
+            "protein": 45.53,
+            "calcium": 4.33,
+            "phosphorus": 2.51,
+            "lysine": 3.4
+          },
+          "nrc_comparison": {},
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=45.53%, Ca=4.33%",
+      "timestamp": "2026-04-15T14:39:47.048896"
+    },
+    {
+      "test_id": "NA-09",
+      "category": "nutrition_analysis",
+      "query": "analyze Catfish Grower nutrition",
+      "expected": "Returns catfish nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Catfish Grower",
+          "animal_type": "Aquatic",
+          "stage": "Grower",
+          "nutrition": {
+            "protein": 38.03,
+            "calcium": 3.35,
+            "phosphorus": 2.04,
+            "lysine": 2.7
+          },
+          "nrc_comparison": {},
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=38.03%, Ca=3.35%",
+      "timestamp": "2026-04-15T14:39:47.049837"
+    },
+    {
+      "test_id": "NA-10",
+      "category": "nutrition_analysis",
+      "query": "analyze Gestating Sow Diet nutrition",
+      "expected": "Returns sow nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Gestating Sow Diet",
+          "animal_type": "Swine",
+          "stage": "Gestating",
+          "nutrition": {
+            "protein": 13.25,
+            "calcium": 1.71,
+            "phosphorus": 1.13,
+            "lysine": 0.7
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 13.25,
+              "standard": 13.0,
+              "status": "\u2713 Meets"
+            },
+            "calcium": {
+              "actual": 1.71,
+              "standard": 0.75,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.13,
+              "standard": 0.6,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 0.7,
+              "standard": 0.6,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 7,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=13.25%, Ca=1.71%",
+      "timestamp": "2026-04-15T14:39:47.050756"
+    },
+    {
+      "test_id": "NA-11",
+      "category": "nutrition_analysis",
+      "query": "analyze Lactating Sow Diet nutrition",
+      "expected": "Returns lactating sow nutrition",
+      "actual": {
+        "success": true,
+        "data": {
+          "formula": "Lactating Sow Diet",
+          "animal_type": "Swine",
+          "stage": "Lactating",
+          "nutrition": {
+            "protein": 17.66,
+            "calcium": 1.88,
+            "phosphorus": 1.21,
+            "lysine": 1.06
+          },
+          "nrc_comparison": {
+            "protein": {
+              "actual": 17.66,
+              "standard": 17.0,
+              "status": "\u2713 Meets"
+            },
+            "calcium": {
+              "actual": 1.88,
+              "standard": 0.85,
+              "status": "\u2713 Meets"
+            },
+            "phosphorus": {
+              "actual": 1.21,
+              "standard": 0.7,
+              "status": "\u2713 Meets"
+            },
+            "lysine": {
+              "actual": 1.06,
+              "standard": 0.9,
+              "status": "\u2713 Meets"
+            }
+          },
+          "ingredients_count": 8,
+          "source": "public"
+        }
+      },
+      "passed": true,
+      "detail": "protein=17.66%, Ca=1.88%",
+      "timestamp": "2026-04-15T14:39:47.051703"
+    },
+    {
+      "test_id": "NA-12",
+      "category": "nutrition_analysis",
+      "query": "list all formulas nutrition",
+      "expected": "Returns formula list",
+      "actual": {
+        "success": true,
+        "data": {
+          "message": "38 formulas available",
+          "formulas": [
+            {
+              "name": "Nursery Diet 1",
+              "animal": null,
+              "stage": "Nursery"
+            },
+            {
+              "name": "Nursery Diet 2",
+              "animal": null,
+              "stage": "Nursery"
+            },
+            {
+              "name": "Nursery Diet 3",
+              "animal": null,
+              "stage": "Nursery"
+            },
+            {
+              "name": "Grower Diet 1",
+              "animal": null,
+              "stage": "Growing"
+            },
+            {
+              "name": "Grower Diet 2",
+              "animal": null,
+              "stage": "Growing"
+            },
+            {
+              "name": "Finisher Diet",
+              "animal": null,
+              "stage": "Finishing"
+            },
+            {
+              "name": "Gestating Sow Diet",
+              "animal": null,
+              "stage": "Gestating"
+            },
+            {
+              "name": "Lactating Sow Diet",
+              "animal": null,
+              "stage": "Lactating"
+            },
+            {
+              "name": "Beef Cattle Starter",
+              "animal": null,
+              "stage": "Starter"
+            },
+            {
+              "name": "Beef Cattle Grower",
+              "animal": null,
+              "stage": "Growing"
+            },
+            {
+              "name": "Beef Cattle Finisher",
+              "animal": null,
+              "stage": "Finishing"
+            },
+            {
+              "name": "Dairy Calf Starter",
+              "animal": null,
+              "stage": "Calf"
+            },
+            {
+              "name": "Dairy Heifer Grower",
+              "animal": null,
+              "stage": "Heifer"
+            },
+            {
+              "name": "Lactating Cow Diet",
+              "animal": null,
+              "stage": "Lactating"
+            },
+            {
+              "name": "Broiler Starter",
+              "animal": null,
+              "stage": "Starter"
+            },
+            {
+              "name": "Broiler Grower",
+              "animal": null,
+              "stage": "Grower"
+            },
+            {
+              "name": "Broiler Finisher",
+              "animal": null,
+              "stage": "Finisher"
+            },
+            {
+              "name": "Layer Starter",
+              "animal": null,
+              "stage": "Starter"
+            },
+            {
+              "name": "Layer Grower",
+              "animal": null,
+              "stage": "Grower"
+            },
+            {
+              "name": "Layer Diet",
+              "animal": null,
+              "stage": "Laying"
+            },
+            {
+              "name": "Turkey Starter",
+              "animal": null,
+              "stage": "Starter"
+            },
+            {
+              "name": "Turkey Grower",
+              "animal": null,
+              "stage": "Grower"
+            },
+            {
+              "name": "Turkey Finisher",
+              "animal": null,
+              "stage": "Finisher"
+            },
+            {
+              "name": "Lamb Starter",
+              "animal": null,
+              "stage": "Lamb"
+            },
+            {
+              "name": "Lamb Finisher",
+              "animal": null,
+              "stage": "Finishing"
+            },
+            {
+              "name": "Ewe Gestating",
+              "animal": null,
+              "stage": "Gestating"
+            },
+            {
+              "name": "Ewe Lactating",
+              "animal": null,
+              "stage": "Lactating"
+            },
+            {
+              "name": "Goat Kid Starter",
+              "animal": null,
+              "stage": "Kid"
+            },
+            {
+              "name": "Goat Doe Gestating",
+              "animal": null,
+              "stage": "Gestating"
+            },
+            {
+              "name": "Goat Doe Lactating",
+              "animal": null,
+              "stage": "Lactating"
+            },
+            {
+              "name": "Duck Starter",
+              "animal": null,
+              "stage": "Starter"
+            },
+            {
+              "name": "Duck Grower",
+              "animal": null,
+              "stage": "Grower"
+            },
+            {
+              "name": "Duck Breeder",
+              "animal": null,
+              "stage": "Breeder"
+            },
+            {
+              "name": "Cat Food Adult",
+              "animal": null,
+              "stage": "Adult"
+            },
+            {
+              "name": "Dog Food Adult",
+              "animal": null,
+              "stage": "Adult"
+            },
+            {
+              "name": "Trout Starter",
+              "animal": null,
+              "stage": "Fry"
+            },
+            {
+              "name": "Trout Grower",
+              "animal": null,
+              "stage": "Fingerling"
+            },
+            {
+              "name": "Catfish Grower",
+              "animal": null,
+              "stage": "Grower"
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "detail": "protein=?%, Ca=?%",
+      "timestamp": "2026-04-15T14:39:47.052880"
+    },
+    {
+      "test_id": "NA-13",
+      "category": "nutrition_analysis",
+      "query": "analyze NonexistentFormula nutrition",
+      "expected": "Should return error",
+      "actual": {
+        "success": false,
+        "error": "Formula name not found. Try: 'analyze Nursery Diet 1 nutrition'"
+      },
+      "passed": true,
+      "detail": "Correctly rejected",
+      "timestamp": "2026-04-15T14:39:47.052929"
+    }
+  ]
+}

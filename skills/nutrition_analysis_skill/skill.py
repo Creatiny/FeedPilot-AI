@@ -57,12 +57,24 @@ class NutritionAnalysisSkill:
     """Nutrition analysis skill - uses FormulaService"""
     
     FORMULA_KEYWORDS = [
-        "Nursery Diet", "Grower Diet", "Finisher Diet",
+        # Numbered diets first (longest match priority)
+        "Nursery Diet 3", "Nursery Diet 2", "Nursery Diet 1",
+        "Grower Diet 2", "Grower Diet 1",
+        # Full names longest-first
+        "Gestating Sow Diet", "Lactating Sow Diet",
+        "Lactating Cow Diet", "Dairy Calf Starter", "Dairy Heifer Grower",
+        "Beef Cattle Starter", "Beef Cattle Grower", "Beef Cattle Finisher",
         "Broiler Starter", "Broiler Grower", "Broiler Finisher",
         "Layer Starter", "Layer Grower", "Layer Diet",
-        "Beef Cattle Starter", "Beef Cattle Grower", "Beef Cattle Finisher",
-        "Turkey", "Lamb", "Goat", "Duck", "Trout", "Catfish",
-        "Sow", "Gestating", "Lactating",
+        "Turkey Starter", "Turkey Grower", "Turkey Finisher",
+        "Lamb Starter", "Lamb Finisher", "Ewe Gestating", "Ewe Lactating",
+        "Goat Kid Starter", "Goat Doe Gestating", "Goat Doe Lactating",
+        "Duck Starter", "Duck Grower", "Duck Breeder",
+        "Cat Food Adult", "Dog Food Adult",
+        "Trout Starter", "Trout Grower",
+        "Catfish Grower",
+        # Shorter names last
+        "Finisher Diet",
     ]
     
     def __init__(self, formula_service=None):
@@ -97,18 +109,19 @@ class NutritionAnalysisSkill:
     
     def _find_formula(self, message: str) -> Optional[str]:
         msg = message.lower()
-        
-        # 先匹配完整名称（包含数字）
-        import re
-        match = re.search(r'(Nursery Diet \d|Grower Diet \d|Finisher Diet|Beef Cattle \w+|Broiler \w+|Layer \w+|Turkey \w+|Lamb \w+|Trout \w+|Catfish \w+)', message, re.IGNORECASE)
-        if match:
-            return match.group(1)
-        
-        # 再匹配关键词
+
+        # Match keywords longest-first to avoid partial matches
+        # (e.g. "Gestating Sow Diet" before "Gestating")
         for keyword in self.FORMULA_KEYWORDS:
             if keyword.lower() in msg:
                 return keyword
-        
+
+        # Fallback: regex for numbered diets like "Nursery Diet 1"
+        import re
+        match = re.search(r'(Nursery Diet \d|Grower Diet \d)', message, re.IGNORECASE)
+        if match:
+            return match.group(1)
+
         return None
     
     def _analyze_formula(self, user_id: str, formula_name: str) -> Dict:
