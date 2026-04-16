@@ -1,3 +1,13 @@
+---
+name: reminder_skill
+description: Create and manage price alerts and formula cost reminders. Users can set alerts for when ingredient prices or formula costs exceed or fall below a threshold.
+triggers:
+  - "alert when corn exceeds $100"
+  - "remind me when soybean meal falls below $350"
+  - "show my reminders"
+  - "delete reminder"
+---
+
 # Reminder Skill
 
 让用户通过对话创建价格提醒和配方成本监控。
@@ -165,12 +175,14 @@ if result.success:
 **用户**: 提醒我当豆粕价格超过 400 美元
 
 **Agent**: 
-```
-✅ 已创建价格提醒！
+```markdown
+✅ 价格提醒已创建！
 
-- 原料: 豆粕 (Soybean meal, 48%)
-- 条件: 超过 $400/吨
-- 频率: 每日检查
+| 字段 | 值 |
+|------|-----|
+| 原料 | 豆粕 (Soybean meal, 48%) |
+| 条件 | 超过 $400/吨 |
+| 提醒 ID | abc12345 |
 
 我会每天检查价格，当超过阈值时立即通知你。
 ```
@@ -180,12 +192,14 @@ if result.success:
 **用户**: 查看我的提醒
 
 **Agent**:
-```
+```markdown
 📋 你的提醒列表 (3 个)：
 
-1. ✅ 豆粕 超过 $400/吨
-2. ✅ 鱼粉 超过 $2000/吨
-3. ✅ 保育料成本 超过 $300/吨
+| ID | 类型 | 目标 | 条件 |
+|----|------|------|------|
+| abc12345 | 价格 | 豆粕 | 超过 $400/吨 |
+| def67890 | 价格 | 鱼粉 | 超过 $2000/吨 |
+| ghi24680 | 配方成本 | 保育料 | 超过 $300/吨 |
 ```
 
 ---
@@ -193,9 +207,10 @@ if result.success:
 **用户**: 删除豆粕价格提醒
 
 **Agent**: 
-```
-要删除这个提醒吗？
-  豆粕 超过 $400/吨
+```markdown
+✅ 已删除提醒
 
-✅ 已删除
+| ID | 目标 | 条件 |
+|----|------|------|
+| abc12345 | 豆粕 | 超过 $400/吨 |
 ```

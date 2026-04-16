@@ -109,9 +109,14 @@ class CustomerRecordSkill:
         result = self.customer_service.create_customer(user_id, customer_data)
         
         if result.success:
+            # 返回 Markdown 表格格式
+            lines = ['✓ Customer added successfully', '', '| Field | Value |', '|-------|-------|']
+            lines.append(f"| Name | {name} |")
+            lines.append(f"| ID | {result.data.get('id', '?')} |")
+            if phone:
+                lines.append(f"| Phone | {phone} |")
             return self._success({
-                'message': f"Customer '{name}' added",
-                'customer': result.data,
+                'message': '\n'.join(lines),
             })
         else:
             return self._error(result.error_message)
@@ -121,10 +126,22 @@ class CustomerRecordSkill:
         
         if result.success:
             customers = result.data.get('customers', [])
+            if not customers:
+                return self._success({
+                    'message': 'No customers found. Add one: "add customer John Smith"',
+                })
+            
+            # 返回 Markdown 表格格式
+            lines = ['| ID | Name | Phone | Notes |', '|----|------|-------|-------|']
+            for c in customers:
+                name = c.get('name', 'N/A')
+                phone = c.get('phone', '-') or '-'
+                notes = (c.get('notes') or '')[:30]
+                lines.append(f"| {c.get('id', '?')} | {name} | {phone} | {notes} |")
+            
             return self._success({
-                'message': f"Found {len(customers)} customers",
+                'message': '\n'.join(lines),
                 'count': len(customers),
-                'customers': customers,
             })
         else:
             return self._error(result.error_message)
@@ -137,9 +154,14 @@ class CustomerRecordSkill:
         result = self.customer_service.get_customer(user_id, name)
         
         if result.success:
+            c = result.data
+            # 返回 Markdown 表格格式
+            lines = ['| Field | Value |', '|-------|-------|']
+            lines.append(f"| Name | {c.get('name', 'N/A')} |")
+            lines.append(f"| Phone | {c.get('phone') or '-'} |")
+            lines.append(f"| Notes | {c.get('notes') or '-'} |")
             return self._success({
-                'message': f"Customer found",
-                'customers': [result.data],
+                'message': '\n'.join(lines),
             })
         else:
             # 尝试模糊搜索 - 先列出所有，再本地过滤
@@ -148,9 +170,14 @@ class CustomerRecordSkill:
                 all_customers = list_result.data.get('customers', [])
                 matches = [c for c in all_customers if name.lower() in c.get('name', '').lower()]
                 if matches:
+                    # 返回 Markdown 表格格式
+                    lines = ['| ID | Name | Phone | Notes |', '|----|------|-------|-------|']
+                    for c in matches:
+                        phone = c.get('phone') or '-'
+                        notes = (c.get('notes') or '')[:30]
+                        lines.append(f"| {c.get('id', '?')} | {c.get('name', 'N/A')} | {phone} | {notes} |")
                     return self._success({
-                        'message': f"Found {len(matches)} customer(s)",
-                        'customers': matches,
+                        'message': '\n'.join(lines),
                     })
             return self._error(f"Customer '{name}' not found")
     

@@ -281,6 +281,180 @@ class SimpleCustomerService:
         return ServiceResult(success=True)
 
 
+# ============== Simple Reminder Service ==============
+class SimpleReminderService:
+    """简化版 ReminderService"""
+    
+    def __init__(self):
+        pass
+    
+    def _get_conn(self):
+        return sqlite3.connect(DB_PATH)
+    
+    def create_reminder(self, user_id: str, reminder_type: str, threshold: float, 
+                        condition: str, ingredient: str = None, ingredient_code: str = None,
+                        formula: str = None, formula_id: str = None):
+        import uuid
+        from datetime import datetime
+        reminder_id = str(uuid.uuid4())[:8]  # 短 ID 便于用户记忆
+        now = datetime.now().isoformat()
+        
+        conn = self._get_conn()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO reminders (id, user_id, type, ingredient, ingredient_code, formula, formula_id, threshold, condition, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (reminder_id, user_id, reminder_type, ingredient, ingredient_code, formula, formula_id, threshold, condition, now))
+        conn.commit()
+        conn.close()
+        return ServiceResult(success=True, data={'id': reminder_id, 'ingredient': ingredient, 'threshold': threshold, 'condition': condition})
+    
+    def list_reminders(self, user_id: str):
+        conn = self._get_conn()
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, type, ingredient, formula, threshold, condition, enabled, created_at FROM reminders WHERE user_id = ? ORDER BY created_at DESC', (user_id,))
+        rows = cursor.fetchall()
+        conn.close()
+        return ServiceResult(success=True, data={'reminders': [dict(r) for r in rows], 'count': len(rows)})
+    
+    def delete_reminder(self, user_id: str, reminder_id: str):
+        conn = self._get_conn()
+        cursor = conn.cursor()
+        # 支持 8 字符短 ID 匹配
+        if len(reminder_id) >= 8:
+            cursor.execute('DELETE FROM reminders WHERE user_id = ? AND id LIKE ?', (user_id, f'{reminder_id}%'))
+        else:
+            cursor.execute('DELETE FROM reminders WHERE user_id = ? AND id = ?', (user_id, reminder_id))
+        deleted = cursor.rowcount
+        conn.commit()
+        conn.close()
+        if deleted > 0:
+            return ServiceResult(success=True, data={'deleted': deleted})
+        return ServiceResult(success=False, error_message=f"Reminder '{reminder_id}' not found")
+
+
+# ============== Reminder Skill ==============
+# 原料名称映射
+_INGREDIENT_MAP = {
+    'corn': {'name': 'Corn, No.2 Yellow', 'code': 'ING_CORN'},
+    'soybean': {'name': 'Soybean meal, 48%', 'code': 'ING_SBM'},
+    'soybean meal': {'name': 'Soybean meal, 48%', 'code': 'ING_SBM'},
+    'sbm': {'name': 'Soybean meal, 48%', 'code': 'ING_SBM'},
+    'wheat': {'name': 'Wheat, grain', 'code': 'ING_WHEAT'},
+    'barley': {'name': 'Barley', 'code': 'ING_BARLEY'},
+    'fish meal': {'name': 'Fish meal, 65%', 'code': 'ING_FISHM'},
+    'ddgs': {'name': 'DDGS, 28%', 'code': 'ING_DDGS'},
+    'limestone': {'name': 'Limestone', 'code': 'ING_LIME'},
+    'lysine': {'name': 'L-Lysine HCl', 'code': 'ING_LYS'},
+    'methionine': {'name': 'DL-Methionine', 'code': 'ING_MET'},
+}
+
+# 配方名称映射
+_FORMULA_MAP = {
+    'nursery': {'name': 'Nursery Diet 1', 'id': 'FORMULA_NURSERY_1'},
+    'nursery diet': {'name': 'Nursery Diet 1', 'id': 'FORMULA_NURSERY_1'},
+    'grower': {'name': 'Grower Diet 1', 'id': 'FORMULA_GROWER_1'},
+    'finishing': {'name': 'Finishing Diet', 'id': 'FORMULA_FINISHING'},
+    'broiler': {'name': 'Broiler Starter', 'id': 'FORMULA_BROILER_STARTER'},
+    'layer': {'name': 'Layer Diet', 'id': 'FORMULA_LAYER'},
+}
+
+
+class ReminderSkill:
+    """提醒技能"""
+    
+    def __init__(self, service: SimpleReminderService):
+        self.service = service
+    
+    async def execute(self, user_id: str, message: str) -> dict:
+        """执行提醒操作"""
+        import re
+        msg_lower = message.lower()
+        
+        # 查看提醒列表
+        if 'list' in msg_lower or 'show' in msg_lower or 'my reminder' in msg_lower or 'reminders' in msg_lower:
+            result = self.service.list_reminders(user_id)
+            if result.success:
+                reminders = result.data['reminders']
+                if not reminders:
+                    return {'success': True, 'message': 'You have no reminders set. Create one:\n• "Alert when corn > $90/ton"\n• "Remind me when soybean meal < $350/ton"'}
+                lines = [f"| ID | Type | Target | Condition |", "|----|------|--------|-----------|"]
+                for r in reminders:
+                    target = r.get('ingredient') or r.get('formula', 'Unknown')
+                    cond = 'above' if r['condition'] == 'above' else 'below'
+                    lines.append(f"| {r['id'][:8]} | {r['type']} | {target} | {cond} ${r['threshold']} |")
+                return {'success': True, 'message': '\n'.join(lines)}
+            return {'success': False, 'error': result.error_message}
+        
+        # 删除提醒
+        if 'delete' in msg_lower or 'remove' in msg_lower or 'cancel' in msg_lower:
+            # 提取 ID (8 位十六进制)
+            id_match = re.search(r'[a-f0-9]{8}', msg_lower)
+            if id_match:
+                reminder_id = id_match.group()
+                result = self.service.delete_reminder(user_id, reminder_id)
+                if result.success:
+                    return {'success': True, 'message': f"✅ Reminder {reminder_id} deleted."}
+                return {'success': False, 'error': result.error_message}
+            return {'success': False, 'error': 'Please provide a reminder ID to delete. Example: "delete reminder 245f1bd9"'}
+        
+        # 创建提醒
+        # 匹配: "alert when X above/below $Y" 或 "remind me when X exceeds/falls below $Y"
+        price_pattern = r'(?:alert|remind|notify).*?(?:when|if)\s+(\w+(?:\s+\w+)?)\s+(?:exceeds?|goes?|falls?|drops?|above|below|>|<)\s*\$?(\d+(?:\.\d+)?)'
+        match = re.search(price_pattern, msg_lower)
+        
+        if match:
+            ingredient_name = match.group(1).strip()
+            threshold = float(match.group(2))
+            
+            # 判断条件
+            condition = 'above'
+            if any(w in msg_lower for w in ['below', 'under', '<', 'falls', 'drops', 'less']):
+                condition = 'below'
+            
+            # 查找原料
+            ingredient_info = _INGREDIENT_MAP.get(ingredient_name.lower())
+            if ingredient_info:
+                result = self.service.create_reminder(
+                    user_id=user_id,
+                    reminder_type='price',
+                    threshold=threshold,
+                    condition=condition,
+                    ingredient=ingredient_info['name'],
+                    ingredient_code=ingredient_info['code']
+                )
+                if result.success:
+                    cond_text = 'exceeds' if condition == 'above' else 'falls below'
+                    return {'success': True, 'message': f"✅ Price alert created!\n\n| Ingredient | Condition | Alert ID |\n|------------|-----------|----------|\n| {ingredient_info['name']} | {cond_text} ${threshold}/ton | {result.data['id']} |"}
+                return {'success': False, 'error': result.error_message}
+            
+            # 查找配方
+            formula_info = _FORMULA_MAP.get(ingredient_name.lower())
+            if formula_info:
+                result = self.service.create_reminder(
+                    user_id=user_id,
+                    reminder_type='formula_cost',
+                    threshold=threshold,
+                    condition=condition,
+                    formula=formula_info['name'],
+                    formula_id=formula_info['id']
+                )
+                if result.success:
+                    cond_text = 'exceeds' if condition == 'above' else 'falls below'
+                    return {'success': True, 'message': f"✅ Formula cost alert created!\n\n| Formula | Condition | Alert ID |\n|---------|-----------|----------|\n| {formula_info['name']} | {cond_text} ${threshold}/ton | {result.data['id']} |"}
+                return {'success': False, 'error': result.error_message}
+            
+            return {'success': False, 'error': f"Unknown ingredient or formula: '{ingredient_name}'. Supported: corn, soybean meal, wheat, barley, fish meal, DDGS, nursery diet, grower diet, finishing diet."}
+        
+        return {'success': False, 'error': 'Could not parse reminder request. Try: "Alert when corn > $100/ton" or "show my reminders"'}
+
+
+def get_reminder_skill():
+    """初始化 ReminderSkill"""
+    return ReminderSkill(SimpleReminderService())
+
+
 # ============== Skill Factories ==============
 def get_price_lookup_skill():
     """初始化 PriceLookupSkill"""
@@ -342,6 +516,9 @@ SKILL_MAP = {
     'analyze': get_nutrition_skill,
     'customer': get_customer_skill,
     'customers': get_customer_skill,
+    'reminder': get_reminder_skill,
+    'reminders': get_reminder_skill,
+    'alert': get_reminder_skill,
 }
 
 

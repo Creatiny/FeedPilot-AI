@@ -49,33 +49,36 @@ python3 {baseDir}/../../scripts/run_skill.py customer "find customer John"
 ## Output Format (English)
 
 **Add Customer:**
-```
-✓ Customer 'John Smith' added
-ID: 123
-Phone: 555-1234
+```markdown
+✓ Customer added successfully
+
+| Field | Value |
+|-------|-------|
+| Name | John Smith |
+| ID | 123 |
+| Phone | 555-1234 |
 ```
 
 **List Customers:**
-```
+```markdown
 Found 3 customers:
 
-1. John Smith (Swine, 500 head)
-   Phone: 555-1234
-
-2. Jane Doe (Beef Cattle, 200 head)
-   Phone: 555-5678
-
-3. Bob Wilson (Broiler, 10,000 head)
-   Phone: 555-9012
+| ID | Name | Farm Type | Scale | Phone |
+|----|------|-----------|-------|-------|
+| 1 | John Smith | Swine | 500 head | 555-1234 |
+| 2 | Jane Doe | Beef Cattle | 200 head | 555-5678 |
+| 3 | Bob Wilson | Broiler | 10,000 head | 555-9012 |
 ```
 
 **Find Customer:**
-```
-Found: John Smith
-Farm Type: Swine
-Scale: 500 head
-Phone: 555-1234
-Notes: Prefers text contact
+```markdown
+| Field | Value |
+|-------|-------|
+| Name | John Smith |
+| Farm Type | Swine |
+| Scale | 500 head |
+| Phone | 555-1234 |
+| Notes | Prefers text contact |
 ```
 
 ## Error Handling
