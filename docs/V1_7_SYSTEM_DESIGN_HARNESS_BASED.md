@@ -25,7 +25,7 @@ v1.6.3 的核心问题不是"功能不够"，而是**环境设计不足**：
 ### 核心目标
 1. **多用户私有数据隔离**：配方库、原料价格、客户信息
 2. **统一数据访问层**：Repository + Service，禁止直连
-3. **最小 Harness 落地**：任务路由、状态管理、结果校验
+3. **最小 Harness 落地**：状态管理、结果校验（LLM 原生 NLU）
 4. **私有优先 / 公共回退**：查询策略明确化
 
 ### 本版本不做
@@ -46,9 +46,16 @@ v1.6.3 的核心问题不是"功能不够"，而是**环境设计不足**：
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Harness Runtime Layer                     │
+│                   OpenClaw Agent Layer                       │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  LLM Native NLU (English) → Skill Selection         │    │
+│  │  - astron-code-latest (primary)                     │    │
+│  │  - MiniMax-M2.7 (fallback)                          │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                              │                               │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
-│  │ Task Router │  │Session State│  │  Result Validator   │  │
+│  │Session State│  │  Skills     │  │  Result Validator   │  │
+│  │  Manager    │  │  (exec)     │  │                     │  │
 │  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -58,9 +65,9 @@ v1.6.3 的核心问题不是"功能不够"，而是**环境设计不足**：
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐   │
 │  │FormulaService│  │ PriceService │  │CustomerService   │   │
 │  └──────────────┘  └──────────────┘  └──────────────────┘   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐   │
-│  │CalcService   │  │ ReportService│  │AnalyticsService  │   │
-│  └──────────────┘  └──────────────┘  └──────────────────┘   │
+│  ┌──────────────┐                                            │
+│  │CalcService   │                                            │
+│  └──────────────┘                                            │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -78,25 +85,42 @@ v1.6.3 的核心问题不是"功能不够"，而是**环境设计不足**：
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Harness Runtime Layer（新增）
+### 2.2 架构变更说明（v1.7 实际实现）
 
-这是 v1.7 的核心增量，按照 ACI 和 Harness 理念设计。
+#### NLU 层：从 TaskRouter 到 LLM Native
 
-#### Task Router（任务路由器）
-把用户请求分类为固定任务类型：
+**原设计**：使用 TaskRouter（正则表达式）进行意图分类
 
-| 任务类型 | 描述 | 触发示例 |
-|---------|------|---------|
-| `formula_cost_query` | 配方成本查询 | "保育料多少钱一吨" |
-| `formula_manage` | 配方管理 | "创建/修改/查看我的配方" |
-| `price_query` | 价格查询 | "玉米价格" |
-| `price_manage` | 价格管理 | "设置我的玉米采购价" |
-| `customer_manage` | 客户管理 | "添加客户张三" |
-| `quote_generate` | 生成报价 | "给客户张三报保育料" |
-| `nutrition_analysis` | 营养分析 | "分析保育料营养" |
-| `formula_compare` | 配方对比 | "对比两个配方成本" |
+**实际实现**：移除 TaskRouter，由 OpenClaw Agent 的 LLM 原生处理 NLU
 
-**设计原则**：先确定任务类型，再进入执行流，避免模型在所有能力里乱猜。
+**变更原因**：
+1. **系统面向北美市场**：所有用户查询使用英文
+2. **TaskRouter 只支持中文**：正则模式如 `r'计算.*成本'` 对英文无效
+3. **LLM NLU 更灵活**：原生支持多语言、模糊匹配、上下文理解
+
+**实现方式**：
+- Agent 通过 `exec` 工具调用 `scripts/run_skill.py`
+- LLM 根据用户消息自动选择正确的 skill 和参数
+- 无需预定义正则模式
+
+```python
+# 用户查询: "corn price"
+# LLM 自动识别为价格查询，调用:
+# exec: python3 /path/to/run_skill.py price "corn"
+
+# 用户查询: "Nursery Diet 1 cost"
+# LLM 自动识别为配方成本查询，调用:
+# exec: python3 /path/to/run_skill.py cost "Nursery Diet 1"
+```
+
+#### Harness Runtime Layer（实际实现）
+
+| 组件 | 状态 | 说明 |
+|------|------|------|
+| TaskRouter | ❌ 已移除 | LLM 原生 NLU 替代 |
+| SessionStateManager | ✅ 已实现 | 会话状态管理 |
+| ResultValidator | ✅ 已实现 | 结果校验 |
+| AuditLogger | ✅ 已实现 | 审计日志 |
 
 #### Session State Manager（会话状态管理）
 维护当前会话上下文：
@@ -130,6 +154,40 @@ class SessionState:
 
 ### 2.3 Service Layer（统一业务逻辑）
 
+**设计原则**：先确定任务类型，再进入执行流，避免模型在所有能力里乱猜。
+
+#### Session State Manager（会话状态管理）
+维护当前会话上下文：
+
+```python
+class SessionState:
+    user_id: str
+    current_customer: Optional[str]
+    current_formula: Optional[str]
+    price_mode: str  # "private" | "public" | "mixed"
+    last_quote_result: Optional[Dict]
+    conversation_turn: int
+```
+
+**作用**：
+- 支持连续对话
+- 避免每轮都重新理解上下文
+- 让模型知道"我们在做什么"
+
+#### Result Validator（结果校验器）
+对关键输出进行结构化校验：
+
+| 校验类型 | 规则 |
+|---------|------|
+| 配方校验 | 成分比例和 ≈ 100%，无重复原料 |
+| 价格校验 | 价格为正数，单位为 USD/ton |
+| 成本校验 | 明细和 = 总成本，来源说明完整 |
+| 客户校验 | name 必填，phone/email 至少一个 |
+
+**作用**：在返回用户前拦截错误，而不是让错误流出去。
+
+### 2.4 Service Layer（统一业务逻辑）
+
 每个 Service 封装一个业务域，提供清晰的接口：
 
 ```python
@@ -160,7 +218,7 @@ class CalculationService:
     def generate_quote(self, user_id: str, formula_name: str, customer_name: str) -> Quote
 ```
 
-### 2.4 Repository Layer（数据访问）
+### 2.5 Repository Layer（数据访问）
 
 已有的 Repository 继续使用，增强为：
 - 强制 owner_id 隔离
@@ -323,46 +381,7 @@ def get_price(user_id, ingredient_code):
 
 ## 5. Harness 最小实现：关键组件
 
-### 5.1 Task Router 实现
-
-```python
-class TaskRouter:
-    TASK_PATTERNS = {
-        "formula_cost_query": [
-            r"(计算|查).*(成本|价格|多少钱)",
-            r".*配方.*成本",
-        ],
-        "formula_manage": [
-            r"(创建|添加|新建|修改|删除).*(配方)",
-            r"(查看|列出).*配方",
-        ],
-        "price_query": [
-            r"(查|问).*(价格|行情)",
-            r".*(价格|多少钱)",
-        ],
-        "price_manage": [
-            r"(设置|修改|更新).*价格",
-            r"我的.*价格",
-        ],
-        "customer_manage": [
-            r"(添加|创建|修改|删除).*客户",
-            r"(查看|列出).*客户",
-        ],
-        "quote_generate": [
-            r"(生成|做|开).*报价",
-            r"给.*报价",
-        ],
-    }
-    
-    def classify(self, message: str) -> str:
-        for task_type, patterns in self.TASK_PATTERNS.items():
-            for pattern in patterns:
-                if re.search(pattern, message):
-                    return task_type
-        return "unknown"
-```
-
-### 5.2 Session State 实现
+### 5.1 Session State 实现
 
 ```python
 class SessionStateManager:
@@ -380,7 +399,7 @@ class SessionStateManager:
             setattr(state, key, value)
 ```
 
-### 5.3 Result Validator 实现
+### 5.2 Result Validator 实现
 
 ```python
 class ResultValidator:
@@ -664,9 +683,11 @@ cursor.execute(
 - [ ] CalculationService
 
 ### Phase 3：Harness Runtime
-- [ ] TaskRouter
 - [ ] SessionStateManager
 - [ ] ResultValidator
+✅ TaskRouter - 已移除（LLM 原生 NLU 替代）
+✅ SessionStateManager - 已实现
+✅ ResultValidator - 已实现
 
 ### Phase 4：技能改造
 - [ ] FormulaCostSkill → 走 CalculationService
@@ -699,13 +720,37 @@ cursor.execute(
 
 v1.7 的本质是**从"技能直连数据"升级为"Harness 驱动的业务系统"**：
 
-| 层面 | v1.6.x | v1.7 |
+| 层级 | v1.6.3 | v1.7 |
 |------|--------|------|
+| 任务路由 | 无 | LLM Native NLU（TaskRouter 已移除） |
 | 数据访问 | 直连 sqlite | Repository + Service |
-| 业务逻辑 | 在技能里散落 | Service 层统一 |
-| 用户隔离 | 靠约定 | 强制在接口层 |
-| 状态管理 | 无 | SessionState |
+| 用户隔离 | 约定 | owner_open_id 强制隔离 |
+| 状态管理 | 无 | SessionStateManager |
 | 结果校验 | 无 | ResultValidator |
-| 任务路由 | 无 | TaskRouter |
+
+### 架构决策记录
+
+#### ADR-001: 移除 TaskRouter
+
+**状态**: 已采纳
+
+**背景**: 
+- 系统面向北美市场，用户查询使用英文
+- TaskRouter 的正则模式只支持中文（如 `r'计算.*成本'`）
+- 英文查询全部返回 `unknown`，导致功能失效
+
+**决策**: 
+移除 TaskRouter，由 OpenClaw Agent 的 LLM 原生处理 NLU
+
+**后果**:
+- ✅ 支持英文查询
+- ✅ 更灵活的意图识别
+- ✅ 支持上下文理解
+- ⚠️ 依赖 LLM 的工具调用能力
+
+**实现**:
+- `harness.py` 不再调用 TaskRouter
+- Agent 通过 `exec` 工具调用 `run_skill.py`
+- LLM 根据用户消息自动选择 skill 和参数
 
 **一句话**：v1.7 让 FeedSales 从"能回答问题"变成"能可靠执行业务流程"。
