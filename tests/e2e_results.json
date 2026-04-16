@@ -1,5 +1,5 @@
 {
-  "run_time": "2026-04-16T09:14:05.088161",
+  "run_time": "2026-04-16T13:30:51.518750",
   "total": 55,
   "passed": 55,
   "failed": 0,
@@ -101,7 +101,7 @@
       },
       "passed": true,
       "detail": "cost=$290.58/ton",
-      "timestamp": "2026-04-16T09:14:05.015825"
+      "timestamp": "2026-04-16T13:30:51.450091"
     },
     {
       "test_id": "FC-02",
@@ -190,7 +190,7 @@
       },
       "passed": true,
       "detail": "cost=$225.98/ton",
-      "timestamp": "2026-04-16T09:14:05.017684"
+      "timestamp": "2026-04-16T13:30:51.451917"
     },
     {
       "test_id": "FC-03",
@@ -279,7 +279,7 @@
       },
       "passed": true,
       "detail": "cost=$219.72/ton",
-      "timestamp": "2026-04-16T09:14:05.019478"
+      "timestamp": "2026-04-16T13:30:51.453751"
     },
     {
       "test_id": "FC-04",
@@ -377,7 +377,7 @@
       },
       "passed": true,
       "detail": "cost=$336.68/ton",
-      "timestamp": "2026-04-16T09:14:05.021282"
+      "timestamp": "2026-04-16T13:30:51.455532"
     },
     {
       "test_id": "FC-05",
@@ -457,7 +457,7 @@
       },
       "passed": true,
       "detail": "cost=$227.25/ton",
-      "timestamp": "2026-04-16T09:14:05.023079"
+      "timestamp": "2026-04-16T13:30:51.457304"
     },
     {
       "test_id": "FC-06",
@@ -536,7 +536,7 @@
       },
       "passed": true,
       "detail": "cost=$234.94/ton",
-      "timestamp": "2026-04-16T09:14:05.025549"
+      "timestamp": "2026-04-16T13:30:51.459089"
     },
     {
       "test_id": "FC-07",
@@ -625,7 +625,7 @@
       },
       "passed": true,
       "detail": "cost=$221.84/ton",
-      "timestamp": "2026-04-16T09:14:05.027430"
+      "timestamp": "2026-04-16T13:30:51.460877"
     },
     {
       "test_id": "FC-08",
@@ -714,7 +714,7 @@
       },
       "passed": true,
       "detail": "cost=$1144.68/ton",
-      "timestamp": "2026-04-16T09:14:05.029491"
+      "timestamp": "2026-04-16T13:30:51.462689"
     },
     {
       "test_id": "FC-09",
@@ -803,7 +803,7 @@
       },
       "passed": true,
       "detail": "cost=$750.99/ton",
-      "timestamp": "2026-04-16T09:14:05.031343"
+      "timestamp": "2026-04-16T13:30:51.464482"
     },
     {
       "test_id": "FC-10",
@@ -901,7 +901,7 @@
       },
       "passed": true,
       "detail": "cost=$290.58/ton",
-      "timestamp": "2026-04-16T09:14:05.033433"
+      "timestamp": "2026-04-16T13:30:51.466425"
     },
     {
       "test_id": "FC-11",
@@ -999,7 +999,7 @@
       },
       "passed": true,
       "detail": "cost=$290.58/ton",
-      "timestamp": "2026-04-16T09:14:05.035980"
+      "timestamp": "2026-04-16T13:30:51.468233"
     },
     {
       "test_id": "FC-12",
@@ -1088,7 +1088,7 @@
       },
       "passed": true,
       "detail": "cost=$227.38/ton",
-      "timestamp": "2026-04-16T09:14:05.037815"
+      "timestamp": "2026-04-16T13:30:51.470016"
     },
     {
       "test_id": "FC-13",
@@ -1186,7 +1186,7 @@
       },
       "passed": true,
       "detail": "cost=$280.32/ton",
-      "timestamp": "2026-04-16T09:14:05.039623"
+      "timestamp": "2026-04-16T13:30:51.471779"
     },
     {
       "test_id": "FC-14",
@@ -1275,7 +1275,7 @@
       },
       "passed": true,
       "detail": "cost=$340.73/ton",
-      "timestamp": "2026-04-16T09:14:05.041493"
+      "timestamp": "2026-04-16T13:30:51.473553"
     },
     {
       "test_id": "FC-15",
@@ -1288,7 +1288,7 @@
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-16T09:14:05.042377"
+      "timestamp": "2026-04-16T13:30:51.474445"
     },
     {
       "test_id": "PL-01",
@@ -1309,7 +1309,7 @@
       },
       "passed": true,
       "detail": "price=$185.5/ton",
-      "timestamp": "2026-04-16T09:14:05.044575"
+      "timestamp": "2026-04-16T13:30:51.476504"
     },
     {
       "test_id": "PL-02",
@@ -1330,7 +1330,7 @@
       },
       "passed": true,
       "detail": "price=$342.0/ton",
-      "timestamp": "2026-04-16T09:14:05.045791"
+      "timestamp": "2026-04-16T13:30:51.477434"
     },
     {
       "test_id": "PL-03",
@@ -1351,7 +1351,7 @@
       },
       "passed": true,
       "detail": "price=$1850.0/ton",
-      "timestamp": "2026-04-16T09:14:05.046837"
+      "timestamp": "2026-04-16T13:30:51.478349"
     },
     {
       "test_id": "PL-04",
@@ -1372,7 +1372,7 @@
       },
       "passed": true,
       "detail": "price=$210.0/ton",
-      "timestamp": "2026-04-16T09:14:05.047781"
+      "timestamp": "2026-04-16T13:30:51.479356"
     },
     {
       "test_id": "PL-05",
@@ -1393,7 +1393,7 @@
       },
       "passed": true,
       "detail": "price=$115.0/ton",
-      "timestamp": "2026-04-16T09:14:05.048752"
+      "timestamp": "2026-04-16T13:30:51.480283"
     },
     {
       "test_id": "PL-06",
@@ -1414,7 +1414,7 @@
       },
       "passed": true,
       "detail": "price=$480.0/ton",
-      "timestamp": "2026-04-16T09:14:05.049680"
+      "timestamp": "2026-04-16T13:30:51.481199"
     },
     {
       "test_id": "PL-07",
@@ -1435,7 +1435,7 @@
       },
       "passed": true,
       "detail": "price=$195.0/ton",
-      "timestamp": "2026-04-16T09:14:05.050747"
+      "timestamp": "2026-04-16T13:30:51.482234"
     },
     {
       "test_id": "PL-08",
@@ -1456,7 +1456,7 @@
       },
       "passed": true,
       "detail": "price=$185.5/ton",
-      "timestamp": "2026-04-16T09:14:05.051679"
+      "timestamp": "2026-04-16T13:30:51.483163"
     },
     {
       "test_id": "PL-09",
@@ -1477,7 +1477,7 @@
       },
       "passed": true,
       "detail": "price=$342.0/ton",
-      "timestamp": "2026-04-16T09:14:05.052577"
+      "timestamp": "2026-04-16T13:30:51.484068"
     },
     {
       "test_id": "PL-10",
@@ -1498,7 +1498,7 @@
       },
       "passed": true,
       "detail": "price=$1250.0/ton",
-      "timestamp": "2026-04-16T09:14:05.053508"
+      "timestamp": "2026-04-16T13:30:51.485027"
     },
     {
       "test_id": "PL-11",
@@ -1519,7 +1519,7 @@
       },
       "passed": true,
       "detail": "price=$2550.0/ton",
-      "timestamp": "2026-04-16T09:14:05.054568"
+      "timestamp": "2026-04-16T13:30:51.485935"
     },
     {
       "test_id": "PL-12",
@@ -1540,7 +1540,7 @@
       },
       "passed": true,
       "detail": "price=$680.0/ton",
-      "timestamp": "2026-04-16T09:14:05.055473"
+      "timestamp": "2026-04-16T13:30:51.486831"
     },
     {
       "test_id": "PL-13",
@@ -1561,7 +1561,7 @@
       },
       "passed": true,
       "detail": "price=$145.0/ton",
-      "timestamp": "2026-04-16T09:14:05.056593"
+      "timestamp": "2026-04-16T13:30:51.487856"
     },
     {
       "test_id": "PL-14",
@@ -1582,7 +1582,7 @@
       },
       "passed": true,
       "detail": "price=$220.0/ton",
-      "timestamp": "2026-04-16T09:14:05.057593"
+      "timestamp": "2026-04-16T13:30:51.488761"
     },
     {
       "test_id": "PL-15",
@@ -1780,7 +1780,7 @@
       },
       "passed": true,
       "detail": "22 prices listed",
-      "timestamp": "2026-04-16T09:14:05.058136"
+      "timestamp": "2026-04-16T13:30:51.489288"
     },
     {
       "test_id": "CR-01",
@@ -1801,14 +1801,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-16 01:14:05"
+              "created_at": "2026-04-16 05:30:51"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customers",
-      "timestamp": "2026-04-16T09:14:05.058628"
+      "timestamp": "2026-04-16T13:30:51.489768"
     },
     {
       "test_id": "CR-02",
@@ -1829,14 +1829,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-16 01:14:05"
+              "created_at": "2026-04-16 05:30:51"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customers",
-      "timestamp": "2026-04-16T09:14:05.059089"
+      "timestamp": "2026-04-16T13:30:51.490228"
     },
     {
       "test_id": "CR-03",
@@ -1856,14 +1856,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-16 01:14:05"
+              "created_at": "2026-04-16 05:30:51"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Customer found",
-      "timestamp": "2026-04-16T09:14:05.060292"
+      "timestamp": "2026-04-16T13:30:51.491314"
     },
     {
       "test_id": "CR-04",
@@ -1883,14 +1883,14 @@
               "animal_type": "swine",
               "scale": 500,
               "notes": "Long-term customer",
-              "created_at": "2026-04-16 01:14:05"
+              "created_at": "2026-04-16 05:30:51"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Found 1 customer(s)",
-      "timestamp": "2026-04-16T09:14:05.061262"
+      "timestamp": "2026-04-16T13:30:51.492207"
     },
     {
       "test_id": "CR-05",
@@ -1914,7 +1914,7 @@
       },
       "passed": true,
       "detail": "Customer 'Johnson Farm' added",
-      "timestamp": "2026-04-16T09:14:05.065660"
+      "timestamp": "2026-04-16T13:30:51.495478"
     },
     {
       "test_id": "CR-06",
@@ -1938,7 +1938,7 @@
       },
       "passed": true,
       "detail": "Customer 'Brown Ranch swine' added",
-      "timestamp": "2026-04-16T09:14:05.068490"
+      "timestamp": "2026-04-16T13:30:51.497906"
     },
     {
       "test_id": "CR-07",
@@ -1958,14 +1958,14 @@
               "animal_type": null,
               "scale": null,
               "notes": "add customer Johnson Farm phone 555-0200",
-              "created_at": "2026-04-16 01:14:05"
+              "created_at": "2026-04-16 05:30:51"
             }
           ]
         }
       },
       "passed": true,
       "detail": "Customer found",
-      "timestamp": "2026-04-16T09:14:05.069190"
+      "timestamp": "2026-04-16T13:30:51.499000"
     },
     {
       "test_id": "CR-08",
@@ -1981,7 +1981,7 @@
       },
       "passed": true,
       "detail": "You have 3 customer(s)",
-      "timestamp": "2026-04-16T09:14:05.069779"
+      "timestamp": "2026-04-16T13:30:51.499592"
     },
     {
       "test_id": "CR-09",
@@ -1997,7 +1997,7 @@
       },
       "passed": true,
       "detail": "You have 3 customer(s)",
-      "timestamp": "2026-04-16T09:14:05.070273"
+      "timestamp": "2026-04-16T13:30:51.500083"
     },
     {
       "test_id": "CR-10",
@@ -2012,7 +2012,7 @@
       },
       "passed": true,
       "detail": "Customer 'Johnson Farm' updated",
-      "timestamp": "2026-04-16T09:14:05.072985"
+      "timestamp": "2026-04-16T13:30:51.503163"
     },
     {
       "test_id": "CR-11",
@@ -2027,7 +2027,7 @@
       },
       "passed": true,
       "detail": "Customer 'Brown Ranch' deleted",
-      "timestamp": "2026-04-16T09:14:05.076145"
+      "timestamp": "2026-04-16T13:30:51.506903"
     },
     {
       "test_id": "CR-12",
@@ -2040,7 +2040,7 @@
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-16T09:14:05.076215"
+      "timestamp": "2026-04-16T13:30:51.506950"
     },
     {
       "test_id": "NA-01",
@@ -2087,7 +2087,7 @@
       },
       "passed": true,
       "detail": "protein=19.1%, Ca=1.89%",
-      "timestamp": "2026-04-16T09:14:05.077304"
+      "timestamp": "2026-04-16T13:30:51.507921"
     },
     {
       "test_id": "NA-02",
@@ -2134,7 +2134,7 @@
       },
       "passed": true,
       "detail": "protein=14.47%, Ca=1.72%",
-      "timestamp": "2026-04-16T09:14:05.078316"
+      "timestamp": "2026-04-16T13:30:51.508864"
     },
     {
       "test_id": "NA-03",
@@ -2181,7 +2181,7 @@
       },
       "passed": true,
       "detail": "protein=12.89%, Ca=1.71%",
-      "timestamp": "2026-04-16T09:14:05.079343"
+      "timestamp": "2026-04-16T13:30:51.509804"
     },
     {
       "test_id": "NA-04",
@@ -2228,7 +2228,7 @@
       },
       "passed": true,
       "detail": "protein=23.08%, Ca=2.01%",
-      "timestamp": "2026-04-16T09:14:05.080316"
+      "timestamp": "2026-04-16T13:30:51.510738"
     },
     {
       "test_id": "NA-05",
@@ -2275,7 +2275,7 @@
       },
       "passed": true,
       "detail": "protein=14.9%, Ca=4.38%",
-      "timestamp": "2026-04-16T09:14:05.081334"
+      "timestamp": "2026-04-16T13:30:51.511669"
     },
     {
       "test_id": "NA-06",
@@ -2301,7 +2301,7 @@
       },
       "passed": true,
       "detail": "protein=15.87%, Ca=1.39%",
-      "timestamp": "2026-04-16T09:14:05.082278"
+      "timestamp": "2026-04-16T13:30:51.512743"
     },
     {
       "test_id": "NA-07",
@@ -2348,7 +2348,7 @@
       },
       "passed": true,
       "detail": "protein=12.48%, Ca=1.83%",
-      "timestamp": "2026-04-16T09:14:05.083217"
+      "timestamp": "2026-04-16T13:30:51.513757"
     },
     {
       "test_id": "NA-08",
@@ -2374,7 +2374,7 @@
       },
       "passed": true,
       "detail": "protein=45.53%, Ca=4.33%",
-      "timestamp": "2026-04-16T09:14:05.084146"
+      "timestamp": "2026-04-16T13:30:51.514719"
     },
     {
       "test_id": "NA-09",
@@ -2400,7 +2400,7 @@
       },
       "passed": true,
       "detail": "protein=38.03%, Ca=3.35%",
-      "timestamp": "2026-04-16T09:14:05.085086"
+      "timestamp": "2026-04-16T13:30:51.515655"
     },
     {
       "test_id": "NA-10",
@@ -2447,7 +2447,7 @@
       },
       "passed": true,
       "detail": "protein=13.25%, Ca=1.71%",
-      "timestamp": "2026-04-16T09:14:05.086018"
+      "timestamp": "2026-04-16T13:30:51.516609"
     },
     {
       "test_id": "NA-11",
@@ -2494,7 +2494,7 @@
       },
       "passed": true,
       "detail": "protein=17.66%, Ca=1.88%",
-      "timestamp": "2026-04-16T09:14:05.086959"
+      "timestamp": "2026-04-16T13:30:51.517585"
     },
     {
       "test_id": "NA-12",
@@ -2701,7 +2701,7 @@
       },
       "passed": true,
       "detail": "protein=?%, Ca=?%",
-      "timestamp": "2026-04-16T09:14:05.088099"
+      "timestamp": "2026-04-16T13:30:51.518691"
     },
     {
       "test_id": "NA-13",
@@ -2714,7 +2714,7 @@
       },
       "passed": true,
       "detail": "Correctly rejected",
-      "timestamp": "2026-04-16T09:14:05.088151"
+      "timestamp": "2026-04-16T13:30:51.518741"
     }
   ]
 }
