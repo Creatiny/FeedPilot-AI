@@ -40,18 +40,17 @@ python3 {baseDir}/../../scripts/run_skill.py price "Barley price"
 ## Output Format (English)
 
 **Price Found:**
-```
-Ingredient: Barley
-Price: $158/ton
-Source: USDA NASS
-Date: 2026-03-31
+```markdown
+| Ingredient | Price | Source | Date |
+|------------|-------|--------|------|
+| Barley | $158/ton | USDA NASS | 2026-03-31 |
 ```
 
 **Auto-added:**
-```
-Ingredient: Oats
-Price: $150/ton
-Source: Reference (auto-added)
+```markdown
+| Ingredient | Price | Source | Date |
+|------------|-------|--------|------|
+| Oats | $150/ton | Reference (auto-added) | 2026-03-31 |
 ```
 
 **Not Found:**

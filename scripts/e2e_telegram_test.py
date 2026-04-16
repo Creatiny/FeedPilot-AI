@@ -25,7 +25,7 @@ from src.database.repository import FormulaRepository, PriceRepository
 from src.services.formula_service import FormulaService
 from src.services.price_service import PriceService
 from src.services.calculation_service import CalculationService
-from src.harness.task_router import TaskRouter
+# TaskRouter removed in v1.7 - LLM handles NLU natively
 from skills.formula_cost_skill.skill import FormulaCostSkill
 from skills.price_lookup_skill.skill import PriceLookupSkill
 
@@ -35,7 +35,7 @@ class TelegramE2ETester:
         self.price_service = PriceService(self.pool)
         self.formula_service = FormulaService(self.pool)
         self.calc_service = CalculationService(self.pool)
-        self.router = TaskRouter()
+        # TaskRouter removed in v1.7 - LLM handles NLU natively
         self.results = {"passed": 0, "failed": 0, "errors": []}
 
     def record(self, name, condition, detail=""):
@@ -152,24 +152,6 @@ class TelegramE2ETester:
             f"got {r_public.data.get('price')}"
         )
 
-    def test_task_router(self):
-        """测试任务路由"""
-        print("\n[任务路由测试]")
-
-        test_cases = [
-            ("计算配方成本", "formula_cost_query"),
-            ("玉米价格多少", "price_query"),
-            ("添加客户张三", "customer_manage"),
-        ]
-
-        for msg, expected in test_cases:
-            routed = self.router.classify(msg)
-            self.record(
-                f"路由 '{msg}' → {routed}",
-                routed == expected,
-                f"expected {expected}"
-            )
-
     def test_formula_list(self):
         """测试配方列表"""
         print("\n[配方列表测试]")
@@ -212,7 +194,7 @@ class TelegramE2ETester:
         self.test_private_price_priority()
         self.test_formula_list()
         self.test_nrc_formula_cost()
-        self.test_task_router()
+        # TaskRouter removed in v1.7 - LLM handles NLU natively
 
         # Skill 集成测试
         self.test_price_lookup_skill()

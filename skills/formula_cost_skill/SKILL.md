@@ -39,18 +39,20 @@ python3 {baseDir}/../../scripts/run_skill.py cost "Beef Cattle Starter cost"
 
 ## Output Format (English)
 
-```
-Formula: Beef Cattle Starter
-Cost: $125.40/ton ($0.125/kg)
-Animal: Beef Cattle
-Stage: Starter
+```markdown
+| Formula | Cost | Animal | Stage |
+|---------|------|--------|-------|
+| Beef Cattle Starter | $125.40/ton ($0.125/kg) | Beef Cattle | Starter |
 
-Ingredient Breakdown:
-- Soybean meal (20%): $70.00
-- Alfalfa hay (20%): $44.00
-- Dicalcium phosphate (1.5%): $9.75
-- Limestone (1%): $1.20
-- Salt (0.3%): $0.45
+**Ingredient Breakdown:**
+
+| Ingredient | Inclusion % | Cost Contribution |
+|------------|-------------|-------------------|
+| Soybean meal | 20% | $70.00 |
+| Alfalfa hay | 20% | $44.00 |
+| Dicalcium phosphate | 1.5% | $9.75 |
+| Limestone | 1% | $1.20 |
+| Salt | 0.3% | $0.45 |
 ```
 
 ## Available Formulas

@@ -31,7 +31,7 @@ class TestCase:
     message: str
     validation: str  # 'contains' | 'regex' | 'jsonpath'
     expected: str
-    category: str  # 'price' | 'formula' | 'task_router' | 'general'
+    category: str  # 'price' | 'formula' | 'nlu' | 'general' (task_router removed in v1.7)
 
 
 class ACPE2ETester:
@@ -242,24 +242,24 @@ class ACPE2ETester:
 
         return self.results["failed"] == 0
 
-    def test_task_router(self) -> bool:
-        """测试任务路由"""
-        print("\n[任务路由测试]")
+    def test_nlu_capability(self) -> bool:
+        """测试 LLM 原生 NLU 能力 (TaskRouter removed in v1.7)"""
+        print("\n[LLM NLU 测试]")
 
         test_cases = [
             TestCase(
-                "价格查询路由",
+                "价格查询理解",
                 "what is the price of corn?",
                 "contains",
                 "corn",
-                "task_router"
+                "nlu"
             ),
             TestCase(
-                "配方成本路由",
+                "配方成本理解",
                 "how much does Nursery Diet cost?",
                 "contains",
                 "cost",
-                "task_router"
+                "nlu"
             ),
         ]
 
@@ -341,7 +341,7 @@ class ACPE2ETester:
 
         self.test_price_lookup()
         self.test_formula_cost()
-        self.test_task_router()
+        self.test_nlu_capability()
         self.test_general()
         self.test_provider_fallback()
 
