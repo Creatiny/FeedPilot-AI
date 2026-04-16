@@ -114,12 +114,12 @@ class FormulaRepository:
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT id, name, stage_type, notes, created_at
+                SELECT id, name, animal_type, stage_type, notes, created_at
                 FROM formulas
                 WHERE owner_open_id = ?
                 ORDER BY created_at DESC
             """, (owner_open_id,))
-            
+
             return [dict(row) for row in cursor.fetchall()]
     
     def create_formula(self, owner_open_id: str, formula_data: Dict) -> int:

@@ -1,6 +1,6 @@
 ---
 name: customer-record
-description: "客户记录管理 - 管理饲料销售客户信息。使用当：用户要求添加/查询/更新/删除客户、显示所有客户、客户列表。支持多租户隔离。"
+description: "Customer record management - Manage feed sales customer information. Use when: user asks to add/find/update/delete customer, show all customers, customer list. Supports multi-tenant isolation."
 metadata:
   {
     "openclaw":
@@ -11,25 +11,25 @@ metadata:
   }
 ---
 
-# Customer Record Skill (客户记录管理)
+# Customer Record Skill
 
-管理饲料销售客户信息，支持多租户隔离。
+Manages feed sales customer information with multi-tenant isolation.
 
 ## When to Use
 
-✅ **使用此 skill 当：**
+✅ **Use this skill when:**
 
-- "添加客户 John"
-- "显示所有客户"
-- "查找客户 Smith"
-- "我有多少客户"
+- "Add customer John"
+- "Show all my customers"
+- "Find customer Smith"
+- "How many customers do I have"
 
 ## Execution
 
-使用统一启动器执行：
+Execute using the unified launcher:
 
 ```bash
-/usr/bin/python3 /root/.openclaw/workspace/feed-ai-assistant/openclaw_skills/launcher.py \
+/usr/bin/python3 /home/kenny/.openclaw/workspace-feedsales/openclaw_skills/launcher.py \
   --skill customer-record \
   --user-id <user_id> \
   --message "show all customers"

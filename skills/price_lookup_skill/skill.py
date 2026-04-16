@@ -44,24 +44,38 @@ class PriceLookupSkill:
     
     async def execute(self, user_id: str, message: str) -> Dict[str, Any]:
         """
-        Execute skill - lookup ingredient prices
-        
+        Execute skill - lookup or set ingredient prices
+
         Args:
             user_id: User ID
-            message: Message with ingredient name
-            
+            message: Message with ingredient name or price setting command
+
         Returns:
-            Dict with price data
+            Dict with price data or operation result
         """
         try:
             logger.info(f"PriceLookupSkill.execute: {message[:50]}...")
-            
+
             if not self.price_service:
                 return self._error("PriceService not initialized")
-            
+
+            # Check for private price setting commands
+            set_match = re.search(
+                r'(?:set|update|change)\s+(?:my\s+)?(.+?)\s+(?:price\s+)?(?:to|=|at|:)\s*(\d+(?:\.\d+)?)',
+                message, re.IGNORECASE
+            )
+            if set_match:
+                ingredient_name = set_match.group(1).strip()
+                price = float(set_match.group(2))
+                return self._set_private_price(user_id, ingredient_name, price)
+
+            # Check for list private prices command
+            if re.search(r'(?:my\s+)?private\s+price', message, re.IGNORECASE):
+                return self._list_private_prices(user_id)
+
             # Find ingredient name
             ingredient = self._find_ingredient(message)
-            
+
             if ingredient:
                 # 将原料名称转换为 ingredient_code（按设计文档：价格查询使用精确的 ingredient_code）
                 ingredient_code = generate_ingredient_code(ingredient)
@@ -171,9 +185,48 @@ class PriceLookupSkill:
     
     def _success(self, data: Dict) -> Dict:
         return {'success': True, 'data': data}
-    
+
     def _error(self, msg: str) -> Dict:
         return {'success': False, 'error': msg}
+
+    def _set_private_price(self, user_id: str, ingredient_name: str, price: float) -> Dict:
+        """Set a private price for an ingredient"""
+        if price <= 0:
+            return self._error("Price must be greater than 0")
+
+        result = self.price_service.set_private_price(user_id, ingredient_name, price)
+
+        if result.success:
+            return self._success({
+                'message': f"Private price for '{ingredient_name}' set to ${price:.2f}/ton",
+                'ingredient': ingredient_name,
+                'price': price,
+                'currency': 'USD',
+                'unit': 'ton',
+                'source': 'private',
+            })
+        else:
+            return self._error(result.error_message)
+
+    def _list_private_prices(self, user_id: str) -> Dict:
+        """List all private prices for a user"""
+        result = self.price_service.list_private_prices(user_id)
+
+        if result.success:
+            prices = result.data.get('prices', [])
+            if not prices:
+                return self._success({
+                    'message': 'No private prices set. Use "set my [ingredient] price to [price]" to add one.',
+                    'count': 0,
+                    'prices': [],
+                })
+            return self._success({
+                'message': f'Found {len(prices)} private price(s)',
+                'count': len(prices),
+                'prices': prices,
+            })
+        else:
+            return self._error(result.error_message)
 
 
 def create_skill(price_service):

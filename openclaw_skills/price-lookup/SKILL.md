@@ -1,6 +1,6 @@
 ---
 name: price-lookup
-description: "原料价格查询 - 查询饲料原料的最新价格。使用当：用户询问原料价格、玉米价格、豆粕多少钱。支持私有价格和公共价格。"
+description: "Ingredient price lookup - Query latest feed ingredient prices. Use when: user asks about ingredient prices, corn price, soybean meal cost. Supports private prices and public prices."
 metadata:
   {
     "openclaw":
@@ -11,28 +11,28 @@ metadata:
   }
 ---
 
-# Price Lookup Skill (原料价格查询)
+# Price Lookup Skill
 
-查询饲料原料的最新价格，支持私有价格和公共价格。
+Queries the latest prices for feed ingredients, supporting private prices and public fallback.
 
 ## When to Use
 
-✅ **使用此 skill 当：**
+✅ **Use this skill when:**
 
-- "玉米价格是多少"
-- "豆粕多少钱一吨"
+- "What is the corn price?"
+- "Soybean meal price per ton"
 - "Fish meal price"
-- "所有原料价格"
+- "All ingredient prices"
 
 ## Execution
 
-使用统一启动器执行：
+Execute using the unified launcher:
 
 ```bash
-/usr/bin/python3 /root/.openclaw/workspace/feed-ai-assistant/openclaw_skills/launcher.py \
+/usr/bin/python3 /home/kenny/.openclaw/workspace-feedsales/openclaw_skills/launcher.py \
   --skill price-lookup \
   --user-id <user_id> \
-  --message "玉米价格"
+  --message "corn price"
 ```
 
 ## Output Example

@@ -1,6 +1,6 @@
 ---
 name: formula-cost
-description: "配方成本计算 - 计算饲料配方的总成本。使用当：用户询问配方成本、配方多少钱、配方价格。支持私有价格优先查询。"
+description: "Feed formula cost calculation - Calculate total feed formula cost. Use when: user asks about formula cost, how much per ton, formula price. Supports private price priority lookup."
 metadata:
   {
     "openclaw":
@@ -11,28 +11,28 @@ metadata:
   }
 ---
 
-# Formula Cost Skill (配方成本计算)
+# Formula Cost Skill
 
-计算饲料配方的总成本，基于配方成分和原料价格。
+Calculates the total cost of a feed formula based on formula ingredients and raw material prices.
 
 ## When to Use
 
-✅ **使用此 skill 当：**
+✅ **Use this skill when:**
 
-- "Nursery Diet 1 成本是多少"
-- "配方多少钱一吨"
-- "计算 Grower Diet 成本"
+- "How much does Nursery Diet 1 cost?"
+- "What is the cost per ton of Grower Diet?"
+- "Calculate formula cost for Beef Finishing 1"
 - "Compare Nursery vs Grower formula cost"
 
 ## Execution
 
-使用统一启动器执行：
+Execute using the unified launcher:
 
 ```bash
-/usr/bin/python3 /root/.openclaw/workspace/feed-ai-assistant/openclaw_skills/launcher.py \
+/usr/bin/python3 /home/kenny/.openclaw/workspace-feedsales/openclaw_skills/launcher.py \
   --skill formula-cost \
   --user-id <user_id> \
-  --message "<formula_name>成本"
+  --message "<formula_name> cost"
 ```
 
 ## Output Example
@@ -44,16 +44,16 @@ metadata:
     "formula_name": "Nursery Diet 1",
     "animal_type": "Swine",
     "stage": "Nursery",
-    "cost_per_ton": 284.30,
-    "cost_per_kg": 0.2843,
+    "cost_per_ton": 224.30,
+    "cost_per_kg": 0.2243,
     "currency": "USD",
     "details": [...],
-    "price_sources": {"Corn": "default", "Soybean meal": "public"}
+    "price_sources": {"Corn, grain": "public", "Soybean meal, 48%": "public"}
   }
 }
 ```
 
 ## Dependencies
 
-- Database: `/root/.openclaw/workspace/feed-ai-assistant/data/feed_sales.db`
-- Services: CalculationService (FormulaService + PriceService)
+- Database: `/home/kenny/.openclaw/workspace-feedsales/data/feed_sales.db`
+- Services: CalculationService (wraps FormulaService + PriceService)

@@ -1,6 +1,6 @@
 ---
 name: nutrition-analysis
-description: "营养分析 - 分析配方营养成分并与 NRC 标准对比。使用当：用户询问配方营养、营养成分、NRC 标准对比。支持猪、鸡、牛等动物。"
+description: "Nutrition analysis - Analyze formula nutrition and compare with NRC standards. Use when: user asks about formula nutrition, nutritional composition, NRC standard comparison. Supports swine, chicken, cattle, etc."
 metadata:
   {
     "openclaw":
@@ -11,25 +11,25 @@ metadata:
   }
 ---
 
-# Nutrition Analysis Skill (营养分析)
+# Nutrition Analysis Skill
 
-分析饲料配方营养成分并与 NRC 标准对比。
+Analyzes feed formula nutrition composition and compares with NRC standards.
 
 ## When to Use
 
-✅ **使用此 skill 当：**
+✅ **Use this skill when:**
 
-- "分析 Nursery Diet 1 营养"
-- "配方营养成分"
-- "NRC 标准对比"
-- "这个配方蛋白质够吗"
+- "Analyze Nursery Diet 1 nutrition"
+- "What are the nutrition facts for this formula"
+- "Compare with NRC standards"
+- "Does this formula have enough protein"
 
 ## Execution
 
-使用统一启动器执行：
+Execute using the unified launcher:
 
 ```bash
-/usr/bin/python3 /root/.openclaw/workspace/feed-ai-assistant/openclaw_skills/launcher.py \
+/usr/bin/python3 /home/kenny/.openclaw/workspace-feedsales/openclaw_skills/launcher.py \
   --skill nutrition-analysis \
   --user-id <user_id> \
   --message "analyze Nursery Diet 1 nutrition"

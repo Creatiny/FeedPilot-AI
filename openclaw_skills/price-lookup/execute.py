@@ -2,7 +2,7 @@
 """
 Price Lookup Skill - OpenClaw Execution Wrapper
 
-查询原料价格
+Queries ingredient prices using v1.7 PriceService.
 """
 
 import sys
@@ -11,11 +11,12 @@ import json
 import argparse
 import asyncio
 
-# Add src to path
-sys.path.insert(0, '/root/.openclaw/workspace/feed-ai-assistant/src')
+# Correct workspace path
+WORKSPACE = "/home/kenny/.openclaw/workspace-feedsales"
+sys.path.insert(0, WORKSPACE)
 
-from database.pool import DatabasePool
-from services.price_service import PriceService
+from src.database.pool import DatabasePool
+from src.services.price_service import PriceService
 from skills.price_lookup_skill.skill import PriceLookupSkill
 
 
@@ -23,26 +24,26 @@ def main():
     parser = argparse.ArgumentParser(description='Price Lookup Skill')
     parser.add_argument('--user-id', required=True, help='User ID')
     parser.add_argument('--message', required=True, help='User message')
-    parser.add_argument('--db-path', default='/root/.openclaw/workspace/feed-ai-assistant/data/feed_sales.db', help='Database path')
-    
+    parser.add_argument('--db-path', default='/home/kenny/.openclaw/workspace-feedsales/data/feed_sales.db', help='Database path')
+
     args = parser.parse_args()
-    
+
     try:
         # Initialize database pool
         db_pool = DatabasePool(args.db_path)
-        
+
         # Initialize service
         price_service = PriceService(db_pool)
-        
+
         # Create skill
         skill = PriceLookupSkill(price_service)
-        
+
         # Execute
         result = asyncio.run(skill.execute(args.user_id, args.message))
-        
+
         # Output JSON
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        
+
     except Exception as e:
         error_result = {
             'success': False,
