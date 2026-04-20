@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     trial_started_at TEXT,
     trial_ends_at TEXT,
     referral_bonus_days INTEGER DEFAULT 0,
+    pro_bonus_months INTEGER DEFAULT 0,
     stripe_customer_id TEXT,
     stripe_subscription_id TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -90,26 +91,116 @@ CREATE TABLE IF NOT EXISTS users (
 -- ============================================
 -- Customers (existing table - preserve schema)
 -- ============================================
--- Note: customers table already exists with owner_open_id instead of user_id
--- Do not recreate
+CREATE TABLE IF NOT EXISTS customers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT,
+    address TEXT,
+    animal_type TEXT,
+    scale INTEGER,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    version INTEGER
+);
 
 -- ============================================
 -- Reminders (existing table - preserve schema)
 -- ============================================
--- Note: reminders table already exists
--- Do not recreate
+CREATE TABLE IF NOT EXISTS reminders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT NOT NULL,
+    customer_id INTEGER,
+    reminder_type TEXT NOT NULL,
+    reminder_date TEXT NOT NULL,
+    message TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
 
 -- ============================================
 -- Formulas (existing table - preserve schema)
 -- ============================================
--- Note: formulas table already exists with owner_open_id instead of user_id
--- Do not recreate
+CREATE TABLE IF NOT EXISTS formulas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    animal_type TEXT,
+    stage_type TEXT NOT NULL,
+    weight_range TEXT,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS formula_ingredients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    formula_id INTEGER NOT NULL,
+    ingredient_name TEXT NOT NULL,
+    ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
+    ingredient_code TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
+);
 
 -- ============================================
 -- Ingredient Prices (existing table - preserve schema)
 -- ============================================
--- Note: ingredient_prices table already exists
--- Do not recreate
+CREATE TABLE IF NOT EXISTS ingredient_prices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT,
+    ingredient_code TEXT NOT NULL,
+    ingredient_name TEXT NOT NULL,
+    price REAL NOT NULL,
+    currency TEXT DEFAULT 'USD',
+    unit TEXT DEFAULT 'ton',
+    source TEXT DEFAULT 'barchart',
+    price_date DATE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- Calculation History
+-- ============================================
+CREATE TABLE IF NOT EXISTS calculation_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_open_id TEXT NOT NULL,
+    formula_name TEXT NOT NULL,
+    total_cost REAL NOT NULL,
+    cost_per_ton REAL NOT NULL,
+    ingredients_json TEXT NOT NULL,
+    data_source TEXT DEFAULT 'barchart',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_open_id) REFERENCES users(open_id)
+);
+
+-- ============================================
+-- User Onboarding
+-- ============================================
+CREATE TABLE IF NOT EXISTS user_onboarding (
+    user_id TEXT PRIMARY KEY,
+    onboarding_step INTEGER DEFAULT 0,
+    first_action_type TEXT,
+    onboarding_started_at TEXT,
+    onboarding_completed_at TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- Audit Log
+-- ============================================
+CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    details TEXT,
+    result TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 -- ============================================
 -- Price History (existing table - preserve schema)

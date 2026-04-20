@@ -103,27 +103,28 @@ class TestFullIntegration:
         assert referrer_stats['total_bonus_days'] == 7
         assert referee_stats['total_bonus_days'] == 7
     
-    def test_three_referrals_permanent_free(self, temp_db):
-        """Test that 3 referrals grant permanent free Pro."""
+    def test_three_referrals_pro_bonus(self, temp_db):
+        """Test that 3 referrals grant 1 month Pro (from 3rd referral)."""
         from src.database.pool import DatabasePool
         from src.services.referral_service import ReferralService
         
         pool = DatabasePool(temp_db)
         referral_service = ReferralService(pool)
         
-        referrer = "permanent_referrer"
+        referrer = "pro_bonus_referrer"
         
         # Make 3 referrals
         for i in range(3):
-            referee = f"permanent_referee_{i}"
+            referee = f"pro_bonus_referee_{i}"
             result = referral_service.process_referral(
                 referrer_id=referrer,
                 referee_id=referee
             )
             assert result['success'] is True
         
-        # Check if permanent free
+        # Check Pro bonus months (only 3rd referral grants Pro)
         stats = referral_service.get_referral_stats(referrer)
         assert stats['referral_count'] == 3
+        assert stats['pro_bonus_months'] == 1  # 1 month Pro (from 3rd referral)
         assert stats['is_permanent_free'] is True
         assert stats['plan_name'] == 'pro'

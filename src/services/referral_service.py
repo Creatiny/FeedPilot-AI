@@ -14,8 +14,8 @@ class ReferralService:
     """Service for managing referrals, stats, and permanent free upgrades."""
     
     # Constants
-    BONUS_DAYS_PER_REFERRAL = 7
-    REFERRALS_FOR_PERMANENT_FREE = 3
+    BONUS_DAYS_PER_REFERRAL = 7  # Both parties get 7 days
+    REFERRALS_FOR_PRO_BONUS = 3  # After 3 referrals, each new referral = 1 month Pro
     
     def __init__(self, db_pool):
         """Initialize with database pool."""
@@ -44,11 +44,12 @@ class ReferralService:
             referral_count = result["count"] if result else 0
             
             cursor.execute(
-                "SELECT referral_bonus_days, plan_id FROM subscriptions WHERE user_id = ?",
+                "SELECT referral_bonus_days, pro_bonus_months, plan_id FROM subscriptions WHERE user_id = ?",
                 (user_id,)
             )
             sub = cursor.fetchone()
             total_bonus_days = sub["referral_bonus_days"] if sub and sub["referral_bonus_days"] else 0
+            pro_bonus_months = sub["pro_bonus_months"] if sub and sub["pro_bonus_months"] else 0
             
             is_permanent_free = False
             plan_name = "free"
@@ -60,12 +61,14 @@ class ReferralService:
                 plan = cursor.fetchone()
                 if plan:
                     plan_name = plan["name"]
-                if plan and plan["name"].lower() == "pro" and referral_count >= self.REFERRALS_FOR_PERMANENT_FREE:
+                # User has Pro bonus months
+                if pro_bonus_months > 0:
                     is_permanent_free = True
         
         return {
             "referral_count": referral_count,
             "total_bonus_days": total_bonus_days,
+            "pro_bonus_months": pro_bonus_months,
             "referral_link": referral_link,
             "is_permanent_free": is_permanent_free,
             "plan_name": plan_name
@@ -75,6 +78,10 @@ class ReferralService:
                          referral_code: str = None, new_user_id: str = None) -> Dict:
         """
         Process a referral.
+        
+        Rules:
+        - 1 referral: Both parties get 7 bonus days
+        - 3+ referrals: Each new referral = 1 month Pro for referrer
         
         Can be called with either:
         - referrer_id + referee_id (direct)
@@ -98,6 +105,7 @@ class ReferralService:
         with self.db_pool.get_connection() as conn:
             cursor = conn.cursor()
             
+            # Check if referee was already referred
             cursor.execute(
                 "SELECT id FROM referrals WHERE referee_id = ?",
                 (referee_id,)
@@ -105,11 +113,20 @@ class ReferralService:
             if cursor.fetchone():
                 return {"success": False, "message": "User has already been referred"}
             
+            # Get current referral count BEFORE adding this one
+            cursor.execute(
+                "SELECT COUNT(*) as count FROM referrals WHERE referrer_id = ?",
+                (referrer_id,)
+            )
+            current_count = cursor.fetchone()["count"]
+            
+            # Record the referral
             cursor.execute(
                 "INSERT INTO referrals (referrer_id, referee_id, bonus_days) VALUES (?, ?, ?)",
                 (referrer_id, referee_id, self.BONUS_DAYS_PER_REFERRAL)
             )
             
+            # Both parties get 7 bonus days
             cursor.execute(
                 "UPDATE subscriptions SET referral_bonus_days = COALESCE(referral_bonus_days, 0) + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
                 (self.BONUS_DAYS_PER_REFERRAL, referrer_id)
@@ -119,25 +136,30 @@ class ReferralService:
                 (self.BONUS_DAYS_PER_REFERRAL, referee_id)
             )
             
-            cursor.execute(
-                "SELECT COUNT(*) as count FROM referrals WHERE referrer_id = ?",
-                (referrer_id,)
-            )
-            referral_count = cursor.fetchone()["count"]
+            # Check if referrer qualifies for Pro bonus (3+ referrals)
+            new_count = current_count + 1
+            pro_bonus_awarded = False
             
-            permanent_free = False
-            if referral_count >= self.REFERRALS_FOR_PERMANENT_FREE:
+            if new_count >= self.REFERRALS_FOR_PRO_BONUS:
+                # Award 1 month Pro for this referral
                 cursor.execute(
-                    "UPDATE subscriptions SET plan_id = 3, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
+                    "UPDATE subscriptions SET pro_bonus_months = COALESCE(pro_bonus_months, 0) + 1, plan_id = 3, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
                     (referrer_id,)
                 )
-                permanent_free = True
+                pro_bonus_awarded = True
+            
+            conn.commit()
+        
+        message = f"Bonus applied! Both users received {self.BONUS_DAYS_PER_REFERRAL} bonus days!"
+        if pro_bonus_awarded:
+            message += f" Plus 1 month Pro for the referrer!"
         
         return {
             "success": True,
             "bonus_days": self.BONUS_DAYS_PER_REFERRAL,
-            "message": f"Bonus applied! Both users received {self.BONUS_DAYS_PER_REFERRAL} bonus days!",
-            "permanent_free": permanent_free
+            "pro_bonus_awarded": pro_bonus_awarded,
+            "message": message,
+            "referral_count": new_count
         }
     
     def get_subscription_status(self, user_id: str) -> Dict:

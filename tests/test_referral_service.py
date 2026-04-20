@@ -24,6 +24,9 @@ class MockConnection:
     def cursor(self):
         return self.conn.cursor()
     
+    def commit(self):
+        self.conn.commit()
+    
     def close(self):
         self.conn.commit()
         self.conn.close()
@@ -148,8 +151,8 @@ class TestReferralService:
         assert result2['success'] is False
         assert 'already been referred' in result2['message'].lower()
     
-    def test_three_referrals_permanent_free(self, referral_service):
-        """Test that 3 referrals grant permanent free (Pro plan)."""
+    def test_three_referrals_pro_bonus(self, referral_service):
+        """Test that 3+ referrals grant 1 month Pro each (starting from 3rd)."""
         # User makes 3 referrals
         for i in range(3):
             result = referral_service.process_referral(
@@ -158,11 +161,28 @@ class TestReferralService:
             )
             assert result['success'] is True
         
-        # Check referrer got upgraded to Pro
+        # Check referrer got Pro bonus months
+        # 3 referrals = 1 month Pro (only the 3rd referral grants Pro)
         stats = referral_service.get_referral_stats('user_123')
         assert stats['referral_count'] == 3
+        assert stats['pro_bonus_months'] == 1  # 1 month Pro (from 3rd referral)
         assert stats['is_permanent_free'] is True
         assert stats['plan_name'].lower() == 'pro'
+    
+    def test_fourth_referral_adds_more_pro(self, referral_service):
+        """Test that 4th referral adds another month Pro."""
+        # User makes 4 referrals
+        for i in range(4):
+            result = referral_service.process_referral(
+                referrer_id='user_123',
+                referee_id=f'user_{i+1}'
+            )
+            assert result['success'] is True
+        
+        # Check referrer got 2 months Pro (3rd and 4th referrals)
+        stats = referral_service.get_referral_stats('user_123')
+        assert stats['referral_count'] == 4
+        assert stats['pro_bonus_months'] == 2  # 2 months Pro (from 3rd and 4th referrals)
     
     def test_referee_gets_bonus(self, referral_service):
         """Test that referee also gets bonus days."""
