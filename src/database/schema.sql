@@ -1,136 +1,126 @@
--- FeedSales AI v1.6 数据库 Schema
--- 启用 WAL 模式
-PRAGMA journal_mode = WAL;
-PRAGMA synchronous = NORMAL;
-PRAGMA cache_size = 10000;
+-- FeedSales AI Database Schema
+-- Version: 1.7.0 (Subscription & Referral System)
+
+-- Enable foreign keys
 PRAGMA foreign_keys = ON;
 
 -- ============================================
--- 用户表
+-- Subscription Plans
 -- ============================================
+CREATE TABLE IF NOT EXISTS subscription_plans (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,          -- 'free', 'starter', 'pro'
+    display_name TEXT NOT NULL,         -- 'Free', 'Starter', 'Pro'
+    price_monthly REAL NOT NULL,        -- 0, 9.9, 39.99
+    queries_per_day INTEGER NOT NULL,   -- 3, 50, -1 (unlimited)
+    max_customers INTEGER NOT NULL,     -- 5, 50, 200
+    features TEXT,                      -- JSON array of feature names
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Seed default plans
+INSERT OR IGNORE INTO subscription_plans (id, name, display_name, price_monthly, queries_per_day, max_customers, features) VALUES
+    (1, 'free', 'Free', 0.0, 3, 5, '["basic queries", "price lookup", "formula cost"]'),
+    (2, 'starter', 'Starter', 9.9, 50, 50, '["basic queries", "price lookup", "formula cost", "customer records", "reminders"]'),
+    (3, 'pro', 'Pro', 39.99, -1, 200, '["basic queries", "price lookup", "formula cost", "customer records", "reminders", "nutrition analysis", "priority support"]');
+
+-- ============================================
+-- User Subscriptions
+-- ============================================
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT NOT NULL UNIQUE,
+    plan_id INTEGER NOT NULL DEFAULT 1,
+    is_in_trial INTEGER DEFAULT 0,
+    trial_started_at TEXT,
+    trial_ends_at TEXT,
+    referral_bonus_days INTEGER DEFAULT 0,
+    stripe_customer_id TEXT,
+    stripe_subscription_id TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(id)
+);
+
+-- ============================================
+-- Daily Query Usage
+-- ============================================
+CREATE TABLE IF NOT EXISTS daily_usage (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    usage_date TEXT NOT NULL,
+    query_count INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, usage_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_daily_usage_user_date ON daily_usage(user_id, usage_date);
+
+-- ============================================
+-- Referrals
+-- ============================================
+CREATE TABLE IF NOT EXISTS referrals (
+    id INTEGER PRIMARY KEY,
+    referrer_id TEXT NOT NULL,
+    referee_id TEXT NOT NULL UNIQUE,
+    status TEXT DEFAULT 'completed',
+    bonus_days INTEGER DEFAULT 7,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (referrer_id) REFERENCES subscriptions(user_id),
+    FOREIGN KEY (referee_id) REFERENCES subscriptions(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
+CREATE INDEX IF NOT EXISTS idx_referrals_referee ON referrals(referee_id);
+
+-- ============================================
+-- Users (existing table, preserve existing schema)
+-- ============================================
+-- Note: users table already exists with different schema
+-- Do not recreate, just ensure it exists
 CREATE TABLE IF NOT EXISTS users (
-    open_id TEXT PRIMARY KEY,              -- OpenClaw 用户 ID
-    telegram_user_id TEXT UNIQUE,          -- Telegram 用户 ID
-    feishu_user_id TEXT UNIQUE,            -- 飞书用户 ID
+    open_id TEXT NOT NULL UNIQUE,
+    telegram_user_id TEXT,
+    feishu_user_id TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================
--- 原料价格表（支持多租户隔离 + 乐观锁）
+-- Customers (existing table - preserve schema)
 -- ============================================
-CREATE TABLE IF NOT EXISTS ingredient_prices (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    owner_open_id TEXT NOT NULL,           -- 所有者 ID（NULL = 公共数据）
-    ingredient_code TEXT NOT NULL,         -- 原料代码
-    ingredient_name TEXT NOT NULL,         -- 原料名称
-    price REAL NOT NULL,                   -- 价格
-    currency TEXT DEFAULT 'USD',           -- 货币（北美市场统一 USD）
-    unit TEXT DEFAULT 'ton',               -- 单位
-    source TEXT DEFAULT 'barchart',        -- 数据来源
-    price_date DATE NOT NULL,              -- 价格日期
-    version INTEGER DEFAULT 1,             -- 乐观锁版本号
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
-    UNIQUE(ingredient_code, price_date, owner_open_id)
+-- Note: customers table already exists with owner_open_id instead of user_id
+-- Do not recreate
+
+-- ============================================
+-- Reminders (existing table - preserve schema)
+-- ============================================
+-- Note: reminders table already exists
+-- Do not recreate
+
+-- ============================================
+-- Formulas (existing table - preserve schema)
+-- ============================================
+-- Note: formulas table already exists with owner_open_id instead of user_id
+-- Do not recreate
+
+-- ============================================
+-- Ingredient Prices (existing table - preserve schema)
+-- ============================================
+-- Note: ingredient_prices table already exists
+-- Do not recreate
+
+-- ============================================
+-- Price History (existing table - preserve schema)
+-- ============================================
+-- Note: price_history table may not exist, create if needed
+CREATE TABLE IF NOT EXISTS price_history (
+    id INTEGER PRIMARY KEY,
+    ingredient_code TEXT NOT NULL,
+    price REAL NOT NULL,
+    source TEXT,
+    recorded_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_prices_owner_date ON ingredient_prices(owner_open_id, price_date);
-CREATE INDEX IF NOT EXISTS idx_prices_code ON ingredient_prices(ingredient_code);
-
--- ============================================
--- 配方表（支持多租户隔离 + 乐观锁）
--- ============================================
-CREATE TABLE IF NOT EXISTS formulas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    owner_open_id TEXT NOT NULL,           -- 所有者 ID
-    name TEXT NOT NULL,                    -- 配方名称
-    animal_type TEXT,                      -- 动物类型（Swine, Beef Cattle, Broiler 等）
-    stage_type TEXT NOT NULL,              -- 饲养阶段
-    weight_range TEXT,                     -- 体重范围
-    notes TEXT,                            -- 备注
-    version INTEGER DEFAULT 1,             -- 乐观锁版本号
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_open_id) REFERENCES users(open_id),
-    UNIQUE(owner_open_id, name)
-);
-
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_formulas_owner ON formulas(owner_open_id);
-CREATE INDEX IF NOT EXISTS idx_formulas_stage ON formulas(stage_type);
-
--- ============================================
--- 配方成分表
--- ============================================
-CREATE TABLE IF NOT EXISTS formula_ingredients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    formula_id INTEGER NOT NULL,
-    ingredient_name TEXT NOT NULL,         -- 原料名称（展示用）
-    ingredient_code TEXT NOT NULL,        -- 原料代码（精确查找键，由应用层保证引用有效性）
-    ratio_percent REAL NOT NULL CHECK(ratio_percent >= 0 AND ratio_percent <= 100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (formula_id) REFERENCES formulas(id) ON DELETE CASCADE
-);
-
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_formula_ingredients_formula ON formula_ingredients(formula_id);
-
--- ============================================
--- 客户数据表（支持多租户隔离 + 乐观锁）
--- ============================================
-CREATE TABLE IF NOT EXISTS customers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    owner_open_id TEXT NOT NULL,           -- 所有者 ID
-    name TEXT NOT NULL,                    -- 客户姓名
-    phone TEXT,                            -- 电话
-    address TEXT,                          -- 地址
-    animal_type TEXT,                      -- 养殖类型
-    scale INTEGER,                         -- 养殖规模
-    notes TEXT,
-    version INTEGER DEFAULT 1,             -- 乐观锁版本号
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_open_id) REFERENCES users(open_id)
-);
-
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_customers_owner ON customers(owner_open_id);
-
--- ============================================
--- 计算历史表（支持多租户隔离）
--- ============================================
-CREATE TABLE IF NOT EXISTS calculation_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    owner_open_id TEXT NOT NULL,           -- 所有者 ID
-    formula_name TEXT NOT NULL,            -- 配方名称
-    total_cost REAL NOT NULL,              -- 总成本
-    cost_per_ton REAL NOT NULL,            -- 每吨成本
-    ingredients_json TEXT NOT NULL,        -- JSON 格式成分
-    data_source TEXT DEFAULT 'barchart',   -- 数据来源
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_open_id) REFERENCES users(open_id)
-);
-
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_history_owner ON calculation_history(owner_open_id);
-CREATE INDEX IF NOT EXISTS idx_history_date ON calculation_history(created_at);
-
--- ============================================
--- 审计日志表
--- ============================================
-CREATE TABLE IF NOT EXISTS audit_log (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    action TEXT NOT NULL,
-    details TEXT,
-    result TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- 索引优化
-CREATE INDEX IF NOT EXISTS idx_audit_user ON audit_log(user_id, timestamp);
-
+CREATE INDEX IF NOT EXISTS idx_price_history_code ON price_history(ingredient_code);
