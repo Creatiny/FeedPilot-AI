@@ -1,0 +1,280 @@
+[
+  {
+    "name": "Corn, grain",
+    "category": "Energy feed",
+    "usda_id": "20081",
+    "nutrition": {
+      "dry_matter": 86.0,
+      "crude_protein": 8.5,
+      "crude_fat": 3.5,
+      "crude_fiber": 2.0,
+      "starch": 70.0,
+      "calcium": 0.02,
+      "phosphorus": 0.27,
+      "lysine": 0.25,
+      "methionine": 0.18
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Soybean meal, 48%",
+    "category": "Protein feed",
+    "usda_id": "20087",
+    "nutrition": {
+      "dry_matter": 87.0,
+      "crude_protein": 48.0,
+      "crude_fat": 1.5,
+      "crude_fiber": 3.5,
+      "calcium": 0.3,
+      "phosphorus": 0.6,
+      "lysine": 2.9,
+      "methionine": 0.65
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Fish meal, 65%",
+    "category": "Protein feed",
+    "usda_id": "20099",
+    "nutrition": {
+      "dry_matter": 92.0,
+      "crude_protein": 65.0,
+      "crude_fat": 10.0,
+      "crude_fiber": 0.5,
+      "calcium": 4.0,
+      "phosphorus": 2.8,
+      "lysine": 4.8,
+      "methionine": 1.5
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Alfalfa hay, early bloom",
+    "category": "Forage",
+    "usda_id": "20011",
+    "nutrition": {
+      "dry_matter": 88.0,
+      "crude_protein": 18.0,
+      "crude_fat": 2.5,
+      "crude_fiber": 28.0,
+      "calcium": 1.4,
+      "phosphorus": 0.25,
+      "tdn": 58.0
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Corn silage",
+    "category": "Forage",
+    "usda_id": "20017",
+    "nutrition": {
+      "dry_matter": 35.0,
+      "crude_protein": 8.0,
+      "crude_fat": 3.5,
+      "crude_fiber": 22.0,
+      "starch": 32.0,
+      "calcium": 0.25,
+      "phosphorus": 0.2,
+      "tdn": 70.0
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Dicalcium phosphate",
+    "category": "Mineral supplement",
+    "nutrition": {
+      "calcium": 23.0,
+      "phosphorus": 18.5
+    },
+    "unit": "%",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Limestone, ag",
+    "category": "Mineral supplement",
+    "nutrition": {
+      "calcium": 38.0
+    },
+    "unit": "%",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Salt, white",
+    "category": "Mineral supplement",
+    "nutrition": {
+      "sodium": 39.0,
+      "chloride": 60.0
+    },
+    "unit": "%",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "L-Lysine HCl",
+    "category": "Amino acid",
+    "nutrition": {
+      "lysine": 78.0
+    },
+    "unit": "%",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "DL-Methionine",
+    "category": "Amino acid",
+    "nutrition": {
+      "methionine": 99.0
+    },
+    "unit": "%",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Vitamin premix, swine",
+    "category": "Vitamin supplement",
+    "nutrition": {
+      "vitamin_a": 500000,
+      "vitamin_d3": 75000,
+      "vitamin_e": 2500
+    },
+    "unit": "IU/lb",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Mineral premix, swine",
+    "category": "Mineral supplement",
+    "nutrition": {
+      "iron": 6000,
+      "zinc": 5000,
+      "manganese": 2500,
+      "copper": 500
+    },
+    "unit": "ppm",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Wheat middlings",
+    "category": "Energy feed",
+    "usda_id": "20135",
+    "nutrition": {
+      "dry_matter": 87.0,
+      "crude_protein": 16.0,
+      "crude_fat": 4.5,
+      "crude_fiber": 9.0,
+      "calcium": 0.12,
+      "phosphorus": 0.95,
+      "tdn": 72.0
+    },
+    "unit": "% DM basis",
+    "source": "USDA Feed Composition Database"
+  },
+  {
+    "name": "Milk replacer, calf",
+    "category": "Protein feed",
+    "nutrition": {
+      "dry_matter": 94.0,
+      "crude_protein": 22.0,
+      "crude_fat": 20.0,
+      "crude_fiber": 0.5,
+      "calcium": 0.7,
+      "phosphorus": 0.6
+    },
+    "unit": "% DM basis",
+    "source": "Commercial Standard"
+  },
+  {
+    "name": "Premix, beef",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 350000,
+      "vitamin_d3": 50000,
+      "vitamin_e": 1000,
+      "calcium": 15.0,
+      "phosphorus": 8.0,
+      "zinc": 3000
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, dairy",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 400000,
+      "vitamin_d3": 100000,
+      "vitamin_e": 2000,
+      "calcium": 18.0,
+      "phosphorus": 10.0,
+      "zinc": 3500
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, broiler",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 600000,
+      "vitamin_d3": 200000,
+      "vitamin_e": 3000,
+      "calcium": 20.0,
+      "phosphorus": 12.0
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, layer",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 500000,
+      "vitamin_d3": 150000,
+      "vitamin_e": 2500,
+      "calcium": 35.0,
+      "phosphorus": 8.0
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, sow",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 450000,
+      "vitamin_d3": 60000,
+      "vitamin_e": 2000,
+      "calcium": 16.0,
+      "phosphorus": 9.0
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, calf",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 500000,
+      "vitamin_d3": 100000,
+      "vitamin_e": 2500,
+      "calcium": 18.0,
+      "phosphorus": 10.0
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  },
+  {
+    "name": "Premix, heifer",
+    "category": "Vitamin/mineral supplement",
+    "nutrition": {
+      "vitamin_a": 400000,
+      "vitamin_d3": 80000,
+      "vitamin_e": 2000,
+      "calcium": 16.0,
+      "phosphorus": 9.0
+    },
+    "unit": "Mixed units",
+    "source": "Feed Additive Standard"
+  }
+]

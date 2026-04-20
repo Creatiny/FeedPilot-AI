@@ -1,0 +1,51 @@
+{
+  "豆粕": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  "豆粕48": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  "豆粕 48%": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  "soybean meal": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  "soybean meal 48": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  "SBM": {"name": "Soybean meal, 48%", "code": "ING_SBM_48"},
+  
+  "玉米": {"name": "Corn, grain", "code": "ING_CORN"},
+  "corn": {"name": "Corn, grain", "code": "ING_CORN"},
+  "corn grain": {"name": "Corn, grain", "code": "ING_CORN"},
+  
+  "鱼粉": {"name": "Fish meal, 65%", "code": "ING_FISH_65"},
+  "鱼粉65": {"name": "Fish meal, 65%", "code": "ING_FISH_65"},
+  "fish meal": {"name": "Fish meal, 65%", "code": "ING_FISH_65"},
+  "fish meal 65": {"name": "Fish meal, 65%", "code": "ING_FISH_65"},
+  
+  "DDGS": {"name": "DDGS, 28%", "code": "ING_DDGS_28"},
+  "ddgs": {"name": "DDGS, 28%", "code": "ING_DDGS_28"},
+  "酒糟蛋白": {"name": "DDGS, 28%", "code": "ING_DDGS_28"},
+  
+  "小麦": {"name": "Wheat, grain", "code": "ING_WHEAT"},
+  "wheat": {"name": "Wheat, grain", "code": "ING_WHEAT"},
+  
+  "麸皮": {"name": "Wheat bran", "code": "ING_WHEAT_BRAN"},
+  "wheat bran": {"name": "Wheat bran", "code": "ING_WHEAT_BRAN"},
+  
+  "豆油": {"name": "Soybean oil", "code": "ING_SBM_OIL"},
+  "soybean oil": {"name": "Soybean oil", "code": "ING_SBM_OIL"},
+  
+  "磷酸氢钙": {"name": "Dicalcium phosphate", "code": "ING_DCP"},
+  "dicalcium phosphate": {"name": "Dicalcium phosphate", "code": "ING_DCP"},
+  "DCP": {"name": "Dicalcium phosphate", "code": "ING_DCP"},
+  
+  "石粉": {"name": "Limestone", "code": "ING_LIMESTONE"},
+  "limestone": {"name": "Limestone", "code": "ING_LIMESTONE"},
+  
+  "盐": {"name": "Salt", "code": "ING_SALT"},
+  "食盐": {"name": "Salt", "code": "ING_SALT"},
+  "salt": {"name": "Salt", "code": "ING_SALT"},
+  
+  "赖氨酸": {"name": "L-Lysine HCl", "code": "ING_LYSINE"},
+  "L-赖氨酸": {"name": "L-Lysine HCl", "code": "ING_LYSINE"},
+  "lysine": {"name": "L-Lysine HCl", "code": "ING_LYSINE"},
+  
+  "蛋氨酸": {"name": "DL-Methionine", "code": "ING_METHIONINE"},
+  "methionine": {"name": "DL-Methionine", "code": "ING_METHIONINE"},
+  
+  "苜蓿草粉": {"name": "Alfalfa hay early bloom", "code": "ING_ALFALFA"},
+  "alfalfa": {"name": "Alfalfa hay early bloom", "code": "ING_ALFALFA"}
+}
