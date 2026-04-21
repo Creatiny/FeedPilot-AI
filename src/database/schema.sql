@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS formulas (
     stage_type TEXT NOT NULL,
     weight_range TEXT,
     notes TEXT,
+    version INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
