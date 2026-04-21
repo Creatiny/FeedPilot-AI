@@ -162,7 +162,15 @@ class SimpleFormulaService:
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name, animal_type, stage_type FROM formulas ORDER BY name')
+        cursor.execute(
+            '''
+            SELECT id, name, animal_type, stage_type
+            FROM formulas
+            WHERE owner_open_id = ? OR owner_open_id = 'system_public'
+            ORDER BY name
+            ''',
+            (user_id,)
+        )
         formulas = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return ServiceResult(success=True, data={'formulas': formulas, 'total': len(formulas)})
@@ -268,8 +276,11 @@ class SimpleCustomerService:
         sets = ', '.join([f'{k} = ?' for k in filtered_data.keys()])
         cursor.execute(f'UPDATE customers SET {sets} WHERE id = ? AND owner_open_id = ?', 
                       list(filtered_data.values()) + [customer_id, user_id])
+        updated = cursor.rowcount
         conn.commit()
         conn.close()
+        if updated == 0:
+            return ServiceResult(success=False, error_message='Customer not found or access denied')
         return ServiceResult(success=True)
     
     def delete_customer(self, user_id: str, customer_id: int):
