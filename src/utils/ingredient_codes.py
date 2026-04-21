@@ -104,8 +104,13 @@ def generate_ingredient_code(ingredient_name: str) -> str:
 
     name_lower = ingredient_name.lower()
 
-    # 精确匹配映射表（优先最长 key 匹配）
-    for key, code in INGREDIENT_CODE_MAP.items():
+    # Longest-key-first matching avoids short-key shadowing
+    # (e.g. "Corn" matching before "Corn, #2 Yellow").
+    for key, code in sorted(
+        INGREDIENT_CODE_MAP.items(),
+        key=lambda item: len(item[0]),
+        reverse=True
+    ):
         if key.lower() in name_lower:
             return code
 

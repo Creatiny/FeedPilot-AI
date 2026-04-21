@@ -106,19 +106,29 @@ CREATE TABLE IF NOT EXISTS customers (
 );
 
 -- ============================================
--- Reminders (existing table - preserve schema)
+-- Reminders (v2 schema)
 -- ============================================
 CREATE TABLE IF NOT EXISTS reminders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    owner_open_id TEXT NOT NULL,
-    customer_id INTEGER,
-    reminder_type TEXT NOT NULL,
-    reminder_date TEXT NOT NULL,
-    message TEXT,
-    status TEXT DEFAULT 'pending',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('price', 'formula_cost')),
+    ingredient TEXT,
+    ingredient_code TEXT,
+    formula TEXT,
+    formula_id TEXT,
+    threshold REAL NOT NULL,
+    condition TEXT NOT NULL CHECK(condition IN ('above', 'below')),
+    enabled BOOLEAN DEFAULT 1,
+    last_triggered_at TEXT,
+    trigger_count INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_reminders_user ON reminders(user_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_enabled ON reminders(enabled);
+CREATE INDEX IF NOT EXISTS idx_reminders_type_ingredient ON reminders(type, ingredient_code);
+CREATE INDEX IF NOT EXISTS idx_reminders_type_formula ON reminders(type, formula_id);
 
 -- ============================================
 -- Formulas (existing table - preserve schema)
