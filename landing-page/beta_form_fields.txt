@@ -1,0 +1,102 @@
+# FeedSales AI Beta Signup Form - Field Definitions
+# For Google Forms setup
+# Created: 2026-03-30
+
+## Form Title
+FeedSales AI Beta Program Signup
+
+## Form Description
+Join our beta program and get 30 days of free access to FeedSales AI — the AI-powered feed sales assistant designed for North American feed industry professionals.
+
+---
+
+## Field 1: Full Name
+- Type: Short text
+- Required: Yes
+- Question: Full Name
+- Validation: None
+
+## Field 2: Email
+- Type: Short text
+- Required: Yes
+- Question: Email Address
+- Validation: Email format
+- Description: We'll send your beta access details here
+
+## Field 3: Company
+- Type: Short text
+- Required: No
+- Question: Company / Organization Name
+- Validation: None
+
+## Field 4: Job Title
+- Type: Short text
+- Required: No
+- Question: Job Title
+- Validation: None
+- Description: e.g., Feed Sales Representative, Feed Mill Manager, Nutritionist
+
+## Field 5: Livestock Operation Size
+- Type: Multiple choice (single select)
+- Required: Yes
+- Question: How many head of livestock does your operation manage?
+- Options:
+  - Less than 1,000
+  - 1,000 - 10,000
+  - More than 10,000
+- Validation: None
+
+## Field 6: Species Worked With
+- Type: Checkbox (multi-select)
+- Required: Yes
+- Question: What species do you work with? (Select all that apply)
+- Options:
+  - Swine
+  - Beef cattle
+  - Dairy cattle
+  - Poultry
+  - Other (with text field for specification)
+- Validation: None
+
+## Field 7: Current Cost Calculation Method
+- Type: Multiple choice (single select)
+- Required: Yes
+- Question: How do you currently calculate feed costs?
+- Options:
+  - Excel spreadsheets
+  - Specialized software (e.g., Feed formulation software)
+  - Manual calculations
+  - Other (with text field for specification)
+- Validation: None
+
+## Field 8: Biggest Frustration
+- Type: Long text (paragraph)
+- Required: Yes
+- Question: What's your biggest frustration with feed cost management?
+- Description: Tell us about the challenges you face — this helps us improve FeedSales AI for your needs
+- Validation: None
+- Max length: 1000 characters (recommended)
+
+---
+
+## Form Settings
+- Confirmation message: "Thank you for signing up! We'll review your application and send beta access details within 2-3 business days."
+- Collect email addresses: Yes
+- Limit to 1 response per person: Yes
+- Edit after submit: No
+- See summary charts: Yes
+
+---
+
+## Optional Additions (Consider for later)
+- "How did you hear about FeedSales AI?" (Dropdown)
+- "What features are you most interested in?" (Checkboxes)
+- "Preferred Telegram username for bot access" (Short text)
+
+---
+
+## Implementation Notes
+1. Create form at forms.google.com
+2. Replace placeholder URL in index.html with actual form URL
+3. Set up email notifications for new responses
+4. Consider integrating with CRM or spreadsheet for tracking

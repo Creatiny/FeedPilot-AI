@@ -1,0 +1,17 @@
+# FeedSales AI Landing Page - robots.txt
+# https://feedsales.ai/robots.txt
+
+User-agent: *
+Allow: /
+
+# Disallow admin/private areas (none currently)
+# Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://feedsales.ai/sitemap.xml
+
+# Crawl delay (optional, be gentle to server)
+Crawl-delay: 1
+
+# Allow search engines to index all public content
+# This is a landing page, so everything should be accessible

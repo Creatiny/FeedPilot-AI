@@ -1,10 +1,12 @@
-# AGENTS.md - FeedPilot AI Workspace
+# AGENTS.md - FeedSales Workspace
 
-**FeedPilot AI Agent** - Feed formula cost calculation service.
+**FeedSales Agent** - Feed formula cost calculation service.
 
 ## Core Project
 
-**FeedPilot AI** - Intelligent Feed Formula Cost Calculation System
+**FeedSales AI MVP** - Feed Formula Cost Calculation System
+
+Location: `/home/kenny/.openclaw/workspace/feed-sales-ai-mvp`
 
 Features:
 - 38 NRC standard formulas (Swine, Cattle, Poultry, Sheep, Goat, Duck, Pet, Aquatic)
@@ -19,17 +21,17 @@ Features:
 ### Exec Command Format
 
 ```
-python3 scripts/run_skill.py <type> "<query>"
+python3 /home/kenny/.openclaw/workspace-feedsales/scripts/run_skill.py <type> "<query>"
 ```
 
 ### Quick Reference
 
 | Query Type | Command Example |
 |------------|-----------------|
-| Ingredient price | `python3 scripts/run_skill.py price "corn price"` |
-| Formula cost | `python3 scripts/run_skill.py cost "Nursery Diet 1 cost"` |
-| Nutrition analysis | `python3 scripts/run_skill.py nutrition "analyze Nursery Diet 1"` |
-| Customer records | `python3 scripts/run_skill.py customer "show customers"` |
+| Ingredient price | `python3 /home/kenny/.openclaw/workspace-feedsales/scripts/run_skill.py price "corn price"` |
+| Formula cost | `python3 /home/kenny/.openclaw/workspace-feedsales/scripts/run_skill.py cost "Nursery Diet 1 cost"` |
+| Nutrition analysis | `python3 /home/kenny/.openclaw/workspace-feedsales/scripts/run_skill.py nutrition "analyze Nursery Diet 1"` |
+| Customer records | `python3 /home/kenny/.openclaw/workspace-feedsales/scripts/run_skill.py customer "show customers"` |
 
 ### Workflow
 
@@ -63,7 +65,20 @@ python3 scripts/run_skill.py <type> "<query>"
 
 **Manual update:**
 ```bash
+cd /home/kenny/.openclaw/workspace/feed-sales-ai-mvp
 python3 scripts/update_prices.py
+```
+
+## User Authorization (MVP)
+
+Using OpenClaw native **Pairing** mode:
+
+```bash
+# View pending requests
+openclaw pairing list telegram --account feedsales
+
+# Approve user
+openclaw pairing approve telegram <pairing_code> --account feedsales
 ```
 
 ---
