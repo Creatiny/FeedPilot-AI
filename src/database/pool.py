@@ -1,8 +1,8 @@
-"""
+﻿"""
 FeedSales AI - Database Pool
 
-SQLite 连接池（WAL 模式）
-提供线程安全的数据库连接管理
+SQLite connection pool utilities (WAL mode)
+Provides thread-safe database connection management.
 """
 
 import sqlite3
@@ -13,79 +13,79 @@ from typing import Generator
 
 
 class DatabasePool:
-    """SQLite 连接池（WAL 模式）"""
-    
-    _instance = None
+    """SQLite connection pool (WAL mode)."""
+
+    _instances = {}
     _lock = threading.Lock()
-    
+
     def __new__(cls, db_path: str):
-        """单例模式"""
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
-    
+        """One shared DatabasePool instance per database path."""
+        resolved_path = str(Path(db_path).resolve())
+        with cls._lock:
+            if resolved_path not in cls._instances:
+                instance = super().__new__(cls)
+                instance._initialized = False
+                cls._instances[resolved_path] = instance
+            return cls._instances[resolved_path]
+
     def __init__(self, db_path: str):
-        """初始化数据库连接池"""
+        """Initialize database pool."""
+        resolved_path = Path(db_path).resolve()
         if self._initialized:
-            if str(self.db_path) != str(db_path):
+            if str(self.db_path) != str(resolved_path):
                 raise RuntimeError(
-                    f"DatabasePool singleton already initialized with {self.db_path}, "
-                    f"cannot switch to {db_path}"
+                    f"DatabasePool instance already initialized with {self.db_path}, "
+                    f"cannot switch to {resolved_path}"
                 )
             return
 
-        self.db_path = Path(db_path)
+        self.db_path = resolved_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._local = threading.local()
         self._init_db()
         self._initialized = True
-    
+
     def _init_db(self):
-        """初始化数据库（启用 WAL 模式）"""
+        """Initialize database and enable WAL mode."""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        
-        # 启用 WAL 模式
+
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.execute("PRAGMA cache_size=10000")
         cursor.execute("PRAGMA foreign_keys=ON")
-        
-        # 执行 Schema
+
         schema_path = Path(__file__).parent / "schema.sql"
         if schema_path.exists():
-            with open(schema_path, 'r', encoding='utf-8') as f:
+            with open(schema_path, "r", encoding="utf-8") as f:
                 cursor.executescript(f.read())
-        
+
         conn.commit()
         conn.close()
-    
+
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
-        """获取数据库连接（线程安全，自动提交）"""
+        """Get a database connection (thread-safe, auto-commit)."""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         try:
             yield conn
-            conn.commit()  # 自动提交未提交的更改
+            conn.commit()
         finally:
             conn.close()
-    
+
     def test_connection(self) -> bool:
-        """测试连接"""
+        """Test database connectivity."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT 1")
             result = cursor.fetchone()[0]
             return result == 1
-    
+
     def get_wal_path(self) -> Path:
-        """获取 WAL 文件路径"""
-        return self.db_path.with_suffix(self.db_path.suffix + '-wal')
-    
+        """Get WAL file path."""
+        return self.db_path.with_suffix(self.db_path.suffix + "-wal")
+
     def get_shm_path(self) -> Path:
-        """获取 SHM 文件路径"""
-        return self.db_path.with_suffix(self.db_path.suffix + '-shm')
+        """Get SHM file path."""
+        return self.db_path.with_suffix(self.db_path.suffix + "-shm")
