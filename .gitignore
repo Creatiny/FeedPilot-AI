@@ -54,6 +54,23 @@ logs/
 .env
 .env.local
 
+# Sensitive data
+data/authorized.json
+memory/
+
+# Non-core directories (kept locally but not in git)
+landing-page/
+marketing/
+reports/
+tests/
+backup/
+content/
+
+# Local development files
+CLAUDE.md
+CODE_REVIEW_REPORT.md
+check_db.py
+
 # OS
 .DS_Store
 Thumbs.db

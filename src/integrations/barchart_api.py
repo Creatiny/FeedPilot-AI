@@ -122,16 +122,16 @@ class BarchartAPIClient:
         Returns:
             USD/吨价格
         """
-        # 转换系数（不同商品不同，1 蒲式耳 = kg）
-        conversion_factors = {
+        # kg per bushel (不同商品不同)
+        kg_per_bushel = {
             "Corn": 25.4,  # 1 蒲式耳 = 25.4 kg
             "Soybean meal": 27.2,
             "Wheat": 27.2,
         }
-        
-        factor = conversion_factors.get(commodity, 25.4)
-        # USD/bushel * kg/bushel * 1000 = USD/ton
-        price_usd_ton = price_usd_bushel * factor * 1000 / 453.6
+
+        factor = kg_per_bushel.get(commodity, 25.4)
+        # USD/bushel -> USD/kg -> USD/ton
+        price_usd_ton = price_usd_bushel / factor * 1000
         
         return round(price_usd_ton, 2)
     

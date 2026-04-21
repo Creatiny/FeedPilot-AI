@@ -13,8 +13,8 @@ import argparse
 import asyncio
 from pathlib import Path
 
-# Set up paths - import from base directory to maintain package structure
-BASE_DIR = Path('/home/kenny/.openclaw/workspace-feedsales')
+# Set up paths - auto-detect project root from this file location
+BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / 'data' / 'feed_sales.db'
 
 # Add base directory to Python path (not src)

@@ -30,8 +30,13 @@ class DatabasePool:
     def __init__(self, db_path: str):
         """初始化数据库连接池"""
         if self._initialized:
+            if str(self.db_path) != str(db_path):
+                raise RuntimeError(
+                    f"DatabasePool singleton already initialized with {self.db_path}, "
+                    f"cannot switch to {db_path}"
+                )
             return
-        
+
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._local = threading.local()

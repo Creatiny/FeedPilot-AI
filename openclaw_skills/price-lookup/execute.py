@@ -11,8 +11,9 @@ import json
 import argparse
 import asyncio
 
-# Correct workspace path
-WORKSPACE = "/home/kenny/.openclaw/workspace-feedsales"
+# Auto-detect project root from this file location
+from pathlib import Path
+WORKSPACE = str(Path(__file__).resolve().parent.parent.parent)
 sys.path.insert(0, WORKSPACE)
 
 from src.database.pool import DatabasePool
@@ -24,7 +25,7 @@ def main():
     parser = argparse.ArgumentParser(description='Price Lookup Skill')
     parser.add_argument('--user-id', required=True, help='User ID')
     parser.add_argument('--message', required=True, help='User message')
-    parser.add_argument('--db-path', default='/home/kenny/.openclaw/workspace-feedsales/data/feed_sales.db', help='Database path')
+    parser.add_argument('--db-path', default=f'{WORKSPACE}/data/feed_sales.db', help='Database path')
 
     args = parser.parse_args()
 

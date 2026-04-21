@@ -8,16 +8,19 @@ FeedSales AI - Cron Price/Formula Check Script
 - 输出固定格式，供 cron job 解析
 """
 import os
-os.environ['PYTHONPATH'] = '/home/kenny/.openclaw/workspace-feedsales'
 import sys
-sys.path.insert(0, '/home/kenny/.openclaw/workspace-feedsales')
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 from src.database.pool import DatabasePool
 from src.services.price_service import PriceService
 from src.services.formula_service import FormulaService
 from src.services.calculation_service import CalculationService
 
-DB_PATH = '/home/kenny/.openclaw/workspace-feedsales/data/feed_sales.db'
-DB = DatabasePool(DB_PATH)
+DB_PATH = PROJECT_ROOT / 'data' / 'feed_sales.db'
+DB = DatabasePool(str(DB_PATH))
 
 def get_price(ingredient_name: str) -> dict | None:
     """通过 PriceService 获取公共价格（设计文档指定方式）"""
