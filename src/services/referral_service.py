@@ -23,12 +23,14 @@ class ReferralService:
         self._referral_code_cache = {}
     
     def get_referral_link(self, user_id: str) -> str:
+        import os
         self._ensure_user_exists(user_id)
         hash_obj = hashlib.md5(user_id.encode())
         referral_code = hash_obj.hexdigest()[:8]
         full_code = f"ref_{referral_code}"
         self._referral_code_cache[full_code] = user_id
-        return full_code
+        bot_username = os.getenv("FEEDPILOT_BOT_USERNAME", "feedpilot_bot")
+        return f"https://t.me/{bot_username}?start={full_code}"
     
     def get_referral_stats(self, user_id: str) -> Dict:
         self._ensure_user_exists(user_id)
