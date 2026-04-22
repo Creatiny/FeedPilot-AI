@@ -11,6 +11,7 @@ import importlib.util
 import json
 import os
 import re
+import sqlite3
 import sys
 from typing import Optional
 
@@ -255,6 +256,15 @@ class ReminderSkill:
 
 def get_reminder_skill():
     return ReminderSkill(SkillReminderService())
+
+
+def _load_module(module_name: str, file_path: str):
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load module '{module_name}' from '{file_path}'")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 # ============== Subscription & Referral Services ==============
@@ -645,11 +655,11 @@ class ReferralSkill:
             return {'success': False, 'error': result.get('message', 'Failed to process referral')}
 
         # Default: show referral info
-        stats = self._referral_service.get_referral_stats(user_id)
+        referral_link = self._referral_service.get_referral_link(user_id)
         return {
             'success': True,
             'data': {
-                '_markdown': f"Your referral link: ref_{hashlib.md5(user_id.encode()).hexdigest()[:8]}\n\nShare it with friends — both of you get 7 bonus days!\n3+ referrals = 1 month Pro per referral!"
+                '_markdown': f"Your referral link: {referral_link}\n\nShare it with friends — both of you get 7 bonus days!\n3+ referrals = 1 month Pro per referral!"
             }
         }
 
