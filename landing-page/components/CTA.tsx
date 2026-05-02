@@ -18,7 +18,7 @@ export default function CTA() {
             Ready to Calculate 360x Faster?
           </h2>
           <p className="text-xl text-white/90 mb-10">
-            Join 50+ feed manufacturers using FeedPilot AI. 
+            Join early users trying FeedPilot AI.
             Start your 7-day free trial today.
           </p>
 

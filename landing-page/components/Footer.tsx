@@ -1,4 +1,4 @@
-import { Linkedin, Twitter, Mail, Github } from "lucide-react";
+import { Linkedin, Twitter, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -12,17 +12,14 @@ export default function Footer() {
               Professional feed formula calculator for manufacturers in North America and Australia.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="https://www.linkedin.com/company/feedpilot-ai" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 <Linkedin className="w-6 h-6" />
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="https://x.com/feedpilot_ai" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 <Twitter className="w-6 h-6" />
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="mailto:hello@feedpilot.ai" className="hover:text-white transition-colors">
                 <Mail className="w-6 h-6" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Github className="w-6 h-6" />
               </a>
             </div>
           </div>
@@ -111,8 +108,6 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-6 text-sm">
             <span>Made with ❤️ for feed manufacturers</span>
-            <span>•</span>
-            <span>Powered by OpenClaw AI</span>
           </div>
         </div>
       </div>

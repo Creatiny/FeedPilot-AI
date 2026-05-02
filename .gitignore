@@ -59,7 +59,6 @@ data/authorized.json
 memory/
 
 # Non-core directories (kept locally but not in git)
-landing-page/
 marketing/
 reports/
 tests/

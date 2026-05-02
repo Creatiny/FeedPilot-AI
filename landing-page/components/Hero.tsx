@@ -19,7 +19,7 @@ export default function Hero() {
             className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold mb-8"
           >
             <CheckCircle className="w-4 h-4" />
-            Trusted by 50+ Feed Manufacturers in North America
+            Early Access — Join Beta Testers
           </motion.div>
 
           {/* Headline */}
@@ -64,7 +64,7 @@ export default function Hero() {
             </a>
             <a href="#demo" className="btn-secondary inline-flex items-center gap-2">
               <Play className="w-5 h-5" />
-              Watch Demo (2:30)
+              Watch Demo (1:00)
             </a>
           </motion.div>
 

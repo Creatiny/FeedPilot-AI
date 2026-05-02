@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
 
 -- Seed default plans
 INSERT OR IGNORE INTO subscription_plans (id, name, display_name, price_monthly, queries_per_day, max_customers, features) VALUES
-    (1, 'free', 'Free', 0.0, 3, 5, '["basic queries", "price lookup", "formula cost"]'),
-    (2, 'starter', 'Starter', 9.9, 50, 50, '["basic queries", "price lookup", "formula cost", "customer records", "reminders"]'),
-    (3, 'pro', 'Pro', 39.99, -1, 200, '["basic queries", "price lookup", "formula cost", "customer records", "reminders", "nutrition analysis", "priority support"]');
+    (1, 'free', 'Free', 0.0, 10, 5, '["basic queries", "price lookup", "formula cost"]'),
+    (2, 'starter', 'Starter', 9.99, 50, 50, '["basic queries", "price lookup", "formula cost", "customer records", "reminders"]'),
+    (3, 'pro', 'Pro', 29.99, -1, 200, '["basic queries", "price lookup", "formula cost", "customer records", "reminders", "nutrition analysis", "priority support"]');
 
 -- ============================================
 -- User Subscriptions
