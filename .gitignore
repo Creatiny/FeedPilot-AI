@@ -74,3 +74,8 @@ check_db.py
 # OS
 .DS_Store
 Thumbs.db
+
+# Node.js / Next.js (landing-page)
+node_modules/
+.next/
+npm-debug.log*
