@@ -13,8 +13,8 @@ import argparse
 import asyncio
 from pathlib import Path
 
-# Set up paths - import from base directory to maintain package structure
-BASE_DIR = Path('/home/kenny/.openclaw/workspace-feedsales')
+# Set up paths - auto-detect project root from this file location
+BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / 'data' / 'feed_sales.db'
 
 # Add base directory to Python path (not src)
@@ -158,15 +158,6 @@ def run_subscription(user_id: str, message: str) -> dict:
             'success': True,
             'message': format_subscription_status(status),
             'data': status
-        }
-    
-    elif message in ['trial', '/trial', 'start trial']:
-        # 开始试用期
-        result = sub_service.start_trial(user_id, days=7)
-        return {
-            'success': True,
-            'message': f"Your 7-day free trial has started! You now have access to Starter features.\n\nTrial ends: {result['trial_ends_at'][:10]}",
-            'data': result
         }
     
     elif message in ['upgrade', '/upgrade', 'plans']:
@@ -314,9 +305,6 @@ def format_subscription_status(status: dict) -> str:
         f"Plan: {status['plan_name']}",
     ]
     
-    if status['is_in_trial']:
-        lines.append(f"Trial: {status['trial_days_left']} days left")
-    
     if status['queries_per_day'] == -1:
         lines.append("Queries: Unlimited")
     else:
@@ -349,7 +337,7 @@ def format_plans_info() -> str:
 • 200 customers
 • All features + nutrition analysis
 
-Type /trial to start your 7-day free trial!"""
+Subscribe at feedpilot.gumroad.com"""
 
 
 SKILLS = {

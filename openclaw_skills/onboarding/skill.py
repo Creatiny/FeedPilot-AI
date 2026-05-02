@@ -2,9 +2,8 @@
 Onboarding Skill - Guide new users through first valuable action
 
 Integrates:
-- 7-day free trial for new users
 - Referral link display
-- Trial status information
+- Subscription status information
 """
 
 import json
@@ -33,20 +32,6 @@ def get_subscription_info(user_id: str) -> dict:
         return service.get_subscription_status(user_id)
     except Exception as e:
         return {"plan_name": "free", "is_in_trial": False, "trial_days_left": 0}
-
-
-def start_user_trial(user_id: str) -> dict:
-    """Start 7-day trial for new user"""
-    try:
-        from src.database.pool import DatabasePool
-        from src.services.subscription_service import SubscriptionService
-        
-        db_path = PROJECT_ROOT / "data" / "feed_sales.db"
-        pool = DatabasePool(str(db_path))
-        service = SubscriptionService(pool)
-        return service.start_trial(user_id, days=7)
-    except Exception as e:
-        return {"success": False, "error": str(e)}
 
 
 def get_referral_link(user_id: str) -> str:
@@ -131,21 +116,15 @@ def handle_onboarding(user_id: str, message: str) -> dict:
     message_lower = message.lower().strip()
     state = get_user_state(user_id)
     
-    # Step 0: New user - show welcome and start trial
+    # Step 0: New user - show welcome
     if state["step"] == 0 or message_lower in ["/start", "start", "hi", "hello"]:
         update_user_state(user_id, 1)
-        
-        # Start 7-day trial for new users
-        trial_result = start_user_trial(user_id)
-        trial_msg = ""
-        if trial_result.get("success"):
-            trial_msg = "\n\n🎁 **Bonus: Your 7-day free trial has started!**"
         
         return {
             "success": True,
             "data": {
                 "step": 1,
-                "message": f"""👋 Welcome to FeedSales AI!
+                "message": f"""👋 Welcome to FeedPilot AI!
 
 I'm your pocket feed assistant. What do you want to do first?
 
@@ -153,7 +132,7 @@ I'm your pocket feed assistant. What do you want to do first?
 2️⃣ Calculate feed formula cost
 3️⃣ Set a customer reminder
 
-Just type 1, 2, or 3 to start!{trial_msg}""",
+Just type 1, 2, or 3 to start!""",
                 "options": ["1", "2", "3"]
             }
         }
@@ -231,11 +210,6 @@ Or type 'help' for more options.""",
         sub_info = get_subscription_info(user_id)
         referral_link = get_referral_link(user_id)
         
-        trial_msg = ""
-        if sub_info.get("is_in_trial"):
-            days_left = sub_info.get("trial_days_left", 7)
-            trial_msg = f"\n\n⏰ **Trial: {days_left} days left**"
-        
         referral_msg = ""
         if referral_link:
             referral_msg = f"""
@@ -257,7 +231,7 @@ Here's what else you can do:
 • /remind - Set customer reminders
 • /customer - Manage your customers
 • /help - See all features
-• /subscription - Check your plan{trial_msg}{referral_msg}
+• /subscription - Check your plan{referral_msg}
 
 💡 Tip: Try asking "What's the corn price trend?" for insights!"""
             }

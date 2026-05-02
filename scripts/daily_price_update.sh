@@ -2,8 +2,9 @@
 # FeedSales AI - Daily Price Update Cron Job
 # Run this script daily to update ingredient prices
 
-# Navigate to project directory
-cd /home/kenny/.openclaw/workspace/feed-sales-ai-mvp
+# Navigate to project directory (auto-detect from script location)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
 
 # Activate virtual environment if exists
 if [ -d ".venv" ]; then

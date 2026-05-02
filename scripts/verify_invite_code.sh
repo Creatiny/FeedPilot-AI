@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # FeedSales Bot 用户授权脚本 (无需重启版)
-# 
+#
 # 用法: ./verify_invite_code.sh <telegram_user_id> <invite_code>
 #
 # 示例:
@@ -10,8 +10,12 @@
 
 set -e
 
+# 获取项目根目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
 # 配置
-PAIRING_STORE="$HOME/.openclaw/credentials/telegram-feedsales-allowFrom.json"
+PAIRING_STORE="$PROJECT_ROOT/data/telegram-feedsales-allowFrom.json"
 INVITE_CODES="FEED2024,SALES2024"  # 可配置多个，逗号分隔
 
 # 颜色输出
@@ -81,7 +85,7 @@ echo "用户现在可以使用 FeedSales Bot。"
 echo "请让用户重新发送消息。"
 
 # 记录授权日志
-LOG_FILE="$HOME/.openclaw/workspace-feedsales/data/auth.log"
+LOG_FILE="$PROJECT_ROOT/data/auth.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "$(date '+%Y-%m-%d %H:%M:%S') | User: $USER_ID | Code: $CODE" >> "$LOG_FILE"
 

@@ -216,7 +216,7 @@ class SubscriptionService:
         self.get_subscription_status(user_id)
         
         # Create unique referral code from user_id
-        hash_obj = hashlib.md5(user_id.encode())
+        hash_obj = hashlib.sha256(user_id.encode())
         referral_code = hash_obj.hexdigest()[:8]
         
         return f"ref_{referral_code}"
