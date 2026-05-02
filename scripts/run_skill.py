@@ -7,12 +7,15 @@ Usage: python3 run_skill.py <skill_name> "<user_message>"
 """
 
 import asyncio
+import html
 import importlib.util
 import json
+import logging
 import os
 import re
 import sqlite3
 import sys
+import unicodedata
 from typing import Optional
 
 WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,6 +23,65 @@ sys.path.insert(0, WORKSPACE)
 sys.path.insert(0, os.path.join(WORKSPACE, "skills"))
 
 DB_PATH = os.path.join(WORKSPACE, "data", "feed_sales.db")
+
+# --- Prompt-injection guard for skill runner ---
+# Blocks common LLM prompt-injection patterns that could escape the skill context.
+_BLOCKED_PATTERNS = [
+    re.compile(r"ignore\s+(all\s+)?(previous|above|prior)\s+(instructions|prompts|commands)", re.I | re.DOTALL),
+    re.compile(r"forget\s+(all\s+)?(previous|above|prior)\s+(instructions|prompts|commands)", re.I | re.DOTALL),
+    re.compile(r"you\s+are\s+now\s+(a\s+)?new\s+(assistant|ai|bot)", re.I | re.DOTALL),
+    re.compile(r"system\s*prompt\s*:\s*", re.I | re.DOTALL),
+    re.compile(r"<\|system\|>", re.I | re.DOTALL),
+    re.compile(r"<\|im_start\|>\s*system", re.I | re.DOTALL),
+    re.compile(r"\{\{\s*system\s*\}\}", re.I | re.DOTALL),
+    re.compile(r"\[\s*system\s*\]", re.I | re.DOTALL),
+    re.compile(r"disregard\s+(the\s+)?(above|previous|earlier)", re.I | re.DOTALL),
+    re.compile(r"do\s+not\s+follow\s+(the\s+)?(above|previous|earlier)\s+instructions", re.I | re.DOTALL),
+]
+
+_MAX_MESSAGE_BYTES = 3800  # Telegram hard limit is 4096 UTF-8 bytes; keep margin
+
+# Map Cyrillic homoglyphs (and other lookalikes) back to ASCII to defeat bypasses.
+_HOMOGLYPH_MAP = str.maketrans({
+    "і": "i", "І": "I",  # Cyrillic i
+    "о": "o", "О": "O",  # Cyrillic o
+    "е": "e", "Е": "E",  # Cyrillic e
+    "р": "p", "Р": "P",  # Cyrillic p
+    "а": "a", "А": "A",  # Cyrillic a
+    "с": "c", "С": "C",  # Cyrillic c
+    "х": "x", "Х": "X",  # Cyrillic kh
+    "у": "y", "У": "Y",  # Cyrillic u
+    "ј": "j", "Ј": "J",  # Cyrillic je
+    "к": "k", "К": "K",  # Cyrillic k
+    "т": "t", "Т": "T",  # Cyrillic t
+    "ѕ": "s", "Ѕ": "S",  # Cyrillic dze
+    "в": "b", "В": "B",  # Cyrillic v
+    "м": "m", "М": "M",  # Cyrillic m
+    "н": "n", "Н": "N",  # Cyrillic n
+    "г": "r", "Г": "R",  # Cyrillic g (looks like r in some fonts, but map anyway)
+    "з": "z", "З": "Z",  # Cyrillic z
+})
+
+logger = logging.getLogger(__name__)
+
+
+def _validate_user_message(user_message: str) -> Optional[str]:
+    """Return error string if message looks like a prompt injection, else None."""
+    if not isinstance(user_message, str):
+        return "Invalid input type."
+    byte_len = len(user_message.encode("utf-8"))
+    if byte_len > _MAX_MESSAGE_BYTES:
+        return f"Message too long ({byte_len} bytes, max {_MAX_MESSAGE_BYTES})."
+    # Normalize Unicode to defeat homoglyph bypasses (e.g. Cyrillic іgnоrе)
+    normalized = unicodedata.normalize("NFKC", user_message)
+    # Fold lookalike characters back to ASCII so regexes match
+    folded = normalized.translate(_HOMOGLYPH_MAP)
+    for pattern in _BLOCKED_PATTERNS:
+        if pattern.search(folded):
+            logger.warning("Prompt injection blocked: %r", user_message[:200])
+            return "Potentially unsafe input detected. Please rephrase your request."
+    return None
+
 
 from src.database.pool import DatabasePool
 from src.services.calculation_service import CalculationService
@@ -330,27 +392,6 @@ class SimpleSubscriptionService:
             'pro_bonus_months': subscription['pro_bonus_months'] or 0,
         }
 
-    def start_trial(self, user_id: str, days: int = 7) -> dict:
-        self.get_subscription_status(user_id)  # ensure user exists
-
-        now = datetime.now()
-        trial_ends = now + timedelta(days=days)
-
-        conn = self._get_conn()
-        cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE subscriptions SET is_in_trial = 1, trial_started_at = ?, trial_ends_at = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?",
-            (now.isoformat(), trial_ends.isoformat(), user_id)
-        )
-        conn.commit()
-        conn.close()
-
-        return {
-            'success': True,
-            'trial_days': days,
-            'trial_ends_at': trial_ends.isoformat()
-        }
-
     def check_query_limit(self, user_id: str) -> dict:
         status = self.get_subscription_status(user_id)
         queries_per_day = status['queries_per_day']
@@ -392,6 +433,18 @@ class SimpleSubscriptionService:
         )
         conn.commit()
         conn.close()
+
+    def get_daily_usage(self, user_id: str) -> int:
+        today = datetime.now().date().isoformat()
+        conn = self._get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT query_count FROM daily_usage WHERE user_id = ? AND usage_date = ?",
+            (user_id, today)
+        )
+        result = cursor.fetchone()
+        conn.close()
+        return result['query_count'] if result else 0
 
 
 class SimpleReferralService:
@@ -554,52 +607,35 @@ class SimpleReferralService:
 
 # ============== Subscription Skill ==============
 class SubscriptionSkill:
-    """Check subscription status, start trial."""
+    """Check subscription status."""
 
     def __init__(self):
         self._sub_service = SimpleSubscriptionService(DB_PATH)
 
     async def execute(self, user_id: str, message: str) -> dict:
-        msg_lower = message.lower().strip()
-
-        if msg_lower in ['trial', '/trial', 'start trial']:
-            result = self._sub_service.start_trial(user_id, days=7)
-            if result.get('success'):
-                trial_ends = result['trial_ends_at'][:10]
-                return {
-                    'success': True,
-                    'data': {
-                        '_markdown': f"Your 7-day free trial has started! You now have access to Starter features.\n\nTrial ends: {trial_ends}",
-                    }
-                }
-            return {'success': False, 'error': result.get('error', 'Failed to start trial')}
-
-        # Default: show subscription status
+        # Show subscription status
         status = self._sub_service.get_subscription_status(user_id)
         lines = [
-            f"Plan: {status['plan_display_name']}",
-            f"Queries per day: {'Unlimited' if status['queries_per_day'] == -1 else status['queries_per_day']}",
+            f"<b>Plan:</b> {html.escape(str(status['plan_display_name']))}",
+            f"<b>Queries per day:</b> {'Unlimited' if status['queries_per_day'] == -1 else status['queries_per_day']}",
         ]
 
-        if status['is_in_trial']:
-            lines.append(f"Trial: {status['trial_days_left']} days left")
-
         if status['referral_bonus_days'] > 0:
-            lines.append(f"Referral bonus: {status['referral_bonus_days']} days")
+            lines.append(f"<b>Referral bonus:</b> {status['referral_bonus_days']} days")
 
         if status['pro_bonus_months'] > 0:
-            lines.append(f"Pro bonus: {status['pro_bonus_months']} months")
+            lines.append(f"<b>Pro bonus:</b> {status['pro_bonus_months']} months")
 
         remaining = self._sub_service.check_query_limit(user_id)
         if remaining['allowed']:
             if remaining['queries_remaining'] > 0:
-                lines.append(f"Queries remaining today: {remaining['queries_remaining']}")
+                lines.append(f"<b>Queries remaining today:</b> {remaining['queries_remaining']}")
         else:
-            lines.append(f"Daily limit reached. Upgrade to Pro for unlimited.")
+            lines.append("<b>Daily limit reached.</b> Upgrade to Pro for unlimited.")
 
         return {
             'success': True,
-            'data': {'_markdown': '\n'.join(lines)}
+            'data': {'_html': '\n'.join(lines)}
         }
 
 
@@ -616,14 +652,14 @@ class ReferralSkill:
 
         if msg_lower in ['link', '/referral', 'my link', 'stats', 'my stats', 'referral stats']:
             stats = self._referral_service.get_referral_stats(user_id)
-            referral_link = self._referral_service.get_referral_link(user_id)
+            referral_link = html.escape(self._referral_service.get_referral_link(user_id))
             lines = [
-                f"Your referral link: {referral_link}",
-                f"Referrals: {stats['referral_count']}",
-                f"Bonus days earned: {stats['total_bonus_days']}",
+                f"<b>Your referral link:</b> {referral_link}",
+                f"<b>Referrals:</b> {stats['referral_count']}",
+                f"<b>Bonus days earned:</b> {stats['total_bonus_days']}",
             ]
             if stats['pro_bonus_months'] > 0:
-                lines.append(f"Pro bonus: {stats['pro_bonus_months']} months")
+                lines.append(f"<b>Pro bonus:</b> {stats['pro_bonus_months']} months")
                 lines.append("You have permanent Pro access!")
             elif stats['referral_count'] >= 3:
                 lines.append("Each new referral = 1 month Pro for you!")
@@ -633,7 +669,7 @@ class ReferralSkill:
 
             return {
                 'success': True,
-                'data': {'_markdown': '\n'.join(lines)}
+                'data': {'_html': '\n'.join(lines)}
             }
 
         # Process a referral code (e.g., "ref_abc12345")
@@ -649,17 +685,17 @@ class ReferralSkill:
                 return {
                     'success': True,
                     'data': {
-                        '_markdown': f"Referral bonus applied!\n\n{result['message']}"
+                        '_html': f"<b>Referral bonus applied!</b>\n\n{html.escape(result['message'])}"
                     }
                 }
             return {'success': False, 'error': result.get('message', 'Failed to process referral')}
 
         # Default: show referral info
-        referral_link = self._referral_service.get_referral_link(user_id)
+        referral_link = html.escape(self._referral_service.get_referral_link(user_id))
         return {
             'success': True,
             'data': {
-                '_markdown': f"Your referral link: {referral_link}\n\nShare it with friends — both of you get 7 bonus days!\n3+ referrals = 1 month Pro per referral!"
+                '_html': f"<b>Your referral link:</b>\n{referral_link}\n\nShare it with friends \u2014 both of you get 7 bonus days!\n3+ referrals = 1 month Pro per referral!"
             }
         }
 
@@ -676,7 +712,6 @@ class OnboardingSkill:
 
     BASIC_PLAN_ID = 1
     PRO_PLAN_ID = 2
-    TRIAL_DAYS = 7
     UPSELL_THRESHOLD = 3  # queries before prompting Pro upgrade
 
     # Step constants
@@ -786,23 +821,39 @@ class OnboardingSkill:
         return self._referral_service.get_referral_link(user_id)
 
     def _build_upgrade_cta(self, user_id: str) -> str:
-        """Build a Pro upgrade CTA with user's referral link."""
-        referral_link = self._get_referral_link(user_id)
+        """Build upgrade CTA with user's referral link."""
+        referral_link = html.escape(self._get_referral_link(user_id))
         return f"""
 ━━━━━━━━━━━━━━━━━━━━━━━
-🚀 **Unlock Pro — $29/month**
+🚀 <b>Upgrade Your Plan</b>
 ━━━━━━━━━━━━━━━━━━━━━━━
-✓ Unlimited queries (no daily cap)
-✓ All feed formulas (Nursery, Breeder, Broiler, Layer...)
-✓ Customer management CRM
-✓ AI-powered nutrition analysis vs NRC standards
-✓ Priority support
 
+<b>Starter — $9.99/month (700 ⭐)</b>
+• 100 queries/day
+• All Basic features
+• More formulas access
+
+👉 <a href="https://t.me/feedpilot_payment_bot?start=starter_monthly">Pay with Stars (700 ⭐)</a>
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
+
+━━━━━━━━━━━━━━━━━━━━━━━
+
+<b>Pro — $29.99/month (2,100 ⭐)</b>
+• Unlimited queries
+• All feed formulas (Nursery, Breeder, Broiler, Layer...)
+• Customer CRM
+• AI nutrition analysis
+• Priority support
+
+👉 <a href="https://t.me/feedpilot_payment_bot?start=pro_monthly">Pay with Stars (2,100 ⭐)</a>
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
+
+━━━━━━━━━━━━━━━━━━━━━━━
 Share to extend your access:
 🔗 {referral_link}
 
-Each friend who joins = +7 days Pro FREE!
-3+ referrals = each gets 1 month Pro FREE."""
+Each friend who joins = +7 days Pro!
+3+ referrals = each gets 1 month Pro."""
 
     async def execute(self, user_id: str, message: str) -> dict:
         message_lower = message.lower().strip()
@@ -811,42 +862,21 @@ Each friend who joins = +7 days Pro FREE!
 
         # === STEP 0: Welcome — show plan selection to new/free users ===
         if state["step"] == self.STEP_WELCOME:
-            # Check if user already has an active trial or Pro
-            is_trial = sub.get("is_in_trial")
             plan_name = sub.get("plan_name", "free")
-            trial_days_left = sub.get("trial_days_left", 0)
 
             if plan_name == "pro":
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": """🦅 **You're a Pro user!**
+                        "_html": """🦅 <b>You're a Pro user!</b>
 
 Welcome back. Here's your quick-start menu:
 
-1️⃣ **Price Check** — corn, soybean meal, wheat...
-2️⃣ **Formula Cost** — nursery, grower, finisher, broiler, layer...
-3️⃣ **Customer CRM** — add, search, manage customers
-4️⃣ **Nutrition Analysis** — compare vs NRC standards
-5️⃣ **Referral Stats** — see your referral count & bonus days
-
-What would you like to try?"""
-                    }
-                }
-
-            if is_trial and trial_days_left > 0:
-                return {
-                    "success": True,
-                    "data": {
-                        "_markdown": f"""👋 Welcome back! Your **Pro trial** has {trial_days_left} days left.
-
-Here's what you can do:
-
-1️⃣ **Price Check** — live ingredient prices
-2️⃣ **Formula Cost** — all formula types (Starter, Grower, Finisher...)
-3️⃣ **Customer CRM** — manage your feed customers
-4️⃣ **Nutrition Analysis** — AI vs NRC standard comparison
-5️⃣ **Referral Program** — share your link for bonus days
+1️⃣ <b>Price Check</b> — corn, soybean meal, wheat...
+2️⃣ <b>Formula Cost</b> — nursery, grower, finisher, broiler, layer...
+3️⃣ <b>Customer CRM</b> — add, search, manage customers
+4️⃣ <b>Nutrition Analysis</b> — compare vs NRC standards
+5️⃣ <b>Referral Stats</b> — see your referral count & bonus days
 
 What would you like to try?"""
                     }
@@ -857,30 +887,36 @@ What would you like to try?"""
             return {
                 "success": True,
                 "data": {
-                    "_markdown": """🐔 **Welcome to FeedPilot AI!**
+                    "_html": """🐔 <b>Welcome to FeedPilot AI!</b>
 Your pocket feed formulation assistant.
 
 ━━━━━━━━━━━━━━━━━━━━━━━
-**Choose your plan:**
+<b>Choose your plan:</b>
 ━━━━━━━━━━━━━━━━━━━━━━━
 
-**Type A** — Basic (FREE)
+<b>Type A</b> — Basic (FREE)
 • 10 price queries/day
 • Price lookup (corn, soybean meal, wheat...)
 • Basic formula cost calculation
 • Good for trying things out
 
-**Type P** — Pro Trial (7 DAYS FREE)
+<b>Type S</b> — Starter ($9.99/month)
+• 100 queries/day
+• All Basic features
+• More formulas access
+• 💳 Pay with Telegram Stars or Gumroad
+
+<b>Type P</b> — Pro ($29.99/month)
 • Everything in Basic, PLUS:
 • ✦ Unlimited queries
 • ✦ All feed formulas (Nursery, Breeder, Broiler, Layer, Finisher...)
 • ✦ Customer CRM management
 • ✦ AI nutrition analysis vs NRC standards
 • ✦ Price trend alerts
-• No credit card required
+• 💳 Pay with Telegram Stars or Gumroad (credit card/PayPal)
 
 ━━━━━━━━━━━━━━━━━━━━━━━
-**Type A or P to get started →**
+<b>Type A, S, or P to get started →</b>
 ━━━━━━━━━━━━━━━━━━━━━━━
 """
                 }
@@ -895,24 +931,58 @@ Your pocket feed formulation assistant.
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": """✅ **Basic plan activated** (10 queries/day)
+                        "_html": """✅ <b>Basic plan activated</b> (10 queries/day)
 
 Let's start with a quick demo — try checking an ingredient price:
 
-**Type an ingredient name** (e.g. corn, soybean meal, wheat, fish meal)
-or type **'all'** to see all prices."""
+<b>Type an ingredient name</b> (e.g. corn, soybean meal, wheat, fish meal)
+or type <b>'all'</b> to see all prices."""
                     }
                 }
 
-            elif message_lower in ["p", "pro", "trial", "2", "pro trial"]:
+            elif message_lower in ["s", "starter", "3"]:
+                chosen = "starter"
+                self._update_onboarding_state(user_id, self.STEP_GUIDED_ACTION, track="starter")
+                return {
+                    "success": True,
+                    "data": {
+                        "_html": """✅ <b>Starter plan selected!</b>
+
+<b>💳 Choose your payment method:</b>
+
+1️⃣ <b>Telegram Stars</b> — pay inside Telegram
+👉 <a href="https://t.me/feedpilot_payment_bot?start=starter_monthly">Pay with Stars (700 ⭐)</a>
+
+2️⃣ <b>Gumroad</b> — credit card / PayPal
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
+
+You now have:
+✓ 100 queries/day
+✓ Basic formulas + price lookup
+✓ More access than Basic
+
+<b>Let's start with your first feature — try checking an ingredient price:</b>
+
+<b>Type an ingredient name</b> (e.g. corn, soybean meal, wheat, fish meal)
+or type <b>'all'</b> to see all prices."""
+                    }
+                }
+
+            elif message_lower in ["p", "pro", "2"]:
                 chosen = "pro"
-                self._sub_service.start_trial(user_id, days=self.TRIAL_DAYS)
                 self._update_onboarding_state(user_id, self.STEP_GUIDED_ACTION, track="pro")
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": f"""🎁 **{self.TRIAL_DAYS}-day Pro trial ACTIVATED!**
-No credit card required.
+                        "_html": """✅ <b>Pro plan selected!</b>
+
+<b>💳 Choose your payment method:</b>
+
+1️⃣ <b>Telegram Stars</b> — pay inside Telegram
+👉 <a href="https://t.me/feedpilot_payment_bot?start=pro_monthly">Pay with Stars (2,100 ⭐)</a>
+
+2️⃣ <b>Gumroad</b> — credit card / PayPal
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
 
 You now have full access to:
 ✓ Unlimited queries
@@ -920,28 +990,46 @@ You now have full access to:
 ✓ Customer CRM
 ✓ AI nutrition analysis
 
-**Let's start with your first Pro feature — try calculating a formula cost:**
+<b>Let's start with your first feature — try calculating a formula cost:</b>
 
 Type your formula, for example:
 `corn 60%, soybean meal 25%, premix 5%, limestone 10%`
 
-Or type **'example'** to see a sample nursery diet calculation with full cost breakdown."""
+Or type <b>'example'</b> to see a sample nursery diet calculation with full cost breakdown."""
                     }
                 }
 
-            elif message_lower in ["upgrade", "up", "pro", "subscribe", "buy"]:
-                # Free user requesting Pro directly
-                self._sub_service.start_trial(user_id, days=self.TRIAL_DAYS)
+            elif message_lower in ["upgrade", "up", "subscribe", "buy"]:
+                # Free user requesting upgrade — show both plans
                 self._update_onboarding_state(user_id, self.STEP_GUIDED_ACTION, track="pro")
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": f"""🎁 **{self.TRIAL_DAYS}-day Pro trial ACTIVATED!**
+                        "_html": """✅ <b>Upgrade your plan!</b>
 
+<b>Starter — $9.99/month (700 ⭐)</b>
+• 100 queries/day
+• All Basic features
+
+👉 <a href="https://t.me/feedpilot_payment_bot?start=starter_monthly">Pay with Stars (700 ⭐)</a>
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
+
+━━━━━━━━━━━━━━━━━━━━━━━
+
+<b>Pro — $29.99/month (2,100 ⭐)</b>
+• Unlimited queries
+• All feed formulas
+• Customer CRM
+• AI nutrition analysis
+
+👉 <a href="https://t.me/feedpilot_payment_bot?start=pro_monthly">Pay with Stars (2,100 ⭐)</a>
+👉 <a href="https://feedpilot.gumroad.com/l/ktkuo">Pay with Gumroad</a>
+
+━━━━━━━━━━━━━━━━━━━━━━━
 Let's calculate your first formula. Type your ingredients:
 `corn 60%, soybean meal 25%, premix 5%`
 
-Or type **'example'** for a full nursery diet cost breakdown."""
+Or type <b>'example'</b> for a full nursery diet cost breakdown."""
                     }
                 }
 
@@ -949,7 +1037,7 @@ Or type **'example'** for a full nursery diet cost breakdown."""
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": "Please type **A** for Basic (free) or **P** for Pro trial (7 days free) to continue."
+                        "_html": "Please type <b>A</b> for Basic (free), <b>S</b> for Starter, or <b>P</b> for Pro to continue."
                     }
                 }
 
@@ -965,13 +1053,13 @@ Or type **'example'** for a full nursery diet cost breakdown."""
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": f"""🔔 **You've used {q_count} queries on Basic**
+                        "_html": f"""🔔 <b>You've used {html.escape(str(q_count))} queries on Basic</b>
 
 You've seen the basics — ready to unlock full access?
 
 {self._build_upgrade_cta(user_id)}
 
-**Just type P or 'upgrade' to start your free Pro trial →**"""
+<b>Just type P or 'upgrade' to unlock Pro features →</b>"""
                     }
                 }
 
@@ -980,57 +1068,57 @@ You've seen the basics — ready to unlock full access?
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": f"""📊 **Basic plan: {10 - q_count} queries left today**
+                        "_html": f"""📊 <b>Basic plan: {html.escape(str(10 - q_count))} queries left today</b>
 
 Try checking prices or calculating a simple formula cost.
 
-**Quick examples:**
+<b>Quick examples:</b>
 • "corn price" — check corn
 • "soybean meal price" — check SBM
 • "example formula" — see a sample calculation
 
-**Type 'upgrade'** anytime to unlock Pro features!"""
+<b>Type 'upgrade'</b> anytime to unlock Pro features!"""
                     }
                 }
             else:  # pro track
                 return {
                     "success": True,
                     "data": {
-                        "_markdown": """🧮 **Pro trial active — unlimited queries!**
+                        "_html": """🧮 <b>Pro features — unlimited queries!</b>
 
 Try one of these Pro features:
 
-**Formula Cost** — type your formula:
+<b>Formula Cost</b> — type your formula:
 `corn 60%, soybean meal 25%, premix 5%, limestone 10%`
 
-**Customer CRM** — type:
+<b>Customer CRM</b> — type:
 `add customer John Farm, phone 555-1234`
 
-**Nutrition Analysis** — type:
+<b>Nutrition Analysis</b> — type:
 `analyze Nursery Diet 1 vs NRC standards`
 
-Or type **'example'** for a full nursery diet breakdown with cost + nutrition data."""
+Or type <b>'example'</b> for a full nursery diet breakdown with cost + nutrition data."""
                     }
                 }
 
         # === STEP 3: Demo complete — show referral + Pro upsell ===
         if state["step"] == self.STEP_DEMO_COMPLETE:
-            referral_link = self._get_referral_link(user_id)
+            referral_link = html.escape(self._get_referral_link(user_id))
             return {
                 "success": True,
                 "data": {
-                    "_markdown": f"""🎉 **You've completed the demo!**
+                    "_html": f"""🎉 <b>You've completed the demo!</b>
 
 Your quick-start menu:
-• **corn price** — check any ingredient
-• **formula cost** — calculate feed cost
-• **add customer** — CRM management
-• **subscription** — check your plan & usage
-• **referral** — share for bonus days
+• <b>corn price</b> — check any ingredient
+• <b>formula cost</b> — calculate feed cost
+• <b>add customer</b> — CRM management
+• <b>subscription</b> — check your plan & usage
+• <b>referral</b> — share for bonus days
 
 {self._build_upgrade_cta(user_id)}
 
-Keep going with any command, or type **'upgrade'** to start your Pro trial!"""
+Keep going with any command, or type <b>'upgrade'</b> to start your Pro trial!"""
                 }
             }
 
@@ -1038,7 +1126,7 @@ Keep going with any command, or type **'upgrade'** to start your Pro trial!"""
         return {
             "success": True,
             "data": {
-                "_markdown": """Type **'onboard'** to restart the guided tour, or type any command to continue."""
+                "_html": """Type <b>'onboard'</b> to restart the guided tour, or type any command to continue."""
             }
         }
 
@@ -1089,6 +1177,16 @@ def get_customer_skill():
     return module.CustomerRecordSkill(SkillCustomerService())
 
 
+def get_subscription_skill():
+    module = _load_module(
+        "subscription",
+        os.path.join(WORKSPACE, "skills/subscription_skill/skill.py"),
+    )
+    sub_service = SimpleSubscriptionService(DB_PATH)
+    referral_service = SimpleReferralService(DB_PATH)
+    return module.SubscriptionSkill(sub_service, referral_service)
+
+
 SKILL_MAP = {
     'price_lookup': get_price_lookup_skill,
     'price': get_price_lookup_skill,
@@ -1101,15 +1199,13 @@ SKILL_MAP = {
     'reminder': get_reminder_skill,
     'reminders': get_reminder_skill,
     'alert': get_reminder_skill,
-    'subscription': SubscriptionSkill,
+    'subscription': get_subscription_skill,
     'onboarding': OnboardingSkill,
     '/onboard': OnboardingSkill,
     'onboard': OnboardingSkill,
     'getstarted': OnboardingSkill,
     'start': OnboardingSkill,
     'upgrade': OnboardingSkill,
-    'free trial': OnboardingSkill,
-    'pro trial': OnboardingSkill,
     'referral': ReferralSkill,
     '/referral': ReferralSkill,
     'my referral': ReferralSkill,
@@ -1119,6 +1215,11 @@ SKILL_MAP = {
 
 
 async def run_skill(skill_name: str, user_message: str, user_id: str = "cli_user"):
+    # LLM trust-boundary guard: validate input before any skill execution
+    validation_error = _validate_user_message(user_message)
+    if validation_error:
+        return {"success": False, "error": validation_error}
+
     skill_factory = SKILL_MAP.get(skill_name)
     if not skill_factory:
         return {"success": False, "error": f"Unknown skill: {skill_name}. Available: {list(SKILL_MAP.keys())}"}
